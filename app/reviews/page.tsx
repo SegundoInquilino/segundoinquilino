@@ -14,6 +14,8 @@ type Review = {
   created_at: string
   user_id: string
   likes_count: number
+  images?: string[]
+  apartment_id?: string
   apartments: {
     id: string
     address: string
@@ -21,6 +23,7 @@ type Review = {
     city: string
     state: string
     zip_code: string
+    property_type: string
   }
 }
 
@@ -105,6 +108,7 @@ export default function ReviewsPage() {
           apartments!apartment_id (
             id,
             address,
+            neighborhood,
             city,
             state,
             zip_code,
@@ -123,7 +127,29 @@ export default function ReviewsPage() {
       const { data: { user }, error: userError } = await supabase.auth.getUser()
       if (userError) console.error('Erro ao carregar usuário:', userError)
 
-      setReviews(reviewsData || [])
+      setReviews(
+        (reviewsData?.map(review => ({
+          id: review.id,
+          rating: review.rating,
+          comment: review.comment,
+          created_at: review.created_at,
+          user_id: review.user_id,
+          images: review.images,
+          apartment_id: review.apartment_id,
+          apartments: {
+            id: review.apartments[0]?.id,
+            address: review.apartments[0]?.address,
+            neighborhood: review.apartments[0]?.neighborhood || '',
+            city: review.apartments[0]?.city,
+            state: review.apartments[0]?.state,
+            zip_code: review.apartments[0]?.zip_code,
+            property_type: review.apartments[0]?.property_type
+          },
+          likes_count: typeof review.likes_count === 'number' 
+            ? review.likes_count 
+            : review.likes_count?.[0]?.count || 0
+        })) as Review[]) || []
+      )
       setCurrentUserId(user?.id || null)
       setUserMap(newUserMap)
     } catch (error) {
