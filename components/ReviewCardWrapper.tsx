@@ -141,18 +141,6 @@ export default function ReviewCardWrapper({
             </button>
 
             <div className="p-6">
-              <h2 className="text-xl font-semibold mb-2">
-                {review.apartments.address}
-              </h2>
-
-              <div className="text-gray-600 mb-4">
-                {review.apartments.city}, {review.apartments.state}
-                <br />
-                {review.apartments.zip_code}
-              </div>
-
-              <p className="text-gray-700 mb-4">{review.comment}</p>
-
               <ReviewModal
                 review={{
                   ...review,
