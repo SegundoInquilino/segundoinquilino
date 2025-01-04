@@ -89,7 +89,7 @@ export default function ProfilePage() {
           created_at,
           images,
           user_id,
-          apartments (
+          apartments!inner (
             id,
             address,
             city,
@@ -109,7 +109,14 @@ export default function ProfilePage() {
       setReviews(
         (reviewsData?.map(review => ({
           ...review,
-          apartments: review.apartments as Apartment
+          apartments: {
+            id: review.apartments[0]?.id,
+            address: review.apartments[0]?.address,
+            city: review.apartments[0]?.city,
+            state: review.apartments[0]?.state,
+            zip_code: review.apartments[0]?.zip_code,
+            property_type: review.apartments[0]?.property_type
+          } as Apartment
         })) as Review[]) || []
       )
       setReviewsCount(reviewsData?.length || 0)
