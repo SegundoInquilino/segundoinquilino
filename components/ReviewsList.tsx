@@ -7,11 +7,23 @@ type ReviewsListProps = {
   reviews: Review[]
   userMap: Record<string, string>
   currentUserId?: string | null
+  onReviewDeleted?: () => void
+  layout?: 'grid' | 'square'
 }
 
-export default function ReviewsList({ reviews, userMap, currentUserId }: ReviewsListProps) {
+export default function ReviewsList({ 
+  reviews, 
+  userMap, 
+  currentUserId, 
+  onReviewDeleted,
+  layout = 'grid'
+}: ReviewsListProps) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className={`grid gap-6 ${
+      layout === 'square' 
+        ? 'grid-cols-1 md:grid-cols-2' 
+        : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+    }`}>
       {reviews?.map((review) => (
         <ReviewCardWrapper
           key={review.id}
@@ -19,6 +31,8 @@ export default function ReviewsList({ reviews, userMap, currentUserId }: Reviews
           username={userMap[review.user_id]}
           currentUserId={currentUserId}
           userMap={userMap}
+          onReviewDeleted={onReviewDeleted}
+          layout={layout}
         />
       ))}
     </div>

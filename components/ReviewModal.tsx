@@ -27,6 +27,7 @@ type ReviewModalProps = {
   isDeleting?: boolean
   onDelete?: () => Promise<void>
   onClose?: () => void
+  onDeleteSuccess?: () => void
 }
 
 export default function ReviewModal({
@@ -37,7 +38,8 @@ export default function ReviewModal({
   selectedCommentId,
   isDeleting,
   onDelete,
-  onClose
+  onClose,
+  onDeleteSuccess
 }: ReviewModalProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
 
@@ -137,11 +139,10 @@ export default function ReviewModal({
       <div className="mt-8 border-t pt-6">
         <ReviewComments
           reviewId={review.id}
-          review={review}
           currentUserId={currentUserId}
           userMap={userMap}
-          selectedCommentId={selectedCommentId}
         />
+        {console.log('Modal currentUserId:', currentUserId)}
       </div>
 
       {/* Botão de deletar */}
@@ -149,7 +150,12 @@ export default function ReviewModal({
         <div className="mt-8 pt-6 border-t">
           <div className="flex justify-end">
             <button
-              onClick={onDelete}
+              onClick={async () => {
+                if (onDelete) {
+                  await onDelete()
+                  onDeleteSuccess?.()
+                }
+              }}
               disabled={isDeleting}
               className="px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2"
             >

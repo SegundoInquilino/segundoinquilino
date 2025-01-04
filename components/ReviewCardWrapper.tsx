@@ -15,6 +15,8 @@ interface ReviewCardWrapperProps {
   isSelected?: boolean
   selectedCommentId?: string | null
   onClose?: () => void
+  onReviewDeleted?: () => void
+  layout?: 'grid' | 'square'
 }
 
 export default function ReviewCardWrapper({
@@ -24,7 +26,9 @@ export default function ReviewCardWrapper({
   userMap,
   isSelected,
   selectedCommentId,
-  onClose
+  onClose,
+  onReviewDeleted,
+  layout = 'grid'
 }: ReviewCardWrapperProps) {
   const [showModal, setShowModal] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
@@ -78,6 +82,7 @@ export default function ReviewCardWrapper({
       // Redirecionar ou atualizar a lista
       router.refresh() // Atualiza os dados da página
       setShowModal(false)
+      onReviewDeleted?.()
     } catch (error) {
       console.error('Erro ao deletar review:', error)
       alert('Erro ao deletar review. Tente novamente.')
@@ -87,13 +92,19 @@ export default function ReviewCardWrapper({
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
-      <div className="relative">
+    <div className={`bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow ${
+      layout === 'square' ? 'aspect-square' : ''
+    }`}>
+      <div className={`relative ${
+        layout === 'square' ? 'h-1/2' : ''
+      }`}>
         {review.images && review.images[0] && (
           <img
             src={review.images[0]}
             alt="Imóvel"
-            className="w-full h-48 object-cover"
+            className={`w-full object-cover ${
+              layout === 'square' ? 'h-full' : 'h-48'
+            }`}
           />
         )}
         
@@ -116,17 +127,16 @@ export default function ReviewCardWrapper({
         </div>
       </div>
 
-      <ReviewCard
-        review={review}
-        username={username}
-        currentUserId={currentUserId}
-        userMap={userMap}
-        onClick={() => setShowModal(true)}
-        onLike={() => {
-          // Se precisar fazer algo quando der like
-          console.log('Like dado')
-        }}
-      />
+      <div className={layout === 'square' ? 'h-1/2 overflow-auto' : ''}>
+        <ReviewCard
+          review={review}
+          username={username}
+          currentUserId={currentUserId}
+          userMap={userMap}
+          onClick={() => setShowModal(true)}
+          layout={layout}
+        />
+      </div>
 
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
@@ -142,16 +152,18 @@ export default function ReviewCardWrapper({
 
             <div className="p-6">
               <ReviewModal
-                review={{
-                  ...review,
-                  likes_count: review.likes_count || { count: 0 }
-                }}
+                review={review}
                 username={username}
                 currentUserId={currentUserId}
                 userMap={userMap}
                 selectedCommentId={selectedCommentId}
                 isDeleting={isDeleting}
                 onDelete={handleDelete}
+                onClose={() => setShowModal(false)}
+                onDeleteSuccess={() => {
+                  setShowModal(false)
+                  onReviewDeleted?.()
+                }}
               />
             </div>
           </div>

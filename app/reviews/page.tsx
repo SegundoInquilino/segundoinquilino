@@ -2,145 +2,57 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/utils/supabase-client'
-import ReviewCardWrapper from '@/components/ReviewCardWrapper'
+import ReviewsList from '@/components/ReviewsList'
 import ReviewFilters from '@/components/ReviewFilters'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import type { Review, PropertyType } from '@/types/review'
-
-interface Filters {
-  searchTerm: string
-  city: string
-  minRating: number
-  sortBy: 'recent' | 'rating' | 'likes'
-  propertyType: string
-}
+import type { Review } from '@/types/review'
+import ReviewModal from '@/components/ReviewModal'
 
 export default function ReviewsPage() {
   const [reviews, setReviews] = useState<Review[]>([])
-  const [cities, setCities] = useState<string[]>([])
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null)
   const [userMap, setUserMap] = useState<Record<string, string>>({})
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
-  const [selectedReview, setSelectedReview] = useState<string | null>(null)
-  const [selectedComment, setSelectedComment] = useState<string | null>(null)
   const [selectedReviewId, setSelectedReviewId] = useState<string | null>(null)
   const [selectedCommentId, setSelectedCommentId] = useState<string | null>(null)
-  const router = useRouter()
+  const [showModal, setShowModal] = useState(false)
+  const [selectedReview, setSelectedReview] = useState<Review | null>(null)
 
-  useEffect(() => {
-    loadInitialData()
-  }, [])
-
-  useEffect(() => {
-    // Verificar parâmetros da URL ao carregar a página
-    const params = new URLSearchParams(window.location.search)
-    const reviewId = params.get('reviewId')
-    const commentId = params.get('commentId')
-    const showModal = params.get('showModal')
-
-    if (reviewId && showModal === 'true') {
-      setSelectedReviewId(reviewId)
-      if (commentId) {
-        setSelectedCommentId(commentId)
-      }
-    }
-  }, [])
-
+  // Função para carregar os dados iniciais
   const loadInitialData = async () => {
     const supabase = createClient()
-    console.log('Carregando dados...') // Debug
 
     try {
-      // Carregar todos os usuários primeiro
-      const { data: usersData, error: usersError } = await supabase
-        .from('profiles')
-        .select('id, username')
-
-      if (usersError) {
-        console.error('Erro ao carregar usuários:', usersError)
-        return
-      }
-
-      // Criar mapa de usuários
-      const newUserMap: Record<string, string> = {}
-      usersData?.forEach(user => {
-        newUserMap[user.id] = user.username || 'Usuário'
-      })
-      console.log('UserMap criado:', newUserMap) // Debug
-
-      // Carregar cidades únicas
-      const { data: citiesData, error: citiesError } = await supabase
-        .from('apartments')
-        .select('city')
-        .not('city', 'is', null)
-        .order('city')
-
-      if (citiesError) {
-        console.error('Erro ao carregar cidades:', citiesError)
-      } else {
-        const uniqueCities = [...new Set(citiesData.map(a => a.city))]
-        setCities(uniqueCities)
-      }
+      // Carregar usuário atual
+      const { data: { user } } = await supabase.auth.getUser()
+      setCurrentUserId(user?.id)
 
       // Carregar reviews
-      const { data: reviewsData, error: reviewsError } = await supabase
+      const { data: reviewsData } = await supabase
         .from('reviews')
         .select(`
-          id,
-          rating,
-          comment,
-          created_at,
-          user_id,
-          images,
-          apartment_id,
-          apartments!apartment_id (
-            id,
-            address,
-            neighborhood,
-            city,
-            state,
-            zip_code,
-            property_type
-          ),
+          *,
+          apartments (*),
           likes_count:review_likes(count)
         `)
         .order('created_at', { ascending: false })
 
-      if (reviewsError) {
-        console.error('Erro ao carregar reviews:', reviewsError)
-        throw reviewsError
+      if (reviewsData) {
+        setReviews(reviewsData as Review[])
+
+        // Carregar userMap
+        const userIds = Array.from(new Set(reviewsData.map(r => r.user_id)))
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('id, username')
+          .in('id', userIds)
+
+        const newUserMap: Record<string, string> = {}
+        profiles?.forEach(profile => {
+          newUserMap[profile.id] = profile.username || 'Usuário'
+        })
+        setUserMap(newUserMap)
       }
-
-      // Carregar usuário atual
-      const { data: { user }, error: userError } = await supabase.auth.getUser()
-      if (userError) console.error('Erro ao carregar usuário:', userError)
-
-      setReviews(
-        (reviewsData?.map(review => ({
-          id: review.id,
-          rating: review.rating,
-          comment: review.comment,
-          created_at: review.created_at,
-          user_id: review.user_id,
-          images: review.images,
-          apartment_id: review.apartment_id,
-          apartments: {
-            id: review.apartments[0]?.id,
-            address: review.apartments[0]?.address,
-            neighborhood: review.apartments[0]?.neighborhood || '',
-            city: review.apartments[0]?.city,
-            state: review.apartments[0]?.state,
-            zip_code: review.apartments[0]?.zip_code,
-            property_type: review.apartments[0]?.property_type as PropertyType
-          },
-          likes_count: typeof review.likes_count === 'number' 
-            ? review.likes_count 
-            : review.likes_count?.[0]?.count || 0
-        })) as Review[]) || []
-      )
-      setCurrentUserId(user?.id || null)
-      setUserMap(newUserMap)
     } catch (error) {
       console.error('Erro ao carregar dados:', error)
     } finally {
@@ -148,221 +60,240 @@ export default function ReviewsPage() {
     }
   }
 
-  const handleFilterChange = async (filters: Filters) => {
+  // Carregar dados quando o componente montar
+  useEffect(() => {
+    loadInitialData()
+  }, [])
+
+  useEffect(() => {
+    // Verificar parâmetros da URL
+    const params = new URLSearchParams(window.location.search)
+    const reviewId = params.get('reviewId')
+    const commentId = params.get('commentId')
+    const showModalParam = params.get('showModal')
+
+    if (reviewId && showModalParam === 'true') {
+      // Buscar a review específica
+      const fetchReview = async () => {
+        const supabase = createClient()
+        const { data } = await supabase
+          .from('reviews')
+          .select(`
+            *,
+            apartments (*),
+            likes_count:review_likes(count)
+          `)
+          .eq('id', reviewId)
+          .single()
+
+        if (data) {
+          setSelectedReview(data as Review)
+          setSelectedCommentId(commentId)
+          setShowModal(true)
+        }
+      }
+
+      fetchReview()
+    }
+  }, [])
+
+  useEffect(() => {
+    if (selectedReviewId) {
+      const review = reviews.find(r => r.id === selectedReviewId)
+      if (review) {
+        setSelectedReview(review)
+        setShowModal(true)
+      }
+    }
+  }, [selectedReviewId, reviews])
+
+  const handleFilterChange = async (filters: {
+    search?: string
+    city?: string
+    rating?: number
+    orderBy?: 'recent' | 'rating' | 'likes'
+  }) => {
     const supabase = createClient()
     
     try {
-      console.log('Iniciando busca com filtros:', filters)
-      
-      // Primeiro, buscar os apartamentos que correspondem à busca
-      let apartmentsQuery = supabase
-        .from('apartments')
-        .select('id')
+      let query = supabase
+        .from('reviews')
+        .select(`
+          *,
+          apartments!inner (*),
+          likes_count:review_likes(count)
+        `)
 
-      if (filters.searchTerm) {
-        const searchTerm = filters.searchTerm.toLowerCase()
-        apartmentsQuery = apartmentsQuery.or(
-          `address.ilike.%${searchTerm}%,` +
-          `neighborhood.ilike.%${searchTerm}%,` +
-          `city.ilike.%${searchTerm}%,` +
-          `state.ilike.%${searchTerm}%,` +
-          `zip_code.ilike.%${searchTerm}%`
-        )
+      // Aplicar filtros de busca
+      if (filters.search?.trim()) {
+        const searchTerm = filters.search.trim()
+        query = query.filter('apartments.address', 'ilike', `%${searchTerm}%`)
       }
 
-      if (filters.city) {
-        apartmentsQuery = apartmentsQuery.eq('city', filters.city)
+      // Filtro por cidade
+      if (filters.city && filters.city !== 'all') {
+        // Ajustar para case insensitive e match parcial
+        query = query.ilike('apartments.city', `%${filters.city}%`)
       }
 
-      if (filters.propertyType) {
-        apartmentsQuery = apartmentsQuery.eq('property_type', filters.propertyType)
+      // Filtro por avaliação
+      if (filters.rating && filters.rating !== 'all') {
+        query = query.gte('rating', filters.rating)
       }
 
-      const { data: matchingApartments, error: apartmentsError } = await apartmentsQuery
-
-      if (apartmentsError) {
-        console.error('Erro ao buscar apartamentos:', apartmentsError)
-        throw apartmentsError
+      // Aplicar ordenação
+      switch (filters.orderBy) {
+        case 'rating':
+          query = query.order('rating', { ascending: false })
+          break
+        case 'likes':
+          query = query.order('likes_count', { ascending: false, nullsFirst: false })
+          break
+        default:
+          query = query.order('created_at', { ascending: false })
       }
 
-      console.log('Apartamentos encontrados:', matchingApartments?.length)
+      console.log('Query de filtro:', query) // Debug
 
-      // Se encontrou apartamentos, buscar as reviews correspondentes
-      if (matchingApartments && matchingApartments.length > 0) {
-        const apartmentIds = matchingApartments.map(apt => apt.id)
+      const { data, error } = await query
 
-        let reviewsQuery = supabase
-          .from('reviews')
-          .select(`
-            id,
-            rating,
-            comment,
-            created_at,
-            user_id,
-            images,
-            apartment_id,
-            apartments!apartment_id (
-              id,
-              address,
-              neighborhood,
-              city,
-              state,
-              zip_code,
-              property_type
-            ),
-            likes_count:review_likes(count)
-          `)
-          .in('apartment_id', apartmentIds)
+      if (error) {
+        console.error('Erro na query:', error)
+        throw error
+      }
 
-        if (filters.minRating) {
-          reviewsQuery = reviewsQuery.gte('rating', filters.minRating)
-        }
+      if (data) {
+        console.log('Resultados encontrados:', data.length)
+        setReviews(data as Review[])
 
-        // Aplicar ordenação
-        switch (filters.sortBy) {
-          case 'rating':
-            reviewsQuery = reviewsQuery.order('rating', { ascending: false })
-            break
-          case 'likes':
-            reviewsQuery = reviewsQuery.order('likes_count', { ascending: false })
-            break
-          default:
-            reviewsQuery = reviewsQuery.order('created_at', { ascending: false })
-        }
+        // Atualizar userMap para os novos resultados
+        const userIds = Array.from(new Set(data.map(r => r.user_id)))
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('id, username')
+          .in('id', userIds)
 
-        const { data: reviews, error: reviewsError } = await reviewsQuery
-
-        if (reviewsError) {
-          console.error('Erro ao buscar reviews:', reviewsError)
-          throw reviewsError
-        }
-
-        console.log('Reviews encontradas:', reviews?.length)
-        setReviews(
-          (reviews?.map(review => ({
-            id: review.id,
-            rating: review.rating,
-            comment: review.comment,
-            created_at: review.created_at,
-            user_id: review.user_id,
-            images: review.images,
-            apartment_id: review.apartment_id,
-            apartments: {
-              id: review.apartments[0]?.id,
-              address: review.apartments[0]?.address,
-              neighborhood: review.apartments[0]?.neighborhood || '',
-              city: review.apartments[0]?.city,
-              state: review.apartments[0]?.state,
-              zip_code: review.apartments[0]?.zip_code,
-              property_type: review.apartments[0]?.property_type as PropertyType
-            },
-            likes_count: typeof review.likes_count === 'number' 
-              ? review.likes_count 
-              : review.likes_count?.[0]?.count || 0
-          })) as Review[]) || []
-        )
-      } else {
-        // Se não encontrou apartamentos, limpar as reviews
-        setReviews([])
+        const newUserMap: Record<string, string> = {}
+        profiles?.forEach(profile => {
+          newUserMap[profile.id] = profile.username || 'Usuário'
+        })
+        setUserMap(newUserMap)
       }
     } catch (error) {
-      console.error('Erro ao filtrar:', error)
-      setReviews([])
+      console.error('Erro ao filtrar reviews:', error)
     }
-  }
-
-  // Função para fechar o modal
-  const handleCloseModal = () => {
-    setSelectedReviewId(null)
-    setSelectedCommentId(null)
-    // Limpar parâmetros da URL
-    window.history.replaceState({}, '', '/reviews')
   }
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12">
-        <div className="container mx-auto px-4">
-          <div className="text-center">
-            Carregando reviews...
-          </div>
+      <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50 py-16">
+        <div className="container mx-auto px-4 text-center">
+          Carregando reviews...
         </div>
       </div>
     )
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50">
-      <div className="container mx-auto px-4 py-12">
-        {/* Header com gradiente */}
-        <div className="bg-gradient-to-r from-primary-600 to-secondary-600 rounded-2xl p-8 mb-8 text-white">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold mb-2">Todas as Reviews</h1>
-              <p className="text-primary-100">
-                Explore todas as experiências compartilhadas pela comunidade
-              </p>
-            </div>
-            {currentUserId && (
-              <Link
-                href="/new-review"
-                className="inline-flex items-center px-6 py-3 bg-white text-primary-600 rounded-full font-semibold hover:bg-primary-50 transition-colors duration-200"
-              >
-                Nova Review
-              </Link>
-            )}
-          </div>
+    <main className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50 py-16">
+      <div className="container mx-auto px-4">
+        {/* Header */}
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-800">Todas as Reviews</h1>
+          <Link
+            href="/new-review"
+            className="inline-flex items-center px-6 py-2 text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors"
+          >
+            <span>Nova Review</span>
+            <svg
+              className="ml-2 w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 4v16m8-8H4"
+              />
+            </svg>
+          </Link>
         </div>
 
-        {/* Filters */}
-        <ReviewFilters
-          cities={cities}
-          onFilterChange={handleFilterChange}
+        {/* Filtros */}
+        <ReviewFilters onFilterChange={handleFilterChange} />
+
+        {/* Reviews List */}
+        <ReviewsList
+          reviews={reviews}
+          userMap={userMap}
+          currentUserId={currentUserId}
+          onReviewDeleted={() => {
+            loadInitialData()
+          }}
         />
-
-        {/* Reviews Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {reviews.map((review) => (
-            <ReviewCardWrapper
-              key={review.id}
-              review={review}
-              username={userMap[review.user_id]}
-              currentUserId={currentUserId}
-              userMap={userMap}
-              isSelected={review.id === selectedReviewId}
-              selectedCommentId={selectedCommentId}
-              onClose={handleCloseModal}
-            />
-          ))}
-        </div>
-
-        {/* Empty State */}
-        {reviews.length === 0 && (
-          <div className="text-center py-12">
-            <h3 className="text-xl font-semibold mb-2">
-              Nenhuma review encontrada
-            </h3>
-            <p className="text-gray-600 mb-6">
-              Tente ajustar os filtros ou seja o primeiro a compartilhar sua experiência!
-            </p>
-            {currentUserId ? (
-              <Link
-                href="/new-review"
-                className="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
-              >
-                Criar Review
-              </Link>
-            ) : (
-              <Link
-                href="/auth"
-                className="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
-              >
-                Fazer Login para Criar Review
-              </Link>
-            )}
-          </div>
-        )}
       </div>
+
+      {/* Modal */}
+      {showModal && selectedReview && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+          onClick={() => {
+            setShowModal(false)
+            setSelectedReview(null)
+            setSelectedCommentId(null)
+          }}
+        >
+          <div 
+            className="bg-white rounded-lg w-full max-w-xl flex flex-col"
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Header do Modal com botão de fechar */}
+            <div className="flex justify-end p-2 border-b">
+              <button
+                onClick={() => {
+                  setShowModal(false)
+                  setSelectedReview(null)
+                  setSelectedCommentId(null)
+                }}
+                className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                aria-label="Fechar modal"
+              >
+                <svg 
+                  className="w-5 h-5 text-gray-500"
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    strokeWidth={2} 
+                    d="M6 18L18 6M6 6l12 12" 
+                  />
+                </svg>
+              </button>
+            </div>
+
+            {/* Conteúdo do Modal com scroll */}
+            <div className="p-4 overflow-y-auto max-h-[calc(100vh-12rem)]">
+              <ReviewModal
+                review={selectedReview}
+                username={userMap[selectedReview.user_id] || ''}
+                currentUserId={currentUserId}
+                userMap={userMap}
+                selectedCommentId={selectedCommentId}
+                onClose={() => {
+                  setShowModal(false)
+                  setSelectedReview(null)
+                  setSelectedCommentId(null)
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   )
 } 

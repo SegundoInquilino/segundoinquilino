@@ -1,402 +1,208 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
+import { createClient } from '@/utils/supabase-client'
 import { formatDistanceToNow } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-import { createClient } from '@/utils/supabase-client'
-
-interface Profile {
-  username: string
-}
-
-interface Comment {
-  id: string
-  review_id: string
-  user_id: string
-  comment: string
-  created_at: string
-  parent_id?: string
-  profiles?: Profile
-  replies?: Comment[]
-}
-
-interface CommentItemProps {
-  comment: Comment
-  currentUserId?: string | null
-  userMap: Record<string, string>
-  onDelete: (id: string) => Promise<void>
-  onReply: (parentId: string, text: string) => Promise<void>
-  level?: number
-  isHighlighted?: boolean
-}
+import { Trash2, MoreVertical } from 'lucide-react'
 
 interface ReviewCommentsProps {
   reviewId: string
-  review: {
-    id: string
-    user_id: string
-  }
   currentUserId?: string | null
   userMap: Record<string, string>
-  selectedCommentId?: string | null
-}
-
-// Componente para um único comentário
-function CommentItem({ 
-  comment, 
-  currentUserId, 
-  userMap, 
-  onDelete, 
-  onReply, 
-  level = 0,
-  isHighlighted = false
-}: CommentItemProps) {
-  const [isReplying, setIsReplying] = useState(false)
-  const [replyText, setReplyText] = useState('')
-  const [isSubmitting, setIsSubmitting] = useState(false)
-
-  const getUsername = (userId: string) => {
-    return comment.profiles?.username || userMap[userId] || 'Usuário'
-  }
-
-  useEffect(() => {
-    console.log('CommentItem - userMap:', userMap)
-    console.log('CommentItem - userId:', comment.user_id)
-    console.log('CommentItem - username:', getUsername(comment.user_id))
-  }, [userMap, comment.user_id])
-
-  const handleReply = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!replyText.trim()) return
-
-    setIsSubmitting(true)
-    try {
-      await onReply(comment.id, replyText)
-      setReplyText('')
-      setIsReplying(false)
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
-
-  useEffect(() => {
-    console.log('Dados do comentário:', {
-      comment,
-      profiles: comment.profiles,
-      username: getUsername(comment.user_id)
-    })
-  }, [comment])
-
-  return (
-    <div className={`${level > 0 ? 'ml-8 mt-4' : ''}`}>
-      <div className={`
-        p-4 rounded-lg transition-colors
-        ${isHighlighted 
-          ? 'bg-blue-50 border-2 border-blue-200' 
-          : 'bg-gray-50'
-        }
-      `}>
-        <div className="flex justify-between items-start">
-          <div>
-            <div className="flex items-center gap-2">
-              <p className="font-medium text-sm text-gray-700">
-                {getUsername(comment.user_id)}
-              </p>
-              <span className="text-xs text-gray-500">
-                {formatDistanceToNow(new Date(comment.created_at), {
-                  addSuffix: true,
-                  locale: ptBR
-                })}
-              </span>
-            </div>
-            <p className="text-gray-600 mt-1">{comment.comment}</p>
-          </div>
-          <div className="flex items-center gap-2">
-            {currentUserId && level < 3 && (
-              <button
-                onClick={() => setIsReplying(!isReplying)}
-                className="text-blue-500 hover:text-blue-700 text-sm"
-              >
-                Responder
-              </button>
-            )}
-            {currentUserId === comment.user_id && (
-              <button
-                onClick={() => onDelete(comment.id)}
-                className="text-red-500 hover:text-red-700 text-sm"
-              >
-                Excluir
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {isReplying && (
-        <form onSubmit={handleReply} className="mt-4">
-          <div className="flex flex-col space-y-2">
-            <textarea
-              value={replyText}
-              onChange={(e) => setReplyText(e.target.value)}
-              placeholder="Escreva sua resposta..."
-              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              rows={2}
-              required
-            />
-            <div className="flex justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => setIsReplying(false)}
-                className="px-4 py-2 text-gray-600 hover:text-gray-800"
-              >
-                Cancelar
-              </button>
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50"
-              >
-                {isSubmitting ? 'Enviando...' : 'Responder'}
-              </button>
-            </div>
-          </div>
-        </form>
-      )}
-
-      {comment.replies?.map((reply) => (
-        <CommentItem
-          key={reply.id}
-          comment={reply}
-          currentUserId={currentUserId}
-          userMap={userMap}
-          onDelete={onDelete}
-          onReply={onReply}
-          level={level + 1}
-        />
-      ))}
-    </div>
-  )
 }
 
 export default function ReviewComments({ 
   reviewId, 
-  review, 
   currentUserId, 
-  userMap = {},
-  selectedCommentId 
+  userMap
 }: ReviewCommentsProps) {
-  const [comments, setComments] = useState<Comment[]>([])
+  const [comments, setComments] = useState<any[]>([])
   const [newComment, setNewComment] = useState('')
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [error, setError] = useState('')
-  const [isLoading, setIsLoading] = useState(true)
+  const [loading, setLoading] = useState(true)
+  const [submitting, setSubmitting] = useState(false)
+  const [menuOpen, setMenuOpen] = useState<string | null>(null)
   const supabase = createClient()
 
-  const loadComments = useCallback(async (showLoading = false) => {
+  useEffect(() => {
+    loadComments()
+  }, [reviewId])
+
+  const loadComments = async () => {
     try {
-      if (showLoading) setIsLoading(true)
-      
-      // Buscar comentários
-      const { data, error } = await supabase
+      const { data: commentsData } = await supabase
         .from('review_comments')
         .select(`
-          id,
-          comment,
-          created_at,
-          user_id,
-          parent_id,
-          profiles!user_id (
-            username
-          )
+          *,
+          profiles:user_id (username)
         `)
         .eq('review_id', reviewId)
         .order('created_at', { ascending: true })
 
-      if (error) throw error
-
-      // Organizar comentários em árvore
-      const commentsTree = data?.reduce((acc: Comment[], comment) => {
-        if (!comment.parent_id) {
-          acc.push({
-            ...comment,
-            review_id: reviewId,
-            profiles: {
-              username: comment.profiles?.[0]?.username || userMap[comment.user_id] || 'Usuário'
-            },
-            replies: data
-              .filter(c => c.parent_id === comment.id)
-              .map(reply => ({
-                ...reply,
-                review_id: reviewId,
-                profiles: {
-                  username: reply.profiles?.[0]?.username || userMap[reply.user_id] || 'Usuário'
-                }
-              }))
-          })
-        }
-        return acc
-      }, []) || []
-
-      setComments(commentsTree)
-      setError('')
+      if (commentsData) {
+        setComments(commentsData)
+      }
     } catch (error) {
       console.error('Erro ao carregar comentários:', error)
-      setError('Não foi possível carregar os comentários.')
     } finally {
-      if (showLoading) setIsLoading(false)
+      setLoading(false)
     }
-  }, [reviewId, userMap])
-
-  useEffect(() => {
-    loadComments(true)
-  }, [loadComments])
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!currentUserId || !newComment.trim()) return
 
-    setIsSubmitting(true)
-    setError('')
-
+    setSubmitting(true)
     try {
-      // Criar comentário
-      const { data: commentData, error: commentError } = await supabase
+      const { error } = await supabase
         .from('review_comments')
         .insert({
           review_id: reviewId,
           user_id: currentUserId,
           comment: newComment.trim()
         })
-        .select('*, profiles:user_id(username)')
-        .single()
 
-      if (commentError) throw commentError
-
-      // Criar notificação
-      if (review.user_id !== currentUserId) {
-        await supabase
-          .from('notifications')
-          .insert({
-            user_id: review.user_id,
-            review_id: reviewId,
-            comment_id: commentData.id,
-            from_user_id: currentUserId
-          })
-      }
+      if (error) throw error
 
       setNewComment('')
-      await loadComments(false)
+      loadComments() // Recarregar comentários
     } catch (error) {
-      console.error('Erro ao criar comentário:', error)
-      setError('Erro ao enviar comentário.')
+      console.error('Erro ao comentar:', error)
     } finally {
-      setIsSubmitting(false)
+      setSubmitting(false)
     }
   }
 
-  const handleDelete = async (commentId: string) => {
-    if (!currentUserId) return
-
+  const handleDeleteComment = async (commentId: string) => {
     try {
+      const comment = comments.find(c => c.id === commentId)
+      if (!comment) throw new Error('Comentário não encontrado')
+      
+      if (currentUserId !== comment.user_id) {
+        throw new Error('Você só pode deletar seus próprios comentários')
+      }
+
+      // Com ON DELETE CASCADE, só precisamos deletar o comentário
       const { error } = await supabase
         .from('review_comments')
         .delete()
         .eq('id', commentId)
         .eq('user_id', currentUserId)
 
-      if (error) throw error
-      await loadComments(false)
+      if (error) {
+        console.error('Erro ao deletar comentário:', error)
+        throw error
+      }
+
+      setComments(prev => prev.filter(c => c.id !== commentId))
+      setMenuOpen(null)
+
     } catch (error) {
       console.error('Erro ao deletar comentário:', error)
-      setError('Erro ao deletar comentário.')
     }
   }
 
-  const handleReply = async (parentId: string, text: string) => {
-    if (!currentUserId) return
-
-    try {
-      const { error } = await supabase
-        .from('review_comments')
-        .insert({
-          review_id: reviewId,
-          user_id: currentUserId,
-          comment: text,
-          parent_id: parentId
-        })
-
-      if (error) throw error
-      await loadComments(false)
-    } catch (error) {
-      console.error('Erro ao responder comentário:', error)
-      setError('Erro ao responder comentário.')
-    }
+  const canDeleteComment = (commentUserId: string) => {
+    console.log('Verificando permissão:', {
+      currentUserId,
+      commentUserId,
+      isOwner: currentUserId === commentUserId
+    })
+    return currentUserId === commentUserId
   }
 
-  if (isLoading) {
-    return (
-      <div className="text-center py-4">
-        <p className="text-gray-500">Carregando comentários...</p>
-      </div>
-    )
-  }
+  if (loading) return <div className="text-center py-4">Carregando comentários...</div>
 
   return (
-    <div className="space-y-4">
-      <h3 className="text-lg font-semibold">Comentários ({comments.length})</h3>
-
-      {error && (
-        <p className="text-red-500 text-sm mb-4">{error}</p>
-      )}
+    <div className="space-y-6">
+      <h3 className="text-lg font-semibold text-gray-900">
+        Comentários ({comments.length})
+      </h3>
 
       {/* Lista de comentários */}
       <div className="space-y-4">
-        {comments
-          .filter(comment => !comment.parent_id) // Mostrar apenas comentários principais
-          .map((comment) => (
-            <CommentItem
-              key={comment.id}
-              comment={comment}
-              currentUserId={currentUserId}
-              userMap={userMap}
-              onDelete={handleDelete}
-              onReply={handleReply}
-            />
-          ))}
+        {comments.map((comment) => (
+          <div 
+            key={comment.id} 
+            className="bg-gray-50 rounded-lg p-4 relative group"
+          >
+            <div className="flex justify-between items-start">
+              <div className="flex items-start space-x-3">
+                {/* Avatar */}
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center text-white text-sm font-medium">
+                  {(comment.profiles?.username || userMap[comment.user_id] || 'U')[0].toUpperCase()}
+                </div>
+                
+                {/* Conteúdo do comentário */}
+                <div>
+                  <div className="flex items-center space-x-2">
+                    <span className="font-medium text-gray-900">
+                      {comment.profiles?.username || userMap[comment.user_id] || 'Usuário'}
+                    </span>
+                    <span className="text-sm text-gray-500">
+                      {formatDistanceToNow(new Date(comment.created_at), {
+                        addSuffix: true,
+                        locale: ptBR
+                      })}
+                    </span>
+                  </div>
+                  <p className="text-gray-700 mt-1">{comment.comment}</p>
+                </div>
+              </div>
 
-        {comments.length === 0 && !isLoading && (
-          <p className="text-gray-500 text-center py-4">
-            Nenhum comentário ainda. Seja o primeiro a comentar!
-          </p>
-        )}
+              {/* Menu de ações (para dono do comentário OU dono da review) */}
+              {canDeleteComment(comment.user_id) && (
+                <div className="relative">
+                  <button
+                    onClick={() => setMenuOpen(menuOpen === comment.id ? null : comment.id)}
+                    className="p-1 rounded-full hover:bg-gray-200 transition-colors opacity-0 group-hover:opacity-100"
+                  >
+                    <MoreVertical className="w-4 h-4 text-gray-500" />
+                  </button>
+
+                  {menuOpen === comment.id && (
+                    <div className="absolute right-0 mt-1 w-48 bg-white rounded-md shadow-lg py-1 z-10">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleDeleteComment(comment.id)
+                        }}
+                        className="w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center space-x-2"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        <span>Deletar comentário</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* Formulário de novo comentário */}
-      {currentUserId ? (
-        <form onSubmit={handleSubmit} className="mt-4">
-          <div className="flex flex-col space-y-2">
-            <textarea
+      {currentUserId && (
+        <form onSubmit={handleSubmit} className="mt-6">
+          <div className="flex gap-4">
+            <input
+              type="text"
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
-              placeholder="Escreva seu comentário..."
-              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              rows={3}
-              required
+              placeholder="Escreva um comentário..."
+              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              disabled={submitting}
             />
-            {error && <p className="text-red-500 text-sm">{error}</p>}
             <button
               type="submit"
-              disabled={isSubmitting || !newComment.trim()}
-              className="self-end bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50"
+              disabled={submitting || !newComment.trim()}
+              className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 transition-colors"
             >
-              {isSubmitting ? 'Enviando...' : 'Comentar'}
+              {submitting ? 'Enviando...' : 'Comentar'}
             </button>
           </div>
         </form>
-      ) : (
-        <p className="text-center text-gray-500 mt-4">
-          Faça login para comentar
-        </p>
       )}
     </div>
   )

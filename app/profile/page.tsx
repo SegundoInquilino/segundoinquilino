@@ -4,7 +4,9 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/utils/supabase-client'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import ReviewModal from '@/components/ReviewModal'
+import ReviewsList from '@/components/ReviewsList'
+import type { Review } from '@/types/review'
+import { useAuth } from '@/contexts/AuthContext'
 
 // Definir interfaces
 interface Apartment {
@@ -38,6 +40,7 @@ interface UserMap {
 }
 
 export default function ProfilePage() {
+  const { currentUserId, setCurrentUserId } = useAuth()
   const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(true)
@@ -48,8 +51,6 @@ export default function ProfilePage() {
   const [likesCount, setLikesCount] = useState(0)
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
   const router = useRouter()
-  const supabase = createClient()
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null)
   const [userMap, setUserMap] = useState<Record<string, string>>({})
   const [selectedReview, setSelectedReview] = useState<Review | null>(null)
   const [showModal, setShowModal] = useState(false)
@@ -60,13 +61,14 @@ export default function ProfilePage() {
 
   const loadProfile = async () => {
     try {
+      const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
+      
       if (!user) {
         router.push('/auth')
         return
       }
 
-      // Definir currentUserId
       setCurrentUserId(user.id)
 
       const { data: profile } = await supabase
@@ -80,70 +82,43 @@ export default function ProfilePage() {
         setEmail(profile.email || '')
       }
 
-      // Carregar reviews com tipagem correta
-      const { data: reviewsData, error: reviewsError } = await supabase
+      // Usar a mesma query das outras páginas
+      const { data: reviewsData } = await supabase
         .from('reviews')
         .select(`
-          id,
-          rating,
-          comment,
-          created_at,
-          images,
-          user_id,
-          apartments!apartment_id (
-            id,
-            address,
-            neighborhood,
-            city,
-            state,
-            zip_code,
-            property_type
-          ),
+          *,
+          apartments (*),
           likes_count:review_likes(count)
         `)
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
 
-      // Criar userMap
-      const newUserMap: Record<string, string> = {}
-      newUserMap[user.id] = profile?.username || 'Usuário'
-      setUserMap(newUserMap)
+      if (reviewsData) {
+        setReviews(reviewsData as Review[])
 
-      setReviews(
-        (reviewsData?.map(review => ({
-          ...review,
-          apartments: {
-            id: review.apartments[0]?.id,
-            address: review.apartments[0]?.address,
-            neighborhood: review.apartments[0]?.neighborhood || '',
-            city: review.apartments[0]?.city,
-            state: review.apartments[0]?.state,
-            zip_code: review.apartments[0]?.zip_code,
-            property_type: review.apartments[0]?.property_type
-          } as Apartment,
-          likes_count: typeof review.likes_count === 'number' 
-            ? review.likes_count 
-            : review.likes_count?.[0]?.count || 0
-        })) as Review[]) || []
-      )
-      setReviewsCount(reviewsData?.length || 0)
+        // Criar userMap
+        const newUserMap: Record<string, string> = {}
+        newUserMap[user.id] = profile?.username || 'Usuário'
+        setUserMap(newUserMap)
+      }
 
+      // Buscar contagens
       const { count: comments } = await supabase
         .from('review_comments')
         .select('id', { count: 'exact' })
         .eq('user_id', user.id)
-
-      setCommentsCount(comments || 0)
 
       const { count: likes } = await supabase
         .from('review_likes')
         .select('id', { count: 'exact' })
         .eq('user_id', user.id)
 
+      setCommentsCount(comments || 0)
       setLikesCount(likes || 0)
 
     } catch (error) {
       console.error('Erro ao carregar perfil:', error)
+      router.push('/auth')
     } finally {
       setLoading(false)
     }
@@ -188,6 +163,17 @@ export default function ProfilePage() {
     setShowModal(true)
   }
 
+  const handleLogout = async () => {
+    try {
+      const supabase = createClient()
+      await supabase.auth.signOut()
+      setCurrentUserId(null)
+      window.location.href = '/auth'
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error)
+    }
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50 py-12">
@@ -200,163 +186,173 @@ export default function ProfilePage() {
     )
   }
 
+  if (!currentUserId) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50 py-12">
+        <div className="max-w-md mx-auto px-4">
+          <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
+            <h1 className="text-2xl font-bold text-gray-800 mb-4">
+              Faça login para acessar seu perfil
+            </h1>
+            <p className="text-gray-600 mb-6">
+              Você precisa estar logado para ver e gerenciar seu perfil.
+            </p>
+            <Link
+              href="/auth"
+              className="inline-flex items-center px-6 py-2 text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors"
+            >
+              <svg
+                className="w-5 h-5 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
+                />
+              </svg>
+              Fazer Login
+            </Link>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50 py-12">
-      <div className="max-w-2xl mx-auto px-4">
-        {/* Header */}
-        <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
-          <div className="flex items-center space-x-4 mb-6">
-            <div className="w-20 h-20 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-full flex items-center justify-center text-white text-2xl font-bold">
-              {username ? username[0].toUpperCase() : 'U'}
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
+              <div className="flex items-center space-x-4 mb-6">
+                <div className="w-20 h-20 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                  {username ? username[0].toUpperCase() : 'U'}
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold text-gray-800">Seu Perfil</h1>
+                  <p className="text-gray-600">Gerencie suas informações pessoais</p>
+                </div>
+              </div>
+
+              {message && (
+                <div className={`p-4 rounded-lg mb-6 ${
+                  message.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
+                }`}>
+                  {message.text}
+                </div>
+              )}
+
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div>
+                  <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
+                    Nome de usuário
+                  </label>
+                  <input
+                    id="username"
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                    Email
+                  </label>
+                  <input
+                    id="email"
+                    type="email"
+                    value={email}
+                    disabled
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 cursor-not-allowed"
+                    aria-label="Email (não pode ser alterado)"
+                  />
+                  <p className="mt-1 text-sm text-gray-500">
+                    O email não pode ser alterado por questões de segurança
+                  </p>
+                </div>
+
+                <div className="flex justify-end space-x-4">
+                  <button
+                    type="button"
+                    onClick={() => router.push('/reviews')}
+                    className="px-6 py-2 text-gray-600 hover:text-gray-800"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={saving}
+                    className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 transition-colors"
+                  >
+                    {saving ? 'Salvando...' : 'Salvar alterações'}
+                  </button>
+                </div>
+              </form>
             </div>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-800">Seu Perfil</h1>
-              <p className="text-gray-600">Gerencie suas informações pessoais</p>
+
+            <div className="bg-white rounded-xl shadow-lg p-6 space-y-4">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 mb-2">Reviews</h3>
+                <p className="text-3xl font-bold text-primary-600">{reviewsCount}</p>
+                <p className="text-sm text-gray-600">Reviews publicadas</p>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 mb-2">Comentários</h3>
+                <p className="text-3xl font-bold text-primary-600">{commentsCount}</p>
+                <p className="text-sm text-gray-600">Comentários feitos</p>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 mb-2">Curtidas</h3>
+                <p className="text-3xl font-bold text-primary-600">{likesCount}</p>
+                <p className="text-sm text-gray-600">Curtidas recebidas</p>
+              </div>
             </div>
           </div>
 
-          {message && (
-            <div className={`p-4 rounded-lg mb-6 ${
-              message.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
-            }`}>
-              {message.text}
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
-                Nome de usuário
-              </label>
-              <input
-                id="username"
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                required
-              />
-            </div>
-
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                Email
-              </label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                disabled
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 cursor-not-allowed"
-                aria-label="Email (não pode ser alterado)"
-              />
-              <p className="mt-1 text-sm text-gray-500">
-                O email não pode ser alterado por questões de segurança
-              </p>
-            </div>
-
-            <div className="flex justify-end space-x-4">
-              <button
-                type="button"
-                onClick={() => router.push('/reviews')}
-                className="px-6 py-2 text-gray-600 hover:text-gray-800"
-              >
-                Cancelar
-              </button>
-              <button
-                type="submit"
-                disabled={saving}
-                className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 transition-colors"
-              >
-                {saving ? 'Salvando...' : 'Salvar alterações'}
-              </button>
-            </div>
-          </form>
-        </div>
-
-        {/* Seção de Estatísticas */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">Reviews</h3>
-            <p className="text-3xl font-bold text-primary-600">{reviewsCount}</p>
-            <p className="text-sm text-gray-600">Reviews publicadas</p>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">Comentários</h3>
-            <p className="text-3xl font-bold text-primary-600">{commentsCount}</p>
-            <p className="text-sm text-gray-600">Comentários feitos</p>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">Curtidas</h3>
-            <p className="text-3xl font-bold text-primary-600">{likesCount}</p>
-            <p className="text-sm text-gray-600">Curtidas recebidas</p>
-          </div>
-        </div>
-
-        {/* Adicionar seção de reviews após as estatísticas */}
-        <div className="mt-8 bg-white rounded-xl shadow-lg p-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Minhas Reviews</h3>
-          
-          {reviews.length === 0 ? (
-            <div className="text-center py-8">
-              <p className="text-gray-600 mb-4">Você ainda não publicou nenhuma review</p>
+          <div className="lg:col-span-2">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-gray-800">Minhas Reviews</h2>
               <Link
                 href="/new-review"
-                className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+                className="inline-flex items-center px-6 py-2 text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors"
               >
-                Criar primeira review
+                Nova Review
               </Link>
             </div>
-          ) : (
-            <div className="space-y-6">
-              {reviews.map((review) => (
-                <div key={review.id} className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
-                  <div className="flex justify-between items-start mb-2">
-                    <h4 className="font-medium text-gray-900">{review.apartments.address}</h4>
-                    <div className="text-yellow-400">
-                      {'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}
-                    </div>
-                  </div>
-                  
-                  <p className="text-sm text-gray-600 mb-2">
-                    {review.apartments.city}, {review.apartments.state}
-                  </p>
-                  
-                  <p className="text-gray-700 mb-4 line-clamp-3">{review.comment}</p>
-                  
-                  {review.images && review.images.length > 0 && (
-                    <div className="flex gap-2 overflow-x-auto py-2">
-                      {review.images.map((image, index) => (
-                        <img
-                          key={index}
-                          src={image}
-                          alt={`Foto ${index + 1}`}
-                          className="w-20 h-20 object-cover rounded-lg"
-                        />
-                      ))}
-                    </div>
-                  )}
-                  
-                  <div className="flex justify-between items-center mt-4 text-sm">
-                    <span className="text-gray-500">
-                      {new Date(review.created_at).toLocaleDateString('pt-BR')}
-                    </span>
-                    <button
-                      onClick={() => handleShowDetails(review)}
-                      className="text-primary-600 hover:text-primary-700"
-                    >
-                      Ver detalhes
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+
+            {reviews.length === 0 ? (
+              <div className="bg-white rounded-xl shadow-lg p-6 text-center">
+                <p className="text-gray-600 mb-4">
+                  Você ainda não publicou nenhuma review
+                </p>
+                <Link
+                  href="/new-review"
+                  className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+                >
+                  Criar primeira review
+                </Link>
+              </div>
+            ) : (
+              <ReviewsList
+                reviews={reviews}
+                userMap={userMap}
+                currentUserId={currentUserId}
+                onReviewDeleted={() => {
+                  loadProfile()
+                }}
+                layout="square"
+              />
+            )}
+          </div>
         </div>
 
-        {/* Seção de Ações */}
         <div className="mt-8 bg-white rounded-xl shadow-lg p-6">
           <h3 className="text-lg font-semibold text-gray-800 mb-4">Ações da conta</h3>
           <div className="space-y-4">
@@ -371,7 +367,7 @@ export default function ProfilePage() {
             </button>
 
             <button
-              onClick={() => supabase.auth.signOut()}
+              onClick={handleLogout}
               className="w-full text-left px-4 py-3 rounded-lg hover:bg-red-50 flex items-center space-x-3 text-red-600"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
