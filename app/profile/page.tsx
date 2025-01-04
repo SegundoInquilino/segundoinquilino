@@ -314,7 +314,7 @@ export default function ProfilePage() {
                   </div>
                   
                   <p className="text-sm text-gray-600 mb-2">
-                    {review.apartments.neighborhood}, {review.apartments.city}, {review.apartments.state}
+                    {review.apartments.city}, {review.apartments.state}
                   </p>
                   
                   <p className="text-gray-700 mb-4 line-clamp-3">{review.comment}</p>
