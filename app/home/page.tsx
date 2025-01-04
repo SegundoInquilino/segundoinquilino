@@ -13,7 +13,7 @@ interface UserMap {
 }
 
 export default async function HomePage() {
-  const supabase = createServerClient()
+  const supabase = createClient()
 
   // Buscar as reviews mais recentes (limitado a 6)
   const { data: recentReviews } = await supabase

@@ -16,7 +16,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  const supabase = createServerClient()
+  const supabase = createClient()
   
   // Buscar informações do usuário
   const { data: { user } } = await supabase.auth.getUser()
