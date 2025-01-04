@@ -10,6 +10,7 @@ import ReviewModal from '@/components/ReviewModal'
 interface Apartment {
   id: string
   address: string
+  neighborhood: string
   city: string
   state: string
   zip_code: string
@@ -89,14 +90,16 @@ export default function ProfilePage() {
           created_at,
           images,
           user_id,
-          apartments!inner (
+          apartments!apartment_id (
             id,
             address,
+            neighborhood,
             city,
             state,
             zip_code,
             property_type
-          )
+          ),
+          likes_count:review_likes(count)
         `)
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
@@ -112,11 +115,15 @@ export default function ProfilePage() {
           apartments: {
             id: review.apartments[0]?.id,
             address: review.apartments[0]?.address,
+            neighborhood: review.apartments[0]?.neighborhood || '',
             city: review.apartments[0]?.city,
             state: review.apartments[0]?.state,
             zip_code: review.apartments[0]?.zip_code,
             property_type: review.apartments[0]?.property_type
-          } as Apartment
+          } as Apartment,
+          likes_count: typeof review.likes_count === 'number' 
+            ? review.likes_count 
+            : review.likes_count?.[0]?.count || 0
         })) as Review[]) || []
       )
       setReviewsCount(reviewsData?.length || 0)
