@@ -14,8 +14,8 @@ interface Notification {
   reviews: {
     apartments: {
       address: string
-    }
-  }
+    }[]
+  }[]
   review_comments?: {
     comment: string
   }[]
@@ -73,9 +73,7 @@ export default function NotificationBell({ userId }: { userId: string }) {
           read: notification.read,
           created_at: notification.created_at,
           reviews: {
-            apartments: {
-              address: notification.reviews?.apartments?.[0]?.address || ''
-            }
+            apartments: notification.reviews?.[0]?.apartments || []
           },
           review_comments: notification.review_comments,
           from_user: notification.from_user
@@ -168,7 +166,7 @@ export default function NotificationBell({ userId }: { userId: string }) {
                     className="w-full text-left p-3 hover:bg-gray-50 transition-colors"
                   >
                     <p className="text-sm font-medium text-gray-900">
-                      Novo comentário em {notification.reviews.apartments.address}
+                      Novo comentário em {notification.reviews?.[0]?.apartments?.[0]?.address}
                     </p>
                     <p className="text-sm text-gray-500 mt-1">
                       {notification.from_user[0].username} comentou: "
