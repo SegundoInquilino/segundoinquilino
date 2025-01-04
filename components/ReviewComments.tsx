@@ -226,6 +226,7 @@ export default function ReviewComments({
               .filter(c => c.parent_id === comment.id)
               .map(reply => ({
                 ...reply,
+                review_id: reviewId,
                 profiles: {
                   username: reply.profiles?.[0]?.username || userMap[reply.user_id] || 'Usuário'
                 }
