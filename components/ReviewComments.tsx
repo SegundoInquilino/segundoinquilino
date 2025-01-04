@@ -219,6 +219,7 @@ export default function ReviewComments({
         if (!comment.parent_id) {
           acc.push({
             ...comment,
+            review_id: reviewId,
             profiles: {
               username: comment.profiles?.[0]?.username || userMap[comment.user_id] || 'Usuário'
             },
