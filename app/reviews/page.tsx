@@ -257,7 +257,29 @@ export default function ReviewsPage() {
         }
 
         console.log('Reviews encontradas:', reviews?.length)
-        setReviews(reviews || [])
+        setReviews(
+          (reviews?.map(review => ({
+            id: review.id,
+            rating: review.rating,
+            comment: review.comment,
+            created_at: review.created_at,
+            user_id: review.user_id,
+            images: review.images,
+            apartment_id: review.apartment_id,
+            apartments: {
+              id: review.apartments[0]?.id,
+              address: review.apartments[0]?.address,
+              neighborhood: review.apartments[0]?.neighborhood || '',
+              city: review.apartments[0]?.city,
+              state: review.apartments[0]?.state,
+              zip_code: review.apartments[0]?.zip_code,
+              property_type: review.apartments[0]?.property_type
+            },
+            likes_count: typeof review.likes_count === 'number' 
+              ? review.likes_count 
+              : review.likes_count?.[0]?.count || 0
+          })) as Review[]) || []
+        )
       } else {
         // Se não encontrou apartamentos, limpar as reviews
         setReviews([])
