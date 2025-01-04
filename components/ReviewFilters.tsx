@@ -2,6 +2,16 @@
 
 import { useState, useEffect } from 'react'
 
+type SortBy = 'recent' | 'rating' | 'likes'
+
+interface Filters {
+  searchTerm: string
+  city: string
+  minRating: number
+  sortBy: SortBy
+  propertyType: string
+}
+
 interface ReviewFiltersProps {
   cities: string[]
   onFilterChange: (filters: {
@@ -14,11 +24,11 @@ interface ReviewFiltersProps {
 }
 
 export default function ReviewFilters({ cities, onFilterChange }: ReviewFiltersProps) {
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<Filters>({
     searchTerm: '',
     city: '',
     minRating: 0,
-    sortBy: 'recent',
+    sortBy: 'recent' as SortBy,
     propertyType: ''
   })
 
@@ -122,7 +132,7 @@ export default function ReviewFilters({ cities, onFilterChange }: ReviewFiltersP
             onChange={(e) => {
               const newFilters = {
                 ...filters,
-                sortBy: e.target.value
+                sortBy: e.target.value as SortBy
               }
               setFilters(newFilters)
             }}
