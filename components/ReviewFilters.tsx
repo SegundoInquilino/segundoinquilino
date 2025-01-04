@@ -8,7 +8,7 @@ interface ReviewFiltersProps {
     searchTerm: string
     city: string
     minRating: number
-    sortBy: string
+    sortBy: 'recent' | 'rating' | 'likes'
     propertyType: string
   }) => void
 }

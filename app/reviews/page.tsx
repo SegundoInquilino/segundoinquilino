@@ -28,11 +28,11 @@ type Review = {
 }
 
 interface Filters {
-  searchTerm?: string
-  city?: string
-  minRating?: number
-  sortBy?: 'recent' | 'rating' | 'likes'
-  propertyType?: string
+  searchTerm: string
+  city: string
+  minRating: number
+  sortBy: 'recent' | 'rating' | 'likes'
+  propertyType: string
 }
 
 export default function ReviewsPage() {
