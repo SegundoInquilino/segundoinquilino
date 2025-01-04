@@ -24,7 +24,7 @@ interface Review {
   images?: string[]
   user_id: string
   apartments: Apartment
-  likes_count?: number
+  likes_count?: number | { count: number }
 }
 
 interface Profile {
@@ -390,7 +390,10 @@ export default function ProfilePage() {
 
             <div className="p-6">
               <ReviewModal
-                review={selectedReview}
+                review={{
+                  ...selectedReview,
+                  likes_count: selectedReview.likes_count || { count: 0 }
+                }}
                 username={username}
                 currentUserId={currentUserId}
                 userMap={userMap}
@@ -398,7 +401,7 @@ export default function ProfilePage() {
                 isDeleting={false}
                 onDelete={async () => {
                   setShowModal(false)
-                  await loadProfile() // Recarrega os dados após deletar
+                  await loadProfile()
                 }}
               />
             </div>
