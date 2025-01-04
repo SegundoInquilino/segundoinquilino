@@ -12,7 +12,8 @@ type ReviewCardProps = {
   username: string
   currentUserId?: string | null
   userMap: Record<string, string>
-  onClick: () => void
+  onClick?: () => void
+  onLike?: () => void
 }
 
 export default function ReviewCard({
@@ -20,7 +21,8 @@ export default function ReviewCard({
   username,
   currentUserId,
   userMap,
-  onClick
+  onClick,
+  onLike
 }: ReviewCardProps) {
   const [isLiking, setIsLiking] = useState(false)
   const [showComments, setShowComments] = useState(false)

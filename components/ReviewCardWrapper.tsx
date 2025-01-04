@@ -122,6 +122,10 @@ export default function ReviewCardWrapper({
         currentUserId={currentUserId}
         userMap={userMap}
         onClick={() => setShowModal(true)}
+        onLike={() => {
+          // Se precisar fazer algo quando der like
+          console.log('Like dado')
+        }}
       />
 
       {showModal && (
