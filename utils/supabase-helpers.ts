@@ -3,6 +3,12 @@ import { createClient } from '@/utils/supabase-client'
 const MAX_RETRIES = 3
 const INITIAL_DELAY = 1000 // 1 segundo
 
+// Adicione a interface para o perfil
+interface Profile {
+  id: string
+  username: string
+}
+
 export async function fetchWithRetry(operation: () => Promise<any>, retries = MAX_RETRIES) {
   try {
     return await operation()
@@ -51,8 +57,9 @@ export const supabaseClient = {
         console.log('Perfis encontrados:', profiles) // Debug
 
         // Criar mapa de usernames
-        const userMap = {}
-        profiles?.forEach(profile => {
+        const userMap: Record<string, string> = {}
+        
+        profiles?.forEach((profile: Profile) => {
           userMap[profile.id] = profile.username
         })
 
