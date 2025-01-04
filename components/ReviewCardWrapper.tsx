@@ -5,34 +5,16 @@ import { useState, useEffect } from 'react'
 import ReviewModal from './ReviewModal'
 import { createClientComponentClient } from '@/utils/supabase-client-component'
 import { useRouter } from 'next/navigation'
+import type { Review } from '@/types/review'
 
-// Definir interface Review
-interface Review {
-  id: string
-  rating: number
-  comment: string
-  created_at: string
-  user_id: string
-  images?: string[]
-  apartments: {
-    id: string
-    address: string
-    city: string
-    state: string
-    zip_code: string
-    property_type: 'house' | 'apartment'
-  }
-  likes_count?: number
-}
-
-type ReviewCardWrapperProps = {
+interface ReviewCardWrapperProps {
   review: Review
   username: string
   currentUserId?: string | null
   userMap: Record<string, string>
   isSelected?: boolean
   selectedCommentId?: string | null
-  onClose?: () => void // Adicionando prop opcional para fechar modal
+  onClose?: () => void
 }
 
 export default function ReviewCardWrapper({
