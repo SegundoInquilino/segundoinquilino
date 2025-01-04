@@ -31,8 +31,8 @@ export default function RegisterForm() {
       if (error) throw error
 
       setSuccess(true)
-    } catch (error) {
-      setError(error.message)
+    } catch (error: any) {
+      setError(error?.message || 'Ocorreu um erro durante o registro')
     } finally {
       setLoading(false)
     }
