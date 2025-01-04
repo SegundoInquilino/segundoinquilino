@@ -6,26 +6,7 @@ import ReviewCardWrapper from '@/components/ReviewCardWrapper'
 import ReviewFilters from '@/components/ReviewFilters'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-
-type Review = {
-  id: string
-  rating: number
-  comment: string
-  created_at: string
-  user_id: string
-  likes_count: number
-  images?: string[]
-  apartment_id?: string
-  apartments: {
-    id: string
-    address: string
-    neighborhood: string
-    city: string
-    state: string
-    zip_code: string
-    property_type: string
-  }
-}
+import type { Review, PropertyType } from '@/types/review'
 
 interface Filters {
   searchTerm: string
@@ -151,7 +132,7 @@ export default function ReviewsPage() {
             city: review.apartments[0]?.city,
             state: review.apartments[0]?.state,
             zip_code: review.apartments[0]?.zip_code,
-            property_type: review.apartments[0]?.property_type
+            property_type: review.apartments[0]?.property_type as PropertyType
           },
           likes_count: typeof review.likes_count === 'number' 
             ? review.likes_count 
@@ -273,7 +254,7 @@ export default function ReviewsPage() {
               city: review.apartments[0]?.city,
               state: review.apartments[0]?.state,
               zip_code: review.apartments[0]?.zip_code,
-              property_type: review.apartments[0]?.property_type
+              property_type: review.apartments[0]?.property_type as PropertyType
             },
             likes_count: typeof review.likes_count === 'number' 
               ? review.likes_count 

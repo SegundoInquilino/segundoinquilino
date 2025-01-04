@@ -1,16 +1,23 @@
+export type PropertyType = 'apartment' | 'house'
+
+export interface Apartment {
+  id: string
+  address: string
+  neighborhood: string
+  city: string
+  state: string
+  zip_code: string
+  property_type: PropertyType
+}
+
 export interface Review {
   id: string
   rating: number
   comment: string
   created_at: string
   user_id: string
+  likes_count: number | { count: number }
   images?: string[]
-  apartments: {
-    id: string
-    address: string
-    city: string
-    state: string
-    zip_code: string
-  }
-  likes_count?: { count: number } | number
+  apartment_id?: string
+  apartments: Apartment
 } 
