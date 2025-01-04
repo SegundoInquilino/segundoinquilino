@@ -306,20 +306,16 @@ export default function ProfilePage() {
             <div className="space-y-6">
               {reviews.map((review) => (
                 <div key={review.id} className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
-                  <div className="mb-4">
-                    <h3 className="text-lg font-semibold">
-                      {review.apartments.address}
-                    </h3>
-                    <p className="text-gray-600">
-                      {review.apartments.neighborhood}, {review.apartments.city}, {review.apartments.state}
-                    </p>
-                  </div>
-                  
                   <div className="flex justify-between items-start mb-2">
+                    <h4 className="font-medium text-gray-900">{review.apartments.address}</h4>
                     <div className="text-yellow-400">
                       {'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}
                     </div>
                   </div>
+                  
+                  <p className="text-sm text-gray-600 mb-2">
+                    {review.apartments.neighborhood}, {review.apartments.city}, {review.apartments.state}
+                  </p>
                   
                   <p className="text-gray-700 mb-4 line-clamp-3">{review.comment}</p>
                   
