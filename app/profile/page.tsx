@@ -306,6 +306,15 @@ export default function ProfilePage() {
             <div className="space-y-6">
               {reviews.map((review) => (
                 <div key={review.id} className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                  <div className="mb-4">
+                    <h3 className="text-lg font-semibold">
+                      {review.apartments?.[0]?.address || '-'}
+                    </h3>
+                    <p className="text-gray-600">
+                      {review.apartments?.[0]?.neighborhood}, {review.apartments?.[0]?.city}
+                    </p>
+                  </div>
+                  
                   <div className="flex justify-between items-start mb-2">
                     <h4 className="font-medium text-gray-900">{review.apartments.address}</h4>
                     <div className="text-yellow-400">

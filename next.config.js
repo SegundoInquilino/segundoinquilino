@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['ejoivntarqlinulkiure.supabase.co'],
+    domains: ['ejoivntarqlinulkiure.supabase.co', 'www.segundoinquilino.com.br'],
   },
   async headers() {
     return [
