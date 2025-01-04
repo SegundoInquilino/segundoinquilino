@@ -13,6 +13,7 @@ interface Apartment {
   city: string
   state: string
   zip_code: string
+  property_type: 'house' | 'apartment'
 }
 
 interface Review {
@@ -21,9 +22,9 @@ interface Review {
   comment: string
   created_at: string
   images?: string[]
-  apartments: Apartment
   user_id: string
-  likes_count?: { count: number } | number
+  apartments: Apartment
+  likes_count?: number
 }
 
 interface Profile {
@@ -79,7 +80,7 @@ export default function ProfilePage() {
       }
 
       // Carregar reviews com tipagem correta
-      const { data: reviewsData } = await supabase
+      const { data: reviewsData, error: reviewsError } = await supabase
         .from('reviews')
         .select(`
           id,
@@ -93,7 +94,8 @@ export default function ProfilePage() {
             address,
             city,
             state,
-            zip_code
+            zip_code,
+            property_type
           )
         `)
         .eq('user_id', user.id)
@@ -104,7 +106,12 @@ export default function ProfilePage() {
       newUserMap[user.id] = profile?.username || 'Usuário'
       setUserMap(newUserMap)
 
-      setReviews(reviewsData as Review[] || [])
+      setReviews(
+        (reviewsData?.map(review => ({
+          ...review,
+          apartments: review.apartments as Apartment
+        })) as Review[]) || []
+      )
       setReviewsCount(reviewsData?.length || 0)
 
       const { count: comments } = await supabase
