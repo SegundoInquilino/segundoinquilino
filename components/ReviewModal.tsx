@@ -140,7 +140,7 @@ export default function ReviewModal({
           review={review}
           currentUserId={currentUserId}
           userMap={userMap}
-          highlightedCommentId={selectedCommentId}
+          selectedCommentId={selectedCommentId}
         />
       </div>
 
