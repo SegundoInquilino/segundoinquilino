@@ -308,10 +308,10 @@ export default function ProfilePage() {
                 <div key={review.id} className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
                   <div className="mb-4">
                     <h3 className="text-lg font-semibold">
-                      {review.apartments?.[0]?.address || '-'}
+                      {review.apartments.address}
                     </h3>
                     <p className="text-gray-600">
-                      {review.apartments?.[0]?.neighborhood}, {review.apartments?.[0]?.city}, {review.apartments?.[0]?.state}
+                      {review.apartments.neighborhood}, {review.apartments.city}, {review.apartments.state}
                     </p>
                   </div>
                   
