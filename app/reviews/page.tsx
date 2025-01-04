@@ -27,6 +27,14 @@ type Review = {
   }
 }
 
+interface Filters {
+  searchTerm?: string
+  city?: string
+  minRating?: number
+  sortBy?: 'recent' | 'rating' | 'likes'
+  propertyType?: string
+}
+
 export default function ReviewsPage() {
   const [reviews, setReviews] = useState<Review[]>([])
   const [cities, setCities] = useState<string[]>([])
@@ -159,7 +167,7 @@ export default function ReviewsPage() {
     }
   }
 
-  const handleFilterChange = async (filters) => {
+  const handleFilterChange = async (filters: Filters) => {
     const supabase = createClient()
     
     try {
