@@ -171,9 +171,9 @@ export default function NotificationBell({ userId }: { userId: string }) {
                       Novo comentário em {notification.reviews?.[0]?.apartments?.[0]?.address}
                     </p>
                     <p className="text-sm text-gray-500 mt-1">
-                      {notification.from_user[0].username} comentou: "
-                      {notification.review_comments?.[0]?.comment.substring(0, 50) || ''}
-                      {notification.review_comments?.[0]?.comment.length > 50 ? '...' : '"'}
+                      {notification.from_user[0]?.username} comentou: "
+                      {notification.review_comments?.[0]?.comment?.substring(0, 50) || ''}
+                      {(notification.review_comments?.[0]?.comment?.length || 0) > 50 ? '...' : '"'}
                     </p>
                   </button>
                 ))
