@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { formatDistanceToNow } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { supabase } from '@/lib/supabase'
@@ -25,25 +25,12 @@ export default function ReviewCard({
   onLike
 }: ReviewCardProps) {
   const [isLiking, setIsLiking] = useState(false)
-  const [showComments, setShowComments] = useState(false)
-  const [comment, setComment] = useState('')
   const [showModal, setShowModal] = useState(false)
 
-  useEffect(() => {
-    console.log('ReviewCard - Review completa:', review)
-    console.log('ReviewCard - Images:', review.images)
-    console.log('ReviewCard - Página:', window.location.pathname)
-  }, [review])
+  if (!review.apartments) return null
 
-  useEffect(() => {
-    console.log('ReviewCard - userMap:', userMap)
-  }, [userMap])
-
-  if (!review.apartments) {
-    return null
-  }
-
-  const handleLike = async () => {
+  const handleLike = async (e: React.MouseEvent) => {
+    e.stopPropagation()
     if (!currentUserId || isLiking) return
     setIsLiking(true)
 
@@ -63,34 +50,14 @@ export default function ReviewCard({
     }
   }
 
-  const handleComment = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!currentUserId || !comment.trim()) return
-
-    try {
-      await supabase
-        .from('review_comments')
-        .insert({
-          review_id: review.id,
-          user_id: currentUserId,
-          comment: comment.trim()
-        })
-
-      setComment('')
-      // Recarregar comentários
-    } catch (error) {
-      console.error('Erro ao comentar:', error)
-    }
-  }
-
-  const { address, city, state, zip_code, neighborhood } = review.apartments
-
   const getLikesCount = () => {
     if (typeof review.likes_count === 'number') {
       return review.likes_count
     }
     return review.likes_count?.count || 0
   }
+
+  const { address, city, state, zip_code, neighborhood } = review.apartments
 
   return (
     <>
@@ -102,10 +69,12 @@ export default function ReviewCard({
           <h2 className="text-xl font-bold text-gray-800 mb-2">{address}</h2>
           <div className="space-y-1">
             <p className="text-secondary-600">
-              {neighborhood && `${neighborhood}, `}{city}
+              {neighborhood ? `${neighborhood}, ` : ''}{city}
             </p>
             <p className="text-gray-500 text-sm">
-              {state} - {zip_code}
+              {state}
+              {state && zip_code ? ' - ' : ''}
+              {zip_code}
             </p>
           </div>
           
@@ -123,6 +92,7 @@ export default function ReviewCard({
                 </span>
               </div>
             </div>
+
             <p className="text-gray-600 text-sm leading-relaxed line-clamp-3 mb-2">
               {review.comment}
             </p>
@@ -138,14 +108,6 @@ export default function ReviewCard({
               >
                 <span className="text-lg">❤️</span>
                 <span className="font-medium">{getLikesCount()}</span>
-              </button>
-              
-              <button 
-                onClick={() => setShowComments(!showComments)}
-                className="flex items-center gap-2 text-primary-600 hover:text-primary-700 transition-colors"
-              >
-                <span className="text-lg">💬</span>
-                <span className="font-medium">Comentários</span>
               </button>
 
               <span className="text-xs text-gray-400 ml-auto">

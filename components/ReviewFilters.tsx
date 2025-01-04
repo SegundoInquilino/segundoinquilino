@@ -1,120 +1,90 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-
-type SortBy = 'recent' | 'rating' | 'likes'
-
-interface Filters {
-  searchTerm: string
-  city: string
-  minRating: number
-  sortBy: SortBy
-  propertyType: string
-}
+import { useState } from 'react'
 
 interface ReviewFiltersProps {
-  cities: string[]
   onFilterChange: (filters: {
-    searchTerm: string
-    city: string
-    minRating: number
-    sortBy: 'recent' | 'rating' | 'likes'
-    propertyType: string
+    search?: string
+    city?: string
+    rating?: number
+    orderBy?: 'recent' | 'rating' | 'likes'
   }) => void
 }
 
-export default function ReviewFilters({ cities, onFilterChange }: ReviewFiltersProps) {
-  const [filters, setFilters] = useState<Filters>({
-    searchTerm: '',
-    city: '',
-    minRating: 0,
-    sortBy: 'recent' as SortBy,
-    propertyType: ''
-  })
+export default function ReviewFilters({ onFilterChange }: ReviewFiltersProps) {
+  const [search, setSearch] = useState('')
+  const [city, setCity] = useState('all')
+  const [rating, setRating] = useState('all')
+  const [orderBy, setOrderBy] = useState('recent')
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    setFilters({
-      ...filters,
-      searchTerm: value
+  const handleChange = (
+    type: 'search' | 'city' | 'rating' | 'orderBy',
+    value: string
+  ) => {
+    if (type === 'search') setSearch(value)
+    if (type === 'city') setCity(value)
+    if (type === 'rating') setRating(value)
+    if (type === 'orderBy') setOrderBy(value)
+
+    onFilterChange({
+      search: type === 'search' ? value : search,
+      city: type === 'city' ? (value === 'all' ? undefined : value) : (city === 'all' ? undefined : city),
+      rating: type === 'rating' ? (value === 'all' ? undefined : Number(value)) : (rating === 'all' ? undefined : Number(rating)),
+      orderBy: type === 'orderBy' ? value as 'recent' | 'rating' | 'likes' : orderBy as 'recent' | 'rating' | 'likes'
     })
   }
 
-  useEffect(() => {
-    const delayDebounceFn = setTimeout(() => {
-      onFilterChange(filters)
-    }, 500)
-
-    return () => clearTimeout(delayDebounceFn)
-  }, [filters, onFilterChange])
-
   return (
     <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+      {/* Buscar localização */}
       <div className="mb-6">
-        <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-gray-700 mb-2">
           Buscar localização
         </label>
         <div className="relative">
           <input
             type="text"
-            id="search"
-            value={filters.searchTerm}
-            onChange={handleSearchChange}
-            placeholder="Digite rua, bairro, cidade ou estado..."
-            className="w-full pl-10 pr-4 py-3 rounded-lg border-2 border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-colors"
+            value={search}
+            onChange={(e) => handleChange('search', e.target.value)}
+            placeholder="Avenida dos Estados"
+            className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </div>
+          <span className="absolute left-3 top-2.5 text-gray-400">
+            🔍
+          </span>
         </div>
-        <p className="mt-1 text-sm text-gray-500">
-          Ex: "Avenida Paulista", "Jardins, São Paulo" ou "Centro"
-        </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Cidade */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Cidade
           </label>
           <select
-            value={filters.city}
-            onChange={(e) => {
-              const newFilters = {
-                ...filters,
-                city: e.target.value
-              }
-              setFilters(newFilters)
-            }}
-            className="w-full h-11 rounded-lg border-2 border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
+            value={city}
+            onChange={(e) => handleChange('city', e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           >
-            <option value="">Todas as cidades</option>
-            {cities.map((city) => (
-              <option key={city} value={city}>
-                {city}
-              </option>
-            ))}
+            <option value="all">Todas as cidades</option>
+            <option value="São Paulo">São Paulo</option>
+            <option value="São Bernardo do Campo">São Bernardo do Campo</option>
+            <option value="Santo André">Santo André</option>
+            <option value="São Caetano do Sul">São Caetano do Sul</option>
           </select>
         </div>
 
+        {/* Avaliação mínima */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Avaliação mínima
           </label>
           <select
-            value={filters.minRating}
-            onChange={(e) => {
-              const newFilters = {
-                ...filters,
-                minRating: Number(e.target.value)
-              }
-              setFilters(newFilters)
-            }}
-            className="w-full h-11 rounded-lg border-2 border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
+            value={rating}
+            onChange={(e) => handleChange('rating', e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           >
-            <option value="">Todas</option>
+            <option value="all">Todas</option>
             <option value="5">5 estrelas</option>
             <option value="4">4+ estrelas</option>
             <option value="3">3+ estrelas</option>
@@ -123,46 +93,19 @@ export default function ReviewFilters({ cities, onFilterChange }: ReviewFiltersP
           </select>
         </div>
 
+        {/* Ordenar por */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Ordenar por
           </label>
           <select
-            value={filters.sortBy}
-            onChange={(e) => {
-              const newFilters = {
-                ...filters,
-                sortBy: e.target.value as SortBy
-              }
-              setFilters(newFilters)
-            }}
-            className="w-full h-11 rounded-lg border-2 border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
+            value={orderBy}
+            onChange={(e) => handleChange('orderBy', e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           >
             <option value="recent">Mais recentes</option>
             <option value="rating">Melhor avaliação</option>
             <option value="likes">Mais curtidas</option>
-          </select>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Tipo de Imóvel
-          </label>
-          <select
-            value={filters.propertyType}
-            onChange={(e) => {
-              const newFilters = {
-                ...filters,
-                propertyType: e.target.value
-              }
-              setFilters(newFilters)
-              onFilterChange(newFilters)
-            }}
-            className="w-full h-11 rounded-lg border-2 border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
-          >
-            <option value="">Todos</option>
-            <option value="apartment">Apartamento</option>
-            <option value="house">Casa</option>
           </select>
         </div>
       </div>

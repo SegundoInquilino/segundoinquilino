@@ -18,6 +18,8 @@ export interface Review {
   user_id: string
   likes_count: number | { count: number }
   images?: string[]
-  apartment_id?: string
+  apartment_id: string
   apartments: Apartment
+  comments_count?: number
+  user_has_liked?: boolean
 } 
