@@ -1,0 +1,38 @@
+{
+  "name": "segundo-inquilino",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "format": "prettier --write .",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@supabase/auth-helpers-nextjs": "0.8.7",
+    "@supabase/ssr": "0.0.10",
+    "@supabase/supabase-js": "latest",
+    "@types/uuid": "^9.0.8",
+    "date-fns": "^2.0.0",
+    "next": "14.0.4",
+    "react": "^18",
+    "react-dom": "^18",
+    "typescript": "^5.0.0",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/forms": "^0.5.7",
+    "@types/cookie": "^0.5.4",
+    "@types/node": "^20.17.11",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "autoprefixer": "^10.0.0",
+    "eslint": "^8.0.0",
+    "eslint-config-next": "14.0.4",
+    "postcss": "^8.0.0",
+    "prettier": "^3.0.0",
+    "tailwindcss": "^3.0.0"
+  }
+}
