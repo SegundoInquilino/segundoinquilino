@@ -1,4 +1,4 @@
-import { createServerClient } from '@/utils/supabase-server'
+import { createClient } from '@/utils/supabase-server'
 import ReviewsList from '@/components/ReviewsList'
 import Link from 'next/link'
 

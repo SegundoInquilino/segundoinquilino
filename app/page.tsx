@@ -1,9 +1,9 @@
 import Link from 'next/link'
-import { createServerClient } from '@/utils/supabase-server'
+import { createClient } from '@/utils/supabase-server'
 import { redirect } from 'next/navigation'
 
 export default async function LandingPage() {
-  const supabase = createServerClient()
+  const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   // Se já estiver logado, redireciona para /home
