@@ -11,14 +11,13 @@ interface Profile {
 
 interface Comment {
   id: string
+  review_id: string
   user_id: string
   comment: string
   created_at: string
-  parent_id?: string | null
+  parent_id?: string
+  profiles?: Profile
   replies?: Comment[]
-  profiles?: {
-    username: string
-  } | null
 }
 
 interface CommentItemProps {
@@ -221,14 +220,14 @@ export default function ReviewComments({
           acc.push({
             ...comment,
             profiles: {
-              username: comment.profiles?.username || userMap[comment.user_id] || 'Usuário'
+              username: comment.profiles?.[0]?.username || userMap[comment.user_id] || 'Usuário'
             },
             replies: data
               .filter(c => c.parent_id === comment.id)
               .map(reply => ({
                 ...reply,
                 profiles: {
-                  username: reply.profiles?.username || userMap[reply.user_id] || 'Usuário'
+                  username: reply.profiles?.[0]?.username || userMap[reply.user_id] || 'Usuário'
                 }
               }))
           })
