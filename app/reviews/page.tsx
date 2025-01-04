@@ -323,16 +323,22 @@ export default function ReviewsPage() {
         {/* Reviews Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {reviews.map((review) => (
-            <ReviewCardWrapper
-              key={review.id}
-              review={review}
-              username={userMap[review.user_id]}
-              currentUserId={currentUserId}
-              userMap={userMap}
-              isSelected={review.id === selectedReviewId}
-              selectedCommentId={selectedCommentId}
-              onClose={handleCloseModal}
-            />
+            <div key={review.id} className="bg-white rounded-lg shadow-lg overflow-hidden">
+              <div className="p-6">
+                <h3 className="text-xl font-bold text-gray-800 mb-2">
+                  {review.apartments?.[0]?.address || '-'}
+                </h3>
+                <p className="text-gray-600 mb-4">
+                  {review.apartments?.[0]?.neighborhood}, {review.apartments?.[0]?.city}, {review.apartments?.[0]?.state}
+                </p>
+                <div className="flex justify-between items-start mb-2">
+                  <div className="text-yellow-400">
+                    {'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}
+                  </div>
+                </div>
+                <p className="text-gray-700 mb-4 line-clamp-3">{review.comment}</p>
+              </div>
+            </div>
           ))}
         </div>
 

@@ -311,20 +311,15 @@ export default function ProfilePage() {
                       {review.apartments?.[0]?.address || '-'}
                     </h3>
                     <p className="text-gray-600">
-                      {review.apartments?.[0]?.neighborhood}, {review.apartments?.[0]?.city}
+                      {review.apartments?.[0]?.neighborhood}, {review.apartments?.[0]?.city}, {review.apartments?.[0]?.state}
                     </p>
                   </div>
                   
                   <div className="flex justify-between items-start mb-2">
-                    <h4 className="font-medium text-gray-900">{review.apartments.address}</h4>
                     <div className="text-yellow-400">
                       {'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}
                     </div>
                   </div>
-                  
-                  <p className="text-sm text-gray-600 mb-2">
-                    {review.apartments.city}, {review.apartments.state}
-                  </p>
                   
                   <p className="text-gray-700 mb-4 line-clamp-3">{review.comment}</p>
                   
