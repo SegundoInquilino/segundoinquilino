@@ -72,9 +72,11 @@ export default function NotificationBell({ userId }: { userId: string }) {
           from_user_id: notification.from_user_id,
           read: notification.read,
           created_at: notification.created_at,
-          reviews: {
-            apartments: notification.reviews?.[0]?.apartments || []
-          },
+          reviews: [
+            {
+              apartments: notification.reviews?.[0]?.apartments || []
+            }
+          ],
           review_comments: notification.review_comments,
           from_user: notification.from_user
         })) || []
