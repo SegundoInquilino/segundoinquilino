@@ -4,10 +4,10 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/utils/supabase-client'
 import { useRouter } from 'next/navigation'
 
-type Notification = {
+interface Notification {
   id: string
   review_id: string
-  comment_id: string
+  comment_id?: string
   from_user_id: string
   read: boolean
   created_at: string
@@ -16,12 +16,12 @@ type Notification = {
       address: string
     }
   }
-  review_comments: {
+  review_comments?: {
     comment: string
-  }
+  }[]
   from_user: {
     username: string
-  }
+  }[]
 }
 
 export default function NotificationBell({ userId }: { userId: string }) {
@@ -43,15 +43,15 @@ export default function NotificationBell({ userId }: { userId: string }) {
           from_user_id,
           read,
           created_at,
-          reviews!inner (
-            apartments!inner (
+          reviews (
+            apartments (
               address
             )
           ),
-          review_comments!inner (
+          review_comments (
             comment
           ),
-          from_user:profiles!fk_from_user (
+          from_user (
             username
           )
         `)
@@ -64,7 +64,23 @@ export default function NotificationBell({ userId }: { userId: string }) {
       }
 
       console.log('Notificações carregadas:', data)
-      setNotifications(data || [])
+      setNotifications(
+        data?.map(notification => ({
+          id: notification.id,
+          review_id: notification.review_id,
+          comment_id: notification.comment_id,
+          from_user_id: notification.from_user_id,
+          read: notification.read,
+          created_at: notification.created_at,
+          reviews: {
+            apartments: {
+              address: notification.reviews?.apartments?.[0]?.address || ''
+            }
+          },
+          review_comments: notification.review_comments,
+          from_user: notification.from_user
+        })) || []
+      )
     } catch (error) {
       console.error('Erro ao carregar notificações:', error)
     }
@@ -155,9 +171,9 @@ export default function NotificationBell({ userId }: { userId: string }) {
                       Novo comentário em {notification.reviews.apartments.address}
                     </p>
                     <p className="text-sm text-gray-500 mt-1">
-                      {notification.from_user.username} comentou: "
-                      {notification.review_comments.comment.substring(0, 50)}
-                      {notification.review_comments.comment.length > 50 ? '...' : '"'}
+                      {notification.from_user[0].username} comentou: "
+                      {notification.review_comments?.[0]?.comment.substring(0, 50) || ''}
+                      {notification.review_comments?.[0]?.comment.length > 50 ? '...' : '"'}
                     </p>
                   </button>
                 ))
