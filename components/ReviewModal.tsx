@@ -25,7 +25,8 @@ type ReviewModalProps = {
   userMap: Record<string, string>
   selectedCommentId?: string | null
   isDeleting?: boolean
-  onDelete?: () => void
+  onDelete?: () => Promise<void>
+  onClose?: () => void
 }
 
 export default function ReviewModal({
@@ -35,7 +36,8 @@ export default function ReviewModal({
   userMap,
   selectedCommentId,
   isDeleting,
-  onDelete
+  onDelete,
+  onClose
 }: ReviewModalProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
 

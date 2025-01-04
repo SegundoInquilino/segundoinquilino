@@ -165,7 +165,6 @@ export default function ReviewCard({
           username={username}
           currentUserId={currentUserId}
           userMap={userMap}
-          onClose={() => setShowModal(false)}
         />
       )}
     </>
