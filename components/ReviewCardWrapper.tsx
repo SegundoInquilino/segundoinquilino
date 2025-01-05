@@ -129,7 +129,10 @@ export default function ReviewCardWrapper({
 
       <div className={layout === 'square' ? 'h-1/2 overflow-auto' : ''}>
         <ReviewCard
-          review={review}
+          review={{
+            ...review,
+            likes_count: review.likes_count || { count: 0 }
+          }}
           username={username}
           currentUserId={currentUserId}
           userMap={userMap}
