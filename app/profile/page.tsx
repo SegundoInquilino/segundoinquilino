@@ -5,6 +5,7 @@ import { createClient } from '@/utils/supabase-client'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import ReviewsList from '@/components/ReviewsList'
+import ReviewModal from '@/components/ReviewModal'
 import type { Review, Apartment } from '@/types/review'
 import { useAuth } from '@/contexts/AuthContext'
 
