@@ -9,4 +9,6 @@ export const AMENITIES = [
   { id: 'pool', label: 'Piscina' },
   { id: 'playground', label: 'Playground' },
   { id: 'pet_friendly', label: 'Pet friendly' }
-] 
+] as const
+
+export type AmenityId = typeof AMENITIES[number]['id'] 

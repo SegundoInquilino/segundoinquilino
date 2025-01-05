@@ -12,9 +12,9 @@ import { useAuth } from '@/contexts/AuthContext'
 interface Filters {
   search?: string
   city?: string
-  rating?: number | 'all'
+  rating?: number | undefined
   orderBy?: 'recent' | 'rating' | 'likes'
-  amenities?: string | string[]
+  amenities?: string[]
 }
 
 export default function ReviewsPage() {
@@ -126,49 +126,31 @@ export default function ReviewsPage() {
           likes_count:review_likes(count)
         `)
 
-      // Filtro por texto (endereço)
+      // Filtros
       if (filters.search?.trim()) {
         query = query.ilike('apartments.address', `%${filters.search.trim()}%`)
       }
 
-      // Filtro por cidade
       if (filters.city && filters.city !== 'all') {
         query = query.ilike('apartments.city', `%${filters.city}%`)
       }
 
-      // Filtro por avaliação
-      if (filters.rating && typeof filters.rating === 'number') {
+      if (typeof filters.rating === 'number') {
         query = query.gte('rating', filters.rating)
       }
 
-      // Filtro por amenidades
-      if (filters.amenities && filters.amenities.length > 0) {
-        // Usar contains para verificar se o array de amenidades contém TODAS as amenidades selecionadas
+      if (filters.amenities?.length) {
         filters.amenities.forEach(amenity => {
           query = query.contains('amenities', [amenity])
         })
       }
 
       // Ordenação
-      switch (filters.orderBy) {
-        case 'rating':
-          query = query.order('rating', { ascending: false })
-          break
-        case 'likes':
-          query = query.order('likes_count', { ascending: false })
-          break
-        default:
-          query = query.order('created_at', { ascending: false })
-      }
-
-      const { data, error } = await query
+      const { data, error } = await query.order('created_at', { ascending: false })
 
       if (error) throw error
+      if (data) setReviews(data as Review[])
 
-      if (data) {
-        setReviews(data as Review[])
-        // Atualizar userMap...
-      }
     } catch (error) {
       console.error('Erro ao filtrar reviews:', error)
     }

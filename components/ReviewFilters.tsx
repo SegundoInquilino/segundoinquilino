@@ -7,7 +7,7 @@ interface ReviewFiltersProps {
   onFilterChange: (filters: {
     search?: string
     city?: string
-    rating?: number
+    rating?: number | undefined
     orderBy?: 'recent' | 'rating' | 'likes'
     amenities?: string[]
   }) => void
