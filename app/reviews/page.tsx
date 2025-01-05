@@ -31,14 +31,17 @@ export default function ReviewsPage() {
     loadReviews()
 
     // Adicionar listener para atualização
-    const handleReviewDeleted = () => {
-      loadReviews()
+    const handleReviewDeleted = (event: CustomEvent) => {
+      const { reviewId } = event.detail
+      setReviews(prev => prev.filter(review => review.id !== reviewId))
+      setShowModal(false)
+      setSelectedReview(null)
     }
 
-    window.addEventListener('reviewDeleted', handleReviewDeleted)
+    window.addEventListener('reviewDeleted', handleReviewDeleted as EventListener)
 
     return () => {
-      window.removeEventListener('reviewDeleted', handleReviewDeleted)
+      window.removeEventListener('reviewDeleted', handleReviewDeleted as EventListener)
     }
   }, [])
 
@@ -215,7 +218,6 @@ export default function ReviewsPage() {
         {/* Reviews List */}
         <ReviewsList
           reviews={reviews}
-          loading={loading}
           userMap={userMap}
           currentUserId={currentUserId}
         />

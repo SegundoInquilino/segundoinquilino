@@ -12,6 +12,8 @@ import { useAuth } from '@/contexts/AuthContext'
 interface Profile {
   id: string
   username: string
+  full_name: string
+  avatar_url: string
 }
 
 interface UserMap {
@@ -33,6 +35,7 @@ export default function ProfilePage() {
   const [userMap, setUserMap] = useState<Record<string, string>>({})
   const [selectedReview, setSelectedReview] = useState<Review | null>(null)
   const [showModal, setShowModal] = useState(false)
+  const [fullName, setFullName] = useState('')
 
   useEffect(() => {
     loadProfile()
@@ -52,13 +55,14 @@ export default function ProfilePage() {
 
       const { data: profile } = await supabase
         .from('profiles')
-        .select('username, email')
+        .select('username, email, full_name, avatar_url')
         .eq('id', user.id)
         .single()
 
       if (profile) {
         setUsername(profile.username || '')
         setEmail(profile.email || '')
+        setFullName(profile.full_name || '')
       }
 
       // Usar a mesma query das outras páginas
@@ -117,8 +121,7 @@ export default function ProfilePage() {
       const { error } = await supabase
         .from('profiles')
         .update({
-          username,
-          updated_at: new Date().toISOString()
+          full_name: fullName
         })
         .eq('id', user.id)
 
@@ -210,11 +213,13 @@ export default function ProfilePage() {
           <div className="lg:col-span-1">
             <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
               <div className="flex items-center space-x-4 mb-6">
-                <div className="w-20 h-20 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-full flex items-center justify-center text-white text-2xl font-bold">
-                  {username ? username[0].toUpperCase() : 'U'}
+                <div className="w-20 h-20 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-lg transform hover:scale-105 transition-all duration-200">
+                  {fullName ? fullName[0].toUpperCase() : username ? username[0].toUpperCase() : 'U'}
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-800">Seu Perfil</h1>
+                  <h1 className="text-2xl font-bold text-gray-800">
+                    {fullName || username || 'Seu Perfil'}
+                  </h1>
                   <p className="text-gray-600">Gerencie suas informações pessoais</p>
                 </div>
               </div>
@@ -229,6 +234,19 @@ export default function ProfilePage() {
 
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
+                  <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-1">
+                    Nome Completo
+                  </label>
+                  <input
+                    id="fullName"
+                    type="text"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  />
+                </div>
+
+                <div>
                   <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
                     Nome de usuário
                   </label>
@@ -236,10 +254,13 @@ export default function ProfilePage() {
                     id="username"
                     type="text"
                     value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    required
+                    disabled
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 cursor-not-allowed"
+                    aria-label="Nome de usuário (não pode ser alterado)"
                   />
+                  <p className="mt-1 text-sm text-gray-500">
+                    O nome de usuário não pode ser alterado
+                  </p>
                 </div>
 
                 <div>

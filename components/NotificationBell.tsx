@@ -11,6 +11,7 @@ interface Notification {
   read: boolean
   created_at: string
   reviews: {
+    id: string
     apartments: {
       address: string
     }
@@ -48,14 +49,15 @@ export default function NotificationBell({ userId }: { userId: string }) {
           read,
           created_at,
           reviews!inner (
-            apartments!inner (
+            id,
+            apartments:apartments!inner (
               address
             )
           ),
           review_comments (
             comment
           ),
-          profiles!from_user_id (
+          profiles:from_user_id (
             username
           )
         `)
@@ -74,6 +76,7 @@ export default function NotificationBell({ userId }: { userId: string }) {
         read: notification.read,
         created_at: notification.created_at,
         reviews: {
+          id: notification.reviews?.[0]?.id || '',
           apartments: {
             address: notification.reviews?.[0]?.apartments?.[0]?.address || ''
           }
@@ -84,7 +87,7 @@ export default function NotificationBell({ userId }: { userId: string }) {
         review_comments: notification.review_comments || []
       })) || []
 
-      setNotifications(formattedData as Notification[])
+      setNotifications(formattedData)
     } catch (error) {
       console.error('Erro ao carregar notificações:', error)
     } finally {
@@ -218,7 +221,7 @@ export default function NotificationBell({ userId }: { userId: string }) {
                 <div className="flex-1 pl-4">
                   <p className={`text-sm ${notification.read ? 'text-gray-600' : 'text-gray-900'}`}>
                     <span className="font-medium">
-                      {notification.profiles?.username}
+                      {notification.profiles[0]?.username}
                     </span>{' '}
                     comentou em sua review do endereço{' '}
                     <span className="font-medium">

@@ -1,7 +1,9 @@
 'use client'
 
 import { useState } from 'react'
+import { createClient } from '@/utils/supabase-client'
 import ReviewComments from './ReviewComments'
+import type { Review } from '@/types/review'
 
 type ReviewModalProps = {
   review: {
@@ -42,6 +44,7 @@ export default function ReviewModal({
   onDeleteSuccess
 }: ReviewModalProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const supabase = createClient()
 
   const handlePrevImage = () => {
     if (!review.images?.length) return
@@ -66,11 +69,16 @@ export default function ReviewModal({
 
       if (error) throw error
 
-      // Emitir evento de atualização
-      const event = new CustomEvent('reviewDeleted')
+      // Primeiro emitir o evento
+      const event = new CustomEvent('reviewDeleted', {
+        detail: { reviewId: review.id }
+      })
       window.dispatchEvent(event)
-      
-      onClose()
+
+      // Depois fechar o modal
+      if (onClose) onClose()
+      if (onDeleteSuccess) onDeleteSuccess()
+
     } catch (error) {
       console.error('Erro ao deletar review:', error)
     }
@@ -168,12 +176,7 @@ export default function ReviewModal({
         <div className="mt-8 pt-6 border-t">
           <div className="flex justify-end">
             <button
-              onClick={async () => {
-                if (onDelete) {
-                  await onDelete()
-                  onDeleteSuccess?.()
-                }
-              }}
+              onClick={handleDelete}
               disabled={isDeleting}
               className="px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2"
             >
