@@ -7,25 +7,29 @@ import ReviewFilters from '@/components/ReviewFilters'
 import Link from 'next/link'
 import type { Review } from '@/types/review'
 import ReviewModal from '@/components/ReviewModal'
+import { useAuth } from '@/contexts/AuthContext'
 
 export default function ReviewsPage() {
   const [reviews, setReviews] = useState<Review[]>([])
-  const [userMap, setUserMap] = useState<Record<string, string>>({})
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const { currentUserId, setCurrentUserId } = useAuth()
+  const [userMap, setUserMap] = useState<Record<string, string>>({})
   const [selectedReviewId, setSelectedReviewId] = useState<string | null>(null)
   const [selectedCommentId, setSelectedCommentId] = useState<string | null>(null)
   const [showModal, setShowModal] = useState(false)
   const [selectedReview, setSelectedReview] = useState<Review | null>(null)
 
-  // Função para carregar os dados iniciais
-  const loadInitialData = async () => {
-    const supabase = createClient()
+  useEffect(() => {
+    loadReviews()
+  }, [])
 
+  const loadReviews = async () => {
     try {
+      const supabase = createClient()
+      
       // Carregar usuário atual
       const { data: { user } } = await supabase.auth.getUser()
-      setCurrentUserId(user?.id)
+      setCurrentUserId(user?.id || null)
 
       // Carregar reviews
       const { data: reviewsData } = await supabase
@@ -54,16 +58,11 @@ export default function ReviewsPage() {
         setUserMap(newUserMap)
       }
     } catch (error) {
-      console.error('Erro ao carregar dados:', error)
+      console.error('Erro ao carregar reviews:', error)
     } finally {
       setLoading(false)
     }
   }
-
-  // Carregar dados quando o componente montar
-  useEffect(() => {
-    loadInitialData()
-  }, [])
 
   useEffect(() => {
     // Verificar parâmetros da URL
@@ -230,7 +229,7 @@ export default function ReviewsPage() {
           userMap={userMap}
           currentUserId={currentUserId}
           onReviewDeleted={() => {
-            loadInitialData()
+            loadReviews()
           }}
         />
       </div>
