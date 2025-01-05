@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { createClient } from '@/utils/supabase-client'
 import ImageUpload from '@/components/ImageUpload'
 import { useRouter } from 'next/navigation'
+import AmenitiesSelector from '@/components/AmenitiesSelector'
 
 export default function NewReview() {
   const router = useRouter()
@@ -20,6 +21,7 @@ export default function NewReview() {
   const [imageUrls, setImageUrls] = useState<string[]>([])
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
+  const [selectedAmenities, setSelectedAmenities] = useState<string[]>([])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -50,7 +52,7 @@ export default function NewReview() {
 
       if (propertyError) throw propertyError
 
-      // Criar review com imagens
+      // Criar review com amenidades
       const { error: reviewError } = await supabase
         .from('reviews')
         .insert({
@@ -58,13 +60,11 @@ export default function NewReview() {
           user_id: user.id,
           rating: formData.rating,
           comment: formData.comment,
-          images: imageUrls // Array de URLs das imagens
+          images: imageUrls,
+          amenities: selectedAmenities
         })
 
-      if (reviewError) {
-        console.error('Erro ao criar review:', reviewError)
-        throw reviewError
-      }
+      if (reviewError) throw reviewError
 
       router.push('/reviews')
     } catch (error) {
@@ -240,6 +240,16 @@ export default function NewReview() {
           <ImageUpload
             onUploadComplete={(urls) => setImageUrls(urls)}
             maxImages={5}
+          />
+        </div>
+
+        <div className="space-y-4">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Características do Imóvel
+          </label>
+          <AmenitiesSelector
+            selectedAmenities={selectedAmenities}
+            onChange={setSelectedAmenities}
           />
         </div>
 
