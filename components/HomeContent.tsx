@@ -15,11 +15,12 @@ interface HomeContentProps {
 
 export default function HomeContent({ 
   initialReviews, 
-  topReviews, 
+  topReviews: initialTopReviews,
   userMap, 
   currentUserId 
 }: HomeContentProps) {
   const [recentReviews, setRecentReviews] = useState<Review[]>(initialReviews)
+  const [topReviews, setTopReviews] = useState<Review[]>(initialTopReviews)
 
   const loadReviews = async () => {
     const supabase = createClient()
@@ -42,6 +43,19 @@ export default function HomeContent({
     window.addEventListener('reviewCreated', handleReviewCreated)
     return () => {
       window.removeEventListener('reviewCreated', handleReviewCreated)
+    }
+  }, [])
+
+  useEffect(() => {
+    const handleReviewDeleted = (event: CustomEvent) => {
+      const { reviewId } = event.detail
+      setRecentReviews(prev => prev.filter(review => review.id !== reviewId))
+      setTopReviews(prev => prev.filter(review => review.id !== reviewId))
+    }
+
+    window.addEventListener('reviewDeleted', handleReviewDeleted as EventListener)
+    return () => {
+      window.removeEventListener('reviewDeleted', handleReviewDeleted as EventListener)
     }
   }, [])
 
