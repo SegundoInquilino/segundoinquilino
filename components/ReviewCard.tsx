@@ -7,13 +7,29 @@ import { supabase } from '@/lib/supabase'
 import ReviewModal from './ReviewModal'
 import type { Review } from '@/types/review'
 
-type ReviewCardProps = {
-  review: Review
+interface ReviewCardProps {
+  review: {
+    id: string
+    rating: number
+    comment: string
+    created_at: string
+    user_id: string
+    likes_count: number | { count: number }
+    images?: string[]
+    apartments: {
+      id: string
+      address: string
+      city: string
+      state: string
+      zip_code: string
+      neighborhood: string
+    }
+  }
   username: string
   currentUserId?: string | null
   userMap: Record<string, string>
   onClick?: () => void
-  onLike?: () => void
+  layout?: 'grid' | 'square'
 }
 
 export default function ReviewCard({
@@ -22,7 +38,7 @@ export default function ReviewCard({
   currentUserId,
   userMap,
   onClick,
-  onLike
+  layout
 }: ReviewCardProps) {
   const [isLiking, setIsLiking] = useState(false)
   const [showModal, setShowModal] = useState(false)
@@ -41,8 +57,6 @@ export default function ReviewCard({
           review_id: review.id, 
           user_id: currentUserId 
         })
-
-      onLike?.()
     } catch (error) {
       console.error('Erro ao dar like:', error)
     } finally {
@@ -58,6 +72,10 @@ export default function ReviewCard({
   }
 
   const { address, city, state, zip_code, neighborhood } = review.apartments
+
+  const likesCount = typeof review.likes_count === 'object' 
+    ? review.likes_count.count 
+    : review.likes_count || 0
 
   return (
     <>

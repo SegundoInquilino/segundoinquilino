@@ -16,5 +16,5 @@ export interface Review {
   images?: string[]
   user_id: string
   apartments: Apartment
-  likes_count?: number | { count: number }
+  likes_count: number | { count: number }
 } 
