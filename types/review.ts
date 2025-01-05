@@ -1,5 +1,3 @@
-export type PropertyType = 'apartment' | 'house'
-
 export interface Apartment {
   id: string
   address: string
@@ -7,7 +5,7 @@ export interface Apartment {
   city: string
   state: string
   zip_code: string
-  property_type: PropertyType
+  property_type: 'house' | 'apartment'
 }
 
 export interface Review {
@@ -15,11 +13,8 @@ export interface Review {
   rating: number
   comment: string
   created_at: string
-  user_id: string
-  likes_count: number | { count: number }
   images?: string[]
-  apartment_id: string
+  user_id: string
   apartments: Apartment
-  comments_count?: number
-  user_has_liked?: boolean
+  likes_count?: number | { count: number }
 } 

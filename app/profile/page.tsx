@@ -5,30 +5,8 @@ import { createClient } from '@/utils/supabase-client'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import ReviewsList from '@/components/ReviewsList'
-import type { Review } from '@/types/review'
+import type { Review, Apartment } from '@/types/review'
 import { useAuth } from '@/contexts/AuthContext'
-
-// Definir interfaces
-interface Apartment {
-  id: string
-  address: string
-  neighborhood: string
-  city: string
-  state: string
-  zip_code: string
-  property_type: 'house' | 'apartment'
-}
-
-interface Review {
-  id: string
-  rating: number
-  comment: string
-  created_at: string
-  images?: string[]
-  user_id: string
-  apartments: Apartment
-  likes_count?: number | { count: number }
-}
 
 interface Profile {
   id: string
