@@ -142,7 +142,6 @@ export default function ReviewModal({
           currentUserId={currentUserId}
           userMap={userMap}
         />
-        {console.log('Modal currentUserId:', currentUserId)}
       </div>
 
       {/* Botão de deletar */}

@@ -18,9 +18,9 @@ interface Notification {
   profiles: {
     username: string
   }
-  review_comments: {
+  review_comments: Array<{
     comment: string
-  }[]
+  }>
 }
 
 export default function NotificationBell({ userId }: { userId: string }) {
@@ -47,8 +47,8 @@ export default function NotificationBell({ userId }: { userId: string }) {
           comment_id,
           read,
           created_at,
-          reviews (
-            apartments (
+          reviews!inner (
+            apartments!inner (
               address
             )
           ),
@@ -65,7 +65,26 @@ export default function NotificationBell({ userId }: { userId: string }) {
         .limit(10)
 
       if (error) throw error
-      setNotifications(data || [])
+      
+      // Formatar os dados corretamente
+      const formattedData = data?.map(notification => ({
+        id: notification.id,
+        review_id: notification.review_id,
+        comment_id: notification.comment_id,
+        read: notification.read,
+        created_at: notification.created_at,
+        reviews: {
+          apartments: {
+            address: notification.reviews?.[0]?.apartments?.[0]?.address || ''
+          }
+        },
+        profiles: {
+          username: notification.profiles?.[0]?.username || ''
+        },
+        review_comments: notification.review_comments || []
+      })) || []
+
+      setNotifications(formattedData as Notification[])
     } catch (error) {
       console.error('Erro ao carregar notificações:', error)
     } finally {
