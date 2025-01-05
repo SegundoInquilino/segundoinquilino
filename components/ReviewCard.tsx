@@ -6,6 +6,7 @@ import { ptBR } from 'date-fns/locale'
 import { supabase } from '@/lib/supabase'
 import ReviewModal from './ReviewModal'
 import type { Review } from '@/types/review'
+import { AMENITIES } from '@/types/amenities'
 
 interface ReviewCardProps {
   review: {
@@ -24,6 +25,7 @@ interface ReviewCardProps {
       zip_code: string
       neighborhood: string
     }
+    amenities?: string[]
   }
   username: string
   currentUserId?: string | null
@@ -146,6 +148,26 @@ export default function ReviewCard({
           currentUserId={currentUserId}
           userMap={userMap}
         />
+      )}
+
+      {review.amenities && review.amenities.length > 0 && (
+        <div className="px-6 py-3 border-t border-gray-100">
+          <div className="flex flex-wrap gap-2">
+            {review.amenities.map(amenityId => {
+              const amenity = AMENITIES.find(a => a.id === amenityId)
+              if (!amenity) return null
+              
+              return (
+                <span
+                  key={amenityId}
+                  className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800"
+                >
+                  {amenity.label}
+                </span>
+              )
+            })}
+          </div>
+        </div>
       )}
     </>
   )

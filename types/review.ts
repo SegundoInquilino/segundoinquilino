@@ -17,4 +17,5 @@ export interface Review {
   user_id: string
   apartments: Apartment
   likes_count: number | { count: number }
+  amenities?: string[]
 } 

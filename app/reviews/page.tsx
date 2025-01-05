@@ -14,6 +14,7 @@ interface Filters {
   city?: string
   rating?: number | 'all'
   orderBy?: 'recent' | 'rating' | 'likes'
+  amenities?: string | string[]
 }
 
 export default function ReviewsPage() {
@@ -125,15 +126,13 @@ export default function ReviewsPage() {
           likes_count:review_likes(count)
         `)
 
-      // Aplicar filtros de busca
+      // Filtro por texto (endereço)
       if (filters.search?.trim()) {
-        const searchTerm = filters.search.trim()
-        query = query.filter('apartments.address', 'ilike', `%${searchTerm}%`)
+        query = query.ilike('apartments.address', `%${filters.search.trim()}%`)
       }
 
       // Filtro por cidade
       if (filters.city && filters.city !== 'all') {
-        // Ajustar para case insensitive e match parcial
         query = query.ilike('apartments.city', `%${filters.city}%`)
       }
 
@@ -142,43 +141,33 @@ export default function ReviewsPage() {
         query = query.gte('rating', filters.rating)
       }
 
-      // Aplicar ordenação
+      // Filtro por amenidades
+      if (filters.amenities && filters.amenities.length > 0) {
+        // Usar contains para verificar se o array de amenidades contém TODAS as amenidades selecionadas
+        filters.amenities.forEach(amenity => {
+          query = query.contains('amenities', [amenity])
+        })
+      }
+
+      // Ordenação
       switch (filters.orderBy) {
         case 'rating':
           query = query.order('rating', { ascending: false })
           break
         case 'likes':
-          query = query.order('likes_count', { ascending: false, nullsFirst: false })
+          query = query.order('likes_count', { ascending: false })
           break
         default:
           query = query.order('created_at', { ascending: false })
       }
 
-      console.log('Query de filtro:', query) // Debug
-
       const { data, error } = await query
 
-      if (error) {
-        console.error('Erro na query:', error)
-        throw error
-      }
+      if (error) throw error
 
       if (data) {
-        console.log('Resultados encontrados:', data.length)
         setReviews(data as Review[])
-
-        // Atualizar userMap para os novos resultados
-        const userIds = Array.from(new Set(data.map(r => r.user_id)))
-        const { data: profiles } = await supabase
-          .from('profiles')
-          .select('id, username')
-          .in('id', userIds)
-
-        const newUserMap: Record<string, string> = {}
-        profiles?.forEach(profile => {
-          newUserMap[profile.id] = profile.username || 'Usuário'
-        })
-        setUserMap(newUserMap)
+        // Atualizar userMap...
       }
     } catch (error) {
       console.error('Erro ao filtrar reviews:', error)

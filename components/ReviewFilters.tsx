@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import AmenitiesSelector from '@/components/AmenitiesSelector'
 
 interface ReviewFiltersProps {
   onFilterChange: (filters: {
@@ -8,6 +9,7 @@ interface ReviewFiltersProps {
     city?: string
     rating?: number
     orderBy?: 'recent' | 'rating' | 'likes'
+    amenities?: string[]
   }) => void
 }
 
@@ -16,21 +18,24 @@ export default function ReviewFilters({ onFilterChange }: ReviewFiltersProps) {
   const [city, setCity] = useState('all')
   const [rating, setRating] = useState('all')
   const [orderBy, setOrderBy] = useState('recent')
+  const [selectedAmenities, setSelectedAmenities] = useState<string[]>([])
 
   const handleChange = (
-    type: 'search' | 'city' | 'rating' | 'orderBy',
-    value: string
+    type: 'search' | 'city' | 'rating' | 'orderBy' | 'amenities',
+    value: any
   ) => {
     if (type === 'search') setSearch(value)
     if (type === 'city') setCity(value)
     if (type === 'rating') setRating(value)
     if (type === 'orderBy') setOrderBy(value)
+    if (type === 'amenities') setSelectedAmenities(value)
 
     onFilterChange({
       search: type === 'search' ? value : search,
       city: type === 'city' ? (value === 'all' ? undefined : value) : (city === 'all' ? undefined : city),
       rating: type === 'rating' ? (value === 'all' ? undefined : Number(value)) : (rating === 'all' ? undefined : Number(rating)),
-      orderBy: type === 'orderBy' ? value as 'recent' | 'rating' | 'likes' : orderBy as 'recent' | 'rating' | 'likes'
+      orderBy: type === 'orderBy' ? value as 'recent' | 'rating' | 'likes' : orderBy as 'recent' | 'rating' | 'likes',
+      amenities: type === 'amenities' ? value : selectedAmenities
     })
   }
 
@@ -109,6 +114,13 @@ export default function ReviewFilters({ onFilterChange }: ReviewFiltersProps) {
           </select>
         </div>
       </div>
+
+      <AmenitiesSelector
+        selectedAmenities={selectedAmenities}
+        onChange={(amenities) => {
+          handleChange('amenities', amenities)
+        }}
+      />
     </div>
   )
 } 
