@@ -17,31 +17,12 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  const supabase = createClient()
-  
-  // Buscar informações do usuário
-  const { data: { user } } = await supabase.auth.getUser()
-  let username = null
-
-  if (user) {
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('username')
-      .eq('id', user.id)
-      .single()
-    
-    username = profile?.username
-  }
-
   return (
     <html lang="pt-BR">
       <body className={inter.className}>
         <AuthProvider>
           <div className="min-h-screen pt-16">
-            <Navbar 
-              username={username || undefined} 
-              currentUserId={user?.id}
-            />
+            <Navbar />
             {children}
           </div>
         </AuthProvider>
