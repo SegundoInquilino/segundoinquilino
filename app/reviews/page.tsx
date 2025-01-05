@@ -9,6 +9,13 @@ import type { Review } from '@/types/review'
 import ReviewModal from '@/components/ReviewModal'
 import { useAuth } from '@/contexts/AuthContext'
 
+interface Filters {
+  search?: string
+  city?: string
+  rating?: number | 'all'
+  orderBy?: 'recent' | 'rating' | 'likes'
+}
+
 export default function ReviewsPage() {
   const [reviews, setReviews] = useState<Review[]>([])
   const [loading, setLoading] = useState(true)
@@ -106,12 +113,7 @@ export default function ReviewsPage() {
     }
   }, [selectedReviewId, reviews])
 
-  const handleFilterChange = async (filters: {
-    search?: string
-    city?: string
-    rating?: number
-    orderBy?: 'recent' | 'rating' | 'likes'
-  }) => {
+  const handleFilterChange = async (filters: Filters) => {
     const supabase = createClient()
     
     try {
@@ -136,7 +138,7 @@ export default function ReviewsPage() {
       }
 
       // Filtro por avaliação
-      if (filters.rating && filters.rating !== 'all') {
+      if (filters.rating && typeof filters.rating === 'number') {
         query = query.gte('rating', filters.rating)
       }
 
