@@ -57,6 +57,25 @@ export default function ReviewModal({
     )
   }
 
+  const handleDelete = async () => {
+    try {
+      const { error } = await supabase
+        .from('reviews')
+        .delete()
+        .eq('id', review.id)
+
+      if (error) throw error
+
+      // Emitir evento de atualização
+      const event = new CustomEvent('reviewDeleted')
+      window.dispatchEvent(event)
+      
+      onClose()
+    } catch (error) {
+      console.error('Erro ao deletar review:', error)
+    }
+  }
+
   return (
     <div className="space-y-6">
       {/* Cabeçalho */}

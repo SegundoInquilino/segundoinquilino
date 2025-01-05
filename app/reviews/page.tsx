@@ -29,6 +29,17 @@ export default function ReviewsPage() {
 
   useEffect(() => {
     loadReviews()
+
+    // Adicionar listener para atualização
+    const handleReviewDeleted = () => {
+      loadReviews()
+    }
+
+    window.addEventListener('reviewDeleted', handleReviewDeleted)
+
+    return () => {
+      window.removeEventListener('reviewDeleted', handleReviewDeleted)
+    }
   }, [])
 
   const loadReviews = async () => {
@@ -140,9 +151,7 @@ export default function ReviewsPage() {
       }
 
       if (filters.amenities?.length) {
-        filters.amenities.forEach(amenity => {
-          query = query.contains('amenities', [amenity])
-        })
+        query = query.overlaps('amenities', filters.amenities)
       }
 
       // Ordenação
@@ -167,30 +176,37 @@ export default function ReviewsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50 py-16">
-      <div className="container mx-auto px-4">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800">Todas as Reviews</h1>
-          <Link
-            href="/new-review"
-            className="inline-flex items-center px-6 py-2 text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors"
-          >
-            <span>Nova Review</span>
-            <svg
-              className="ml-2 w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 4v16m8-8H4"
-              />
-            </svg>
-          </Link>
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50 py-12">
+      <div className="max-w-7xl mx-auto px-4">
+        {/* Header roxo */}
+        <div className="bg-gradient-to-r from-primary-600 to-secondary-600 rounded-2xl p-8 mb-8 text-white">
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-3xl font-bold">Reviews</h1>
+            {currentUserId && (
+              <Link
+                href="/new-review"
+                className="inline-flex items-center px-4 py-2 bg-white text-primary-600 rounded-lg hover:bg-primary-50 transition-colors"
+              >
+                <svg
+                  className="w-5 h-5 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 4v16m8-8H4"
+                  />
+                </svg>
+                Nova Review
+              </Link>
+            )}
+          </div>
+          <p className="text-primary-100 mb-4">
+            Compartilhe suas experiências e ajude outros inquilinos a encontrar o lugar ideal.
+          </p>
         </div>
 
         {/* Filtros */}
@@ -199,11 +215,9 @@ export default function ReviewsPage() {
         {/* Reviews List */}
         <ReviewsList
           reviews={reviews}
+          loading={loading}
           userMap={userMap}
           currentUserId={currentUserId}
-          onReviewDeleted={() => {
-            loadReviews()
-          }}
         />
       </div>
 
@@ -266,6 +280,6 @@ export default function ReviewsPage() {
           </div>
         </div>
       )}
-    </main>
+    </div>
   )
 } 

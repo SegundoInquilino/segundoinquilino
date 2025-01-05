@@ -66,7 +66,11 @@ export default function NewReview() {
 
       if (reviewError) throw reviewError
 
-      router.push('/reviews')
+      // Emitir evento de atualização
+      const event = new CustomEvent('reviewCreated')
+      window.dispatchEvent(event)
+      
+      router.push('/home')
     } catch (error) {
       console.error('Erro:', error)
       setError('Erro ao criar review')
