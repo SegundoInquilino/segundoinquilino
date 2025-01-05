@@ -10,12 +10,15 @@ export interface Apartment {
 
 export interface Review {
   id: string
+  user_id: string
+  apartment_id: string
   rating: number
+  content: string
   comment: string
   created_at: string
   images?: string[]
-  user_id: string
   apartments: Apartment
-  likes_count: number | { count: number }
-  amenities?: string[]
+  likes_count: number | {
+    count: number
+  }
 } 

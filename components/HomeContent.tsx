@@ -3,7 +3,7 @@
 import { ReactNode, useState, useEffect } from 'react'
 import ReviewsList from './ReviewsList'
 import Link from 'next/link'
-import { Review } from '@/types'
+import { Review } from '@/types/review'
 import { useRouter } from 'next/navigation'
 
 interface HomeContentProps {

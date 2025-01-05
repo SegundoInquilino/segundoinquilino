@@ -6,8 +6,9 @@ import { useRouter } from 'next/navigation'
 
 interface Notification {
   id: string
+  user_id: string
   review_id: string
-  comment_id: string
+  comment_id?: string
   read: boolean
   created_at: string
   reviews: {
@@ -18,8 +19,8 @@ interface Notification {
   }
   profiles: {
     username: string
-  }
-  review_comments: Array<{
+  }[]
+  review_comments?: Array<{
     comment: string
   }>
 }
@@ -44,20 +45,26 @@ export default function NotificationBell({ userId }: { userId: string }) {
         .from('notifications')
         .select(`
           id,
+          user_id,
           review_id,
           comment_id,
           read,
           created_at,
           reviews!inner (
             id,
-            apartments:apartments!inner (
+            apartments!inner (
               address
             )
           ),
           review_comments (
-            comment
+            id,
+            comment,
+            user_id,
+            profiles:user_id (
+              username
+            )
           ),
-          profiles:from_user_id (
+          from_user:from_user_id (
             username
           )
         `)
@@ -66,30 +73,48 @@ export default function NotificationBell({ userId }: { userId: string }) {
         .order('created_at', { ascending: false })
         .limit(10)
 
-      if (error) throw error
-      
+      if (error) {
+        console.error('Erro na query do Supabase:', error.message, error.details)
+        return
+      }
+
+      if (!data) {
+        console.log('Nenhuma notificação encontrada')
+        setNotifications([])
+        return
+      }
+
+      // Log para debug
+      console.log('Dados retornados:', data)
+
       // Formatar os dados corretamente
-      const formattedData = data?.map(notification => ({
+      const formattedData = data.map(notification => ({
         id: notification.id,
+        user_id: notification.user_id,
         review_id: notification.review_id,
         comment_id: notification.comment_id,
         read: notification.read,
         created_at: notification.created_at,
         reviews: {
-          id: notification.reviews?.[0]?.id || '',
+          id: notification.reviews[0]?.id || '',
           apartments: {
-            address: notification.reviews?.[0]?.apartments?.[0]?.address || ''
+            address: notification.reviews[0]?.apartments[0]?.address || ''
           }
         },
-        profiles: {
-          username: notification.profiles?.[0]?.username || ''
-        },
+        profiles: notification.from_user || [],
         review_comments: notification.review_comments || []
-      })) || []
+      }))
 
       setNotifications(formattedData)
     } catch (error) {
-      console.error('Erro ao carregar notificações:', error)
+      if (error instanceof Error) {
+        console.error('Erro ao carregar notificações:', {
+          message: error.message,
+          stack: error.stack
+        })
+      } else {
+        console.error('Erro desconhecido ao carregar notificações:', error)
+      }
     } finally {
       setLoading(false)
     }
@@ -122,25 +147,19 @@ export default function NotificationBell({ userId }: { userId: string }) {
 
   const handleNotificationClick = async (notification: Notification) => {
     try {
-      // Marcar como lida se ainda não estiver
       if (!notification.read) {
         await supabase
           .from('notifications')
           .update({ read: true })
           .eq('id', notification.id)
-
-        // Atualizar estado local
-        setNotifications(prev => 
-          prev.map(n => 
-            n.id === notification.id 
-              ? { ...n, read: true }
-              : n
-          )
-        )
       }
 
-      // Redirecionar para a review e forçar refresh da página
-      router.push(`/reviews?reviewId=${notification.review_id}&showModal=true&commentId=${notification.comment_id}&t=${Date.now()}`)
+      // Fechar o menu de notificações
+      setIsOpen(false)
+      
+      // Usar window.location para forçar um refresh completo
+      window.location.href = `/reviews?reviewId=${notification.review_id}&showModal=true&commentId=${notification.comment_id}`
+
     } catch (error) {
       console.error('Erro ao processar notificação:', error)
     }
@@ -221,7 +240,7 @@ export default function NotificationBell({ userId }: { userId: string }) {
                 <div className="flex-1 pl-4">
                   <p className={`text-sm ${notification.read ? 'text-gray-600' : 'text-gray-900'}`}>
                     <span className="font-medium">
-                      {notification.profiles[0]?.username}
+                      {notification.profiles[0]?.username || 'Usuário'}
                     </span>{' '}
                     comentou em sua review do endereço{' '}
                     <span className="font-medium">

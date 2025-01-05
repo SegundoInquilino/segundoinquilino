@@ -1,0 +1,1 @@
+export * from './review'  // Isso vai exportar todos os tipos do arquivo review.ts 

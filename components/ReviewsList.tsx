@@ -6,7 +6,7 @@ import type { Review } from '@/types/review'
 interface ReviewsListProps {
   reviews: Review[]
   userMap: Record<string, string>
-  currentUserId?: string
+  currentUserId?: string | null
   onReviewDeleted?: (reviewId: string) => void
   layout?: 'grid' | 'square'
 }
@@ -32,6 +32,7 @@ export default function ReviewsList({
           currentUserId={currentUserId}
           onReviewDeleted={() => onReviewDeleted?.(review.id)}
           layout={layout}
+          userMap={userMap}
         />
       ))}
     </div>
