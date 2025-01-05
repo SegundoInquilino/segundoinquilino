@@ -107,6 +107,8 @@ export default function ProfilePage() {
     setSaving(true)
     setMessage(null)
 
+    const supabase = createClient()
+
     try {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) throw new Error('Usuário não autenticado')
