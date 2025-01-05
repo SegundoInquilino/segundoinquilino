@@ -4,6 +4,7 @@ import './globals.css'
 import Navbar from '@/components/Navbar'
 import { createClient } from '@/utils/supabase-server'
 import { AuthProvider } from '@/contexts/AuthContext'
+import Header from '@/components/Header'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -17,14 +18,17 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
   return (
     <html lang="pt-BR">
       <body className={inter.className}>
         <AuthProvider>
-          <div className="min-h-screen pt-16">
-            <Navbar />
+          <Header currentUserId={user?.id} />
+          <main>
             {children}
-          </div>
+          </main>
         </AuthProvider>
       </body>
     </html>
