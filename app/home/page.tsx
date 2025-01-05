@@ -1,6 +1,14 @@
 import { createClient } from '@/utils/supabase-server'
 import HomeContent from '@/components/HomeContent'
 
+// Adicionar interfaces
+interface Profile {
+  id: string
+  username: string
+}
+
+type UserMap = Record<string, string>
+
 export default async function HomePage() {
   const supabase = createClient()
 
