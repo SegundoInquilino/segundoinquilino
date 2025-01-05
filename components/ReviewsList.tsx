@@ -3,18 +3,18 @@
 import ReviewCardWrapper from './ReviewCardWrapper'
 import type { Review } from '@/types/review'
 
-type ReviewsListProps = {
+interface ReviewsListProps {
   reviews: Review[]
   userMap: Record<string, string>
-  currentUserId?: string | null
-  onReviewDeleted?: () => void
+  currentUserId?: string
+  onReviewDeleted?: (reviewId: string) => void
   layout?: 'grid' | 'square'
 }
 
 export default function ReviewsList({ 
   reviews, 
   userMap, 
-  currentUserId, 
+  currentUserId,
   onReviewDeleted,
   layout = 'grid'
 }: ReviewsListProps) {
@@ -30,8 +30,7 @@ export default function ReviewsList({
           review={review}
           username={userMap[review.user_id]}
           currentUserId={currentUserId}
-          userMap={userMap}
-          onReviewDeleted={onReviewDeleted}
+          onReviewDeleted={() => onReviewDeleted?.(review.id)}
           layout={layout}
         />
       ))}

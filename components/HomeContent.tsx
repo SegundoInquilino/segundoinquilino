@@ -1,107 +1,55 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { createClient } from '@/utils/supabase-client'
+import { ReactNode, useState, useEffect } from 'react'
 import ReviewsList from './ReviewsList'
 import Link from 'next/link'
-import type { Review } from '@/types/review'
+import { Review } from '@/types'
+import { useRouter } from 'next/navigation'
 
 interface HomeContentProps {
   initialReviews: Review[]
   topReviews: Review[]
   userMap: Record<string, string>
-  currentUserId: string | null
+  currentUserId?: string
+  children?: ReactNode
 }
 
 export default function HomeContent({ 
   initialReviews, 
-  topReviews: initialTopReviews,
+  topReviews, 
   userMap, 
-  currentUserId 
+  currentUserId,
+  children 
 }: HomeContentProps) {
-  const [recentReviews, setRecentReviews] = useState<Review[]>(initialReviews)
-  const [topReviews, setTopReviews] = useState<Review[]>(initialTopReviews)
+  const router = useRouter()
+  const [reviews, setReviews] = useState(initialReviews)
+  const [topRatedReviews, setTopRatedReviews] = useState(topReviews)
 
-  const loadReviews = async () => {
-    const supabase = createClient()
-    const { data } = await supabase
-      .from('reviews')
-      .select(`*, apartments (*), likes_count:review_likes(count)`)
-      .order('created_at', { ascending: false })
-      .limit(6)
+  const handleReviewDeleted = (deletedReviewId: string) => {
+    // Atualiza os estados locais imediatamente
+    setReviews(prevReviews => 
+      prevReviews.filter(review => review.id !== deletedReviewId)
+    )
+    
+    setTopRatedReviews(prevReviews => 
+      prevReviews.filter(review => review.id !== deletedReviewId)
+    )
 
-    if (data) {
-      setRecentReviews(data as Review[])
-    }
+    // Atualiza os dados do servidor
+    router.refresh()
   }
 
-  useEffect(() => {
-    const handleReviewCreated = () => {
-      loadReviews()
-    }
-
-    window.addEventListener('reviewCreated', handleReviewCreated)
-    return () => {
-      window.removeEventListener('reviewCreated', handleReviewCreated)
-    }
-  }, [])
-
-  useEffect(() => {
-    const handleReviewDeleted = (event: CustomEvent) => {
-      const { reviewId } = event.detail
-      setRecentReviews(prev => prev.filter(review => review.id !== reviewId))
-      setTopReviews(prev => prev.filter(review => review.id !== reviewId))
-    }
-
-    window.addEventListener('reviewDeleted', handleReviewDeleted as EventListener)
-    return () => {
-      window.removeEventListener('reviewDeleted', handleReviewDeleted as EventListener)
-    }
-  }, [])
-
   return (
-    <main className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-primary-600 to-secondary-700 text-white py-20">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-5xl font-bold mb-6 leading-tight">
-              Segundo Inquilino
-            </h1>
-            <p className="text-xl mb-12 text-primary-100">
-              Encontre e compartilhe experiências reais sobre apartamentos para alugar
-            </p>
-            <Link
-              href="/new-review"
-              className="inline-flex items-center px-8 py-3 text-lg font-semibold text-white bg-secondary-600 rounded-full hover:bg-secondary-500 transition-colors duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-            >
-              <span>Criar Nova Review</span>
-              <svg
-                className="ml-2 w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M17 8l4 4m0 0l-4 4m4-4H3"
-                />
-              </svg>
-            </Link>
-          </div>
-        </div>
-      </section>
+    <div className="min-h-screen bg-gray-100">
+      {children}
 
-      {/* Recent Reviews Section */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <section className="mb-16">
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-2xl font-bold text-gray-800">Reviews Recentes</h2>
             <Link
               href="/reviews"
-              className="text-primary-600 hover:text-primary-700 font-semibold flex items-center gap-2"
+              className="text-purple-800 hover:text-purple-900 font-semibold flex items-center gap-2"
             >
               Ver todas
               <svg
@@ -120,42 +68,23 @@ export default function HomeContent({
             </Link>
           </div>
           <ReviewsList
-            reviews={recentReviews}
+            reviews={reviews}
             userMap={userMap}
             currentUserId={currentUserId}
+            onReviewDeleted={handleReviewDeleted}
           />
-        </div>
-      </section>
+        </section>
 
-      {/* Top Rated Section */}
-      <section className="bg-white py-16">
-        <div className="container mx-auto px-4">
+        <section className="bg-white rounded-2xl shadow-sm p-8">
           <h2 className="text-2xl font-bold text-gray-800 mb-8">Melhores Avaliações</h2>
           <ReviewsList
-            reviews={topReviews}
+            reviews={topRatedReviews}
             userMap={userMap}
             currentUserId={currentUserId}
+            onReviewDeleted={handleReviewDeleted}
           />
-        </div>
-      </section>
-
-      {/* Call to Action Section */}
-      <section className="bg-gradient-to-br from-primary-600 to-secondary-700 text-white py-16">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-4">
-            Compartilhe Sua Experiência
-          </h2>
-          <p className="text-primary-100 mb-8 max-w-2xl mx-auto">
-            Ajude outros inquilinos a encontrar o lugar perfeito compartilhando sua experiência com um apartamento.
-          </p>
-          <Link
-            href="/new-review"
-            className="inline-flex items-center px-8 py-3 text-lg font-semibold text-white bg-secondary-600 rounded-full hover:bg-secondary-500 transition-colors duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-          >
-            Criar Nova Review
-          </Link>
-        </div>
-      </section>
-    </main>
+        </section>
+      </main>
+    </div>
   )
 } 
