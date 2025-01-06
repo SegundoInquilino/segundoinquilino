@@ -6,6 +6,31 @@ import ReviewsList from '@/components/ReviewsList'
 import type { Review } from '@/types/review'
 import { useAuth } from '@/contexts/AuthContext'
 
+interface FavoriteWithReview {
+  review_id: string
+  reviews: {
+    id: string
+    user_id: string
+    apartment_id: string
+    rating: number
+    content: string
+    comment: string
+    created_at: string
+    images?: string[]
+    apartments: {
+      id: string
+      name: string
+      property_type: 'house' | 'apartment'
+      address: string
+      neighborhood: string
+      city: string
+      state: string
+      zip_code: string
+    }
+    likes_count?: { count: number }[]
+  }
+}
+
 export default function FavoritesPage() {
   const [reviews, setReviews] = useState<Review[]>([])
   const [userMap, setUserMap] = useState<Record<string, string>>({})
@@ -26,15 +51,38 @@ export default function FavoritesPage() {
         .select(`
           review_id,
           reviews (
-            *,
-            apartments (*),
+            id,
+            user_id,
+            apartment_id,
+            rating,
+            content,
+            comment,
+            created_at,
+            images,
+            apartments (
+              id,
+              name,
+              property_type,
+              address,
+              neighborhood,
+              city,
+              state,
+              zip_code
+            ),
             likes_count:review_likes(count)
           )
         `)
         .eq('user_id', currentUserId)
 
       if (favorites) {
-        const reviewsData = favorites.map(f => f.reviews as Review)
+        const typedFavorites = favorites as unknown as FavoriteWithReview[]
+        
+        const reviewsData = typedFavorites.map(f => ({
+          ...f.reviews,
+          comment: f.reviews.comment || '',
+          likes_count: f.reviews.likes_count?.[0] || { count: 0 }
+        }))
+        
         setReviews(reviewsData)
 
         // Carregar userMap
