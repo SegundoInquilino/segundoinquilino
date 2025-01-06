@@ -115,21 +115,32 @@ export default function ReviewCardWrapper({
     if (!currentUserId) return
 
     try {
+      // Log para debug
+      console.log('Tentando favoritar review:', review.id)
+
       if (isFavorited) {
-        await supabase
+        const { error: deleteError } = await supabase
           .from('favorites')
           .delete()
           .eq('user_id', currentUserId)
           .eq('review_id', review.id)
+
+        if (deleteError) throw deleteError
       } else {
-        await supabase
+        const { error: insertError } = await supabase
           .from('favorites')
           .insert({
             user_id: currentUserId,
             review_id: review.id
           })
+
+        if (insertError) throw insertError
       }
+
+      // Se chegou aqui, deu certo
       setIsFavorited(!isFavorited)
+      console.log('Favorito atualizado com sucesso')
+
     } catch (error) {
       console.error('Erro ao favoritar:', error)
     }

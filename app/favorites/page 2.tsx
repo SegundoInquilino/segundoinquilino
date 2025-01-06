@@ -31,42 +31,6 @@ interface FavoriteWithReview {
   }
 }
 
-interface ReviewData {
-  id: string
-  user_id: string
-  apartment_id: string
-  rating: number
-  comment: string
-  created_at: string
-  images?: string[]
-  apartments: {
-    id: string
-    address: string
-    property_type: 'house' | 'apartment'
-    neighborhood: string
-    city: string
-    state: string
-    zip_code: string
-  }
-  likes_count?: { count: number }[]
-}
-
-interface ProcessedReview extends Omit<ReviewData, 'likes_count'> {
-  content: string
-  comment: string
-  likes_count: { count: number }
-  apartments: {
-    id: string
-    name: string
-    address: string
-    property_type: 'house' | 'apartment'
-    neighborhood: string
-    city: string
-    state: string
-    zip_code: string
-  }
-}
-
 export default function FavoritesPage() {
   const [reviews, setReviews] = useState<Review[]>([])
   const [userMap, setUserMap] = useState<Record<string, string>>({})
@@ -76,36 +40,30 @@ export default function FavoritesPage() {
 
   useEffect(() => {
     if (currentUserId) {
-      console.log('Carregando favoritos para usuário:', currentUserId)
       loadFavorites()
     }
   }, [currentUserId])
 
   const loadFavorites = async () => {
     try {
-      if (!currentUserId) {
-        console.log('Nenhum usuário logado')
-        return
-      }
-
-      // Query ajustada com os campos corretos da tabela reviews
-      const { data: favorites, error } = await supabase
+      const { data: favorites } = await supabase
         .from('favorites')
         .select(`
-          id,
           review_id,
           reviews (
             id,
             user_id,
             apartment_id,
             rating,
+            content,
             comment,
             created_at,
             images,
             apartments (
               id,
-              address,
+              name,
               property_type,
+              address,
               neighborhood,
               city,
               state,
@@ -116,58 +74,23 @@ export default function FavoritesPage() {
         `)
         .eq('user_id', currentUserId)
 
-      console.log('Query completa - Dados:', favorites)
+      if (favorites) {
+        const typedFavorites = favorites as unknown as FavoriteWithReview[]
+        
+        const reviewsData = typedFavorites.map(f => ({
+          ...f.reviews,
+          comment: f.reviews.comment || '',
+          likes_count: f.reviews.likes_count?.[0] || { count: 0 }
+        }))
+        
+        setReviews(reviewsData)
 
-      if (error) {
-        console.error('Erro na query:', error.message, error.details)
-        throw error
-      }
-
-      if (!favorites || favorites.length === 0) {
-        console.log('Nenhum favorito encontrado')
-        setReviews([])
-        return
-      }
-
-      // Processar os dados
-      const reviewsData = favorites
-        .map(favorite => {
-          const review = favorite.reviews as unknown as ReviewData
-          if (!review) {
-            console.log('Review não encontrada para favorito:', favorite)
-            return null
-          }
-
-          const processedReview: ProcessedReview = {
-            ...review,
-            content: review.comment,
-            comment: review.comment || '',
-            likes_count: review.likes_count?.[0] || { count: 0 },
-            apartments: {
-              ...review.apartments,
-              name: review.apartments.address
-            }
-          }
-
-          return processedReview
-        })
-        .filter((review): review is ProcessedReview => review !== null)
-
-      console.log('Reviews processadas:', reviewsData)
-      setReviews(reviewsData as unknown as Review[])
-
-      // Carregar userMap
-      if (reviewsData.length > 0) {
+        // Carregar userMap
         const userIds = Array.from(new Set(reviewsData.map(r => r.user_id)))
-        const { data: profiles, error: profilesError } = await supabase
+        const { data: profiles } = await supabase
           .from('profiles')
           .select('id, username')
           .in('id', userIds)
-
-        if (profilesError) {
-          console.error('Erro ao carregar perfis:', profilesError)
-          return
-        }
 
         const newUserMap: Record<string, string> = {}
         profiles?.forEach(profile => {
@@ -175,7 +98,6 @@ export default function FavoritesPage() {
         })
         setUserMap(newUserMap)
       }
-
     } catch (error) {
       console.error('Erro ao carregar favoritos:', error)
     } finally {
