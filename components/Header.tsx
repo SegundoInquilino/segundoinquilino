@@ -1,44 +1,25 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import NotificationBell from './NotificationBell'
 import Sidebar from './Sidebar'
-import { createClient } from '@/utils/supabase-client'
+import { useRouter } from 'next/navigation'
 
 interface HeaderProps {
   currentUserId?: string
+  username?: string
+  profile?: {
+    avatar_url?: string
+  }
 }
 
-export default function Header({ currentUserId }: HeaderProps) {
+export default function Header({ username, currentUserId, profile }: HeaderProps) {
+  const router = useRouter()
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
-  const [username, setUsername] = useState('')
-  const supabase = createClient()
-
-  useEffect(() => {
-    if (currentUserId) {
-      loadUserProfile()
-    }
-  }, [currentUserId])
-
-  const loadUserProfile = async () => {
-    try {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('username')
-        .eq('id', currentUserId)
-        .single()
-
-      if (profile?.username) {
-        setUsername(profile.username)
-      }
-    } catch (error) {
-      console.error('Erro ao carregar perfil:', error)
-    }
-  }
 
   return (
-    <header className="bg-white shadow-sm">
+    <header className="fixed top-0 left-0 right-0 bg-white shadow-sm z-40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Menu Button */}
@@ -70,23 +51,29 @@ export default function Header({ currentUserId }: HeaderProps) {
 
           {/* Right Section */}
           <div className="flex items-center space-x-4">
-            {currentUserId && (
+            {currentUserId ? (
               <>
-                <NotificationBell userId={currentUserId} />
-                <div className="flex items-center space-x-2">
-                  {/* Avatar */}
+                <NotificationBell currentUserId={currentUserId} />
+                <Link
+                  href="/profile"
+                  className="text-gray-700 hover:text-primary-600 transition-colors font-medium flex items-center gap-2 group"
+                >
                   <div className="relative">
-                    <div className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-white font-medium">
-                      {username.charAt(0).toUpperCase()}
+                    <div className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-white font-medium group-hover:bg-purple-700 transition-colors">
+                      {username?.charAt(0).toUpperCase()}
                     </div>
                     <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
                   </div>
-                  {/* Username */}
-                  <span className="text-sm font-medium text-gray-700">
-                    {username}
-                  </span>
-                </div>
+                  <span className="hover:underline">{username}</span>
+                </Link>
               </>
+            ) : (
+              <Link
+                href="/auth"
+                className="text-gray-700 hover:text-primary-600 transition-colors"
+              >
+                Entrar
+              </Link>
             )}
           </div>
         </div>

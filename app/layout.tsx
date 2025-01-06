@@ -19,12 +19,34 @@ export default async function RootLayout({
 }) {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
+  
+  let username = ''
+  let profile = null
+
+  if (user) {
+    const { data } = await supabase
+      .from('profiles')
+      .select('username, avatar_url')
+      .eq('id', user.id)
+      .single()
+    
+    if (data) {
+      username = data.username
+      profile = {
+        avatar_url: data.avatar_url
+      }
+    }
+  }
 
   return (
     <html lang="pt-BR">
       <body className={inter.className}>
         <AuthProvider>
-          {user && <Header currentUserId={user.id} />}
+          <Header 
+            currentUserId={user?.id} 
+            username={username}
+            profile={profile}
+          />
           <main className={user ? 'pt-16' : ''}>
             {children}
           </main>

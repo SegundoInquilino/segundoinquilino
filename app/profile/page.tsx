@@ -8,6 +8,7 @@ import ReviewsList from '@/components/ReviewsList'
 import ReviewModal from '@/components/ReviewModal'
 import type { Review, Apartment } from '@/types/review'
 import { useAuth } from '@/contexts/AuthContext'
+import AvatarUpload from '@/components/AvatarUpload'
 
 interface Profile {
   id: string
@@ -36,6 +37,7 @@ export default function ProfilePage() {
   const [selectedReview, setSelectedReview] = useState<Review | null>(null)
   const [showModal, setShowModal] = useState(false)
   const [fullName, setFullName] = useState('')
+  const [profile, setProfile] = useState<Profile | null>(null)
 
   useEffect(() => {
     loadProfile()
@@ -156,6 +158,10 @@ export default function ProfilePage() {
     } catch (error) {
       console.error('Erro ao fazer logout:', error)
     }
+  }
+
+  const handleAvatarUpload = (url: string) => {
+    setProfile(prev => prev ? { ...prev, avatar_url: url } : null)
   }
 
   if (loading) {
@@ -412,6 +418,14 @@ export default function ProfilePage() {
             </div>
           </div>
         </div>
+      )}
+
+      {currentUserId && (
+        <AvatarUpload
+          userId={currentUserId}
+          currentAvatarUrl={profile?.avatar_url}
+          onUploadComplete={handleAvatarUpload}
+        />
       )}
     </div>
   )
