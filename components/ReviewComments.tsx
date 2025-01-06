@@ -45,7 +45,10 @@ export default function ReviewComments({
         .from('review_comments')
         .select(`
           *,
-          profiles:user_id (username)
+          profiles:user_id (
+            username,
+            full_name
+          )
         `)
         .eq('review_id', reviewId)
         .order('created_at', { ascending: true })
@@ -147,14 +150,14 @@ export default function ReviewComments({
               <div className="flex items-start space-x-3">
                 {/* Avatar */}
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center text-white text-sm font-medium">
-                  {(comment.profiles?.username || userMap[comment.user_id] || 'U')[0].toUpperCase()}
+                  {(comment.profiles?.full_name?.[0] || comment.profiles?.username?.[0] || 'U').toUpperCase()}
                 </div>
                 
                 {/* Conteúdo do comentário */}
                 <div>
                   <div className="flex items-center space-x-2">
                     <span className="font-medium text-gray-900">
-                      {comment.profiles?.username || userMap[comment.user_id] || 'Usuário'}
+                      {comment.profiles?.full_name || comment.profiles?.username || 'Usuário'}
                     </span>
                     <span className="text-sm text-gray-500">
                       {formatDistanceToNow(new Date(comment.created_at), {
