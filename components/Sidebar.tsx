@@ -17,8 +17,19 @@ export default function Sidebar({ isOpen, onClose, currentUserId }: SidebarProps
   const supabase = createClient()
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut()
-    router.push('/')
+    try {
+      // Primeiro faz o logout
+      await supabase.auth.signOut()
+      
+      // Fecha o sidebar
+      onClose()
+      
+      // Força uma navegação completa para a landing page
+      window.location.href = '/'
+      
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error)
+    }
   }
 
   const handleNavigation = (path: string) => {
@@ -142,7 +153,7 @@ export default function Sidebar({ isOpen, onClose, currentUserId }: SidebarProps
                 </button>
                 <button
                   onClick={handleSignOut}
-                  className="w-full text-left px-4 py-2 text-gray-700 hover:bg-purple-50 hover:text-purple-700 rounded-lg transition-colors"
+                  className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                 >
                   Sair
                 </button>
