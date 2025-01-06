@@ -10,23 +10,20 @@ export interface Apartment {
 
 export interface Review {
   id: string
-  user_id: string
-  apartment_id: string
   rating: number
-  content: string
   comment: string
   created_at: string
+  user_id: string
   images?: string[]
   amenities?: string[]
   apartments: {
     id: string
-    name: string
-    property_type: 'house' | 'apartment'
     address: string
-    neighborhood: string
     city: string
     state: string
     zip_code: string
+    neighborhood: string
+    property_type: string
   }
   likes_count: number | { count: number }
 } 

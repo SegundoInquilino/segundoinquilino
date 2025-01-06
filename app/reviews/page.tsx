@@ -267,16 +267,15 @@ export default function ReviewsPage() {
             {/* Conteúdo do Modal com scroll */}
             <div className="p-4 overflow-y-auto max-h-[calc(100vh-12rem)]">
               <ReviewModal
-                review={selectedReview}
+                review={{
+                  ...selectedReview,
+                  likes_count: selectedReview.likes_count || { count: 0 }
+                }}
                 username={userMap[selectedReview.user_id] || ''}
                 currentUserId={currentUserId}
                 userMap={userMap}
                 selectedCommentId={selectedCommentId}
-                onClose={() => {
-                  setShowModal(false)
-                  setSelectedReview(null)
-                  setSelectedCommentId(null)
-                }}
+                onClose={() => setShowModal(false)}
               />
             </div>
           </div>

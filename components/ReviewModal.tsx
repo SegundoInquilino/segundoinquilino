@@ -235,14 +235,14 @@ export default function ReviewModal({
         <div className="flex justify-end gap-4 pt-4 border-t">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-gray-600 hover:text-gray-800"
+            className="px-4 py-2 bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-lg transition-colors"
           >
             Fechar
           </button>
           <button
             onClick={onDelete}
             disabled={isDeleting}
-            className="px-4 py-2 text-red-600 hover:text-red-700 disabled:opacity-50"
+            className="px-4 py-2 bg-red-600 text-white hover:bg-red-700 disabled:bg-red-300 rounded-lg transition-colors"
           >
             {isDeleting ? 'Deletando...' : 'Deletar Review'}
           </button>

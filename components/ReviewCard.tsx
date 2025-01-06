@@ -3,30 +3,11 @@
 import { useState } from 'react'
 import { formatDistanceToNow } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-import { supabase } from '@/lib/supabase'
 import ReviewModal from './ReviewModal'
 import type { Review } from '@/types/review'
-import { AMENITIES } from '@/types/amenities'
 
 interface ReviewCardProps {
-  review: {
-    id: string
-    rating: number
-    comment: string
-    created_at: string
-    user_id: string
-    likes_count: number | { count: number }
-    images?: string[]
-    apartments: {
-      id: string
-      address: string
-      city: string
-      state: string
-      zip_code: string
-      neighborhood: string
-    }
-    amenities?: string[]
-  }
+  review: Review
   username: string
   currentUserId?: string | null
   userMap: Record<string, string>
@@ -42,42 +23,8 @@ export default function ReviewCard({
   onClick,
   layout
 }: ReviewCardProps) {
-  const [isLiking, setIsLiking] = useState(false)
   const [showModal, setShowModal] = useState(false)
-
-  if (!review.apartments) return null
-
-  const handleLike = async (e: React.MouseEvent) => {
-    e.stopPropagation()
-    if (!currentUserId || isLiking) return
-    setIsLiking(true)
-
-    try {
-      await supabase
-        .from('review_likes')
-        .upsert({ 
-          review_id: review.id, 
-          user_id: currentUserId 
-        })
-    } catch (error) {
-      console.error('Erro ao dar like:', error)
-    } finally {
-      setIsLiking(false)
-    }
-  }
-
-  const getLikesCount = () => {
-    if (typeof review.likes_count === 'number') {
-      return review.likes_count
-    }
-    return review.likes_count?.count || 0
-  }
-
   const { address, city, state, zip_code, neighborhood } = review.apartments
-
-  const likesCount = typeof review.likes_count === 'object' 
-    ? review.likes_count.count 
-    : review.likes_count || 0
 
   return (
     <div 
@@ -120,16 +67,7 @@ export default function ReviewCard({
               Clique para ver mais...
             </p>
             
-            <div className="mt-4 flex items-center gap-6 text-sm">
-              <button 
-                onClick={handleLike}
-                disabled={isLiking || !currentUserId}
-                className="flex items-center gap-2 text-secondary-600 hover:text-secondary-700 disabled:opacity-50 transition-colors"
-              >
-                <span className="text-lg">❤️</span>
-                <span className="font-medium">{getLikesCount()}</span>
-              </button>
-
+            <div className="mt-4 flex items-center">
               <span className="text-xs text-gray-400 ml-auto">
                 {formatDistanceToNow(new Date(review.created_at), {
                   addSuffix: true,

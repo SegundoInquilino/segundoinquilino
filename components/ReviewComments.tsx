@@ -167,24 +167,24 @@ export default function ReviewComments({
                 </div>
               </div>
 
-              {/* Menu de ações (para dono do comentário OU dono da review) */}
+              {/* Menu de ações */}
               {canDeleteComment(comment.user_id) && (
                 <div className="relative">
                   <button
                     onClick={() => setMenuOpen(menuOpen === comment.id ? null : comment.id)}
-                    className="p-1 rounded-full hover:bg-gray-200 transition-colors opacity-0 group-hover:opacity-100"
+                    className="p-1 rounded-full hover:bg-gray-200 transition-colors"
                   >
-                    <MoreVertical className="w-4 h-4 text-gray-500" />
+                    <MoreVertical className="w-4 h-4 text-gray-600" />
                   </button>
 
                   {menuOpen === comment.id && (
-                    <div className="absolute right-0 mt-1 w-48 bg-white rounded-md shadow-lg py-1 z-10">
+                    <div className="absolute right-0 mt-1 w-48 bg-white rounded-md shadow-lg py-1 z-10 border border-gray-200">
                       <button
                         onClick={(e) => {
                           e.stopPropagation()
                           handleDeleteComment(comment.id)
                         }}
-                        className="w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center space-x-2"
+                        className="w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center space-x-2 transition-colors"
                       >
                         <Trash2 className="w-4 h-4" />
                         <span>Deletar comentário</span>
