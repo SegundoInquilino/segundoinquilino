@@ -14,11 +14,15 @@ export interface Review {
   apartment_id: string
   rating: number
   content: string
-  comment: string
   created_at: string
   images?: string[]
-  apartments: Apartment
-  likes_count: number | {
+  comment?: string
+  apartments: {
+    id: string
+    name: string
+    property_type: 'house' | 'apartment'
+  }
+  likes: {
     count: number
   }
 } 

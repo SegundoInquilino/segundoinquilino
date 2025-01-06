@@ -2,30 +2,32 @@ import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-export async function middleware(request: NextRequest) {
+export async function middleware(req: NextRequest) {
   const res = NextResponse.next()
-  const supabase = createMiddlewareClient({ req: request, res })
+  const supabase = createMiddlewareClient({ req, res })
 
   const {
     data: { session },
   } = await supabase.auth.getSession()
 
-  // Se não houver sessão e o usuário estiver tentando acessar uma rota protegida
+  // Se não estiver autenticado e tentar acessar rotas protegidas
   if (!session && (
-    request.nextUrl.pathname.startsWith('/reviews') ||
-    request.nextUrl.pathname.startsWith('/new-review')
+    req.nextUrl.pathname.startsWith('/settings') ||
+    req.nextUrl.pathname.startsWith('/profile')
   )) {
-    return NextResponse.redirect(new URL('/', request.url))
-  }
-
-  // Se houver sessão e o usuário estiver na página inicial
-  if (session && request.nextUrl.pathname === '/') {
-    return NextResponse.redirect(new URL('/reviews', request.url))
+    const redirectUrl = req.nextUrl.clone()
+    redirectUrl.pathname = '/auth'
+    return NextResponse.redirect(redirectUrl)
   }
 
   return res
 }
 
 export const config = {
-  matcher: ['/', '/reviews/:path*', '/new-review/:path*']
+  matcher: [
+    '/settings/:path*',
+    '/profile/:path*',
+    '/new-review/:path*',
+    '/favorites/:path*'
+  ]
 }
