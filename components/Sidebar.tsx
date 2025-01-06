@@ -94,6 +94,12 @@ export default function Sidebar({ isOpen, onClose, currentUserId }: SidebarProps
                 >
                   Perfil
                 </Link>
+                <Link 
+                  href="/favorites"
+                  className="block px-4 py-2 text-gray-700 hover:bg-purple-50 hover:text-purple-700 rounded-lg transition-colors"
+                >
+                  Favoritos
+                </Link>
                 <button
                   onClick={handleSignOut}
                   className="w-full text-left px-4 py-2 text-gray-700 hover:bg-purple-50 hover:text-purple-700 rounded-lg transition-colors"

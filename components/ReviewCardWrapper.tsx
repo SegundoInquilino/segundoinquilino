@@ -6,6 +6,7 @@ import ReviewModal from './ReviewModal'
 import { createClientComponentClient } from '@/utils/supabase-client-component'
 import { useRouter } from 'next/navigation'
 import type { Review } from '@/types/review'
+import { createClient } from '@/utils/supabase-client'
 
 interface ReviewCardWrapperProps {
   review: Review
@@ -34,12 +35,19 @@ export default function ReviewCardWrapper({
   const [isDeleting, setIsDeleting] = useState(false)
   const router = useRouter()
   const supabase = createClientComponentClient()
+  const [isFavorited, setIsFavorited] = useState(false)
 
   useEffect(() => {
     if (isSelected) {
       setShowModal(true)
     }
   }, [isSelected])
+
+  useEffect(() => {
+    if (currentUserId) {
+      checkIfFavorited()
+    }
+  }, [currentUserId, review.id])
 
   const handleDelete = async () => {
     if (!confirm('Tem certeza que deseja excluir esta review?')) return
@@ -91,10 +99,72 @@ export default function ReviewCardWrapper({
     }
   }
 
+  const checkIfFavorited = async () => {
+    const { data } = await supabase
+      .from('favorites')
+      .select('id')
+      .eq('user_id', currentUserId)
+      .eq('review_id', review.id)
+      .single()
+
+    setIsFavorited(!!data)
+  }
+
+  const toggleFavorite = async (e: React.MouseEvent) => {
+    e.stopPropagation() // Evita que o modal abra ao clicar no botão
+    if (!currentUserId) return
+
+    try {
+      if (isFavorited) {
+        await supabase
+          .from('favorites')
+          .delete()
+          .eq('user_id', currentUserId)
+          .eq('review_id', review.id)
+      } else {
+        await supabase
+          .from('favorites')
+          .insert({
+            user_id: currentUserId,
+            review_id: review.id
+          })
+      }
+      setIsFavorited(!isFavorited)
+    } catch (error) {
+      console.error('Erro ao favoritar:', error)
+    }
+  }
+
   return (
-    <div className={`bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow ${
+    <div className={`bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow relative ${
       layout === 'square' ? 'aspect-square' : ''
     }`}>
+      {currentUserId && (
+        <button
+          onClick={toggleFavorite}
+          className="absolute top-3 right-3 p-2 rounded-full bg-white/90 backdrop-blur-sm shadow-md hover:bg-white transition-all duration-200 z-50"
+          title={isFavorited ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
+        >
+          <svg
+            className={`w-5 h-5 transition-colors duration-200 ${
+              isFavorited 
+                ? 'text-red-500 fill-current' 
+                : 'text-gray-600 hover:text-red-500'
+            }`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+            />
+          </svg>
+        </button>
+      )}
+
       <div className={`relative ${
         layout === 'square' ? 'h-1/2' : ''
       }`}>
