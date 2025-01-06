@@ -10,12 +10,14 @@ interface ReviewCommentsProps {
   reviewId: string
   currentUserId?: string | null
   userMap: Record<string, string>
+  selectedCommentId?: string | null
 }
 
 export default function ReviewComments({ 
   reviewId, 
   currentUserId, 
-  userMap
+  userMap,
+  selectedCommentId
 }: ReviewCommentsProps) {
   const [comments, setComments] = useState<any[]>([])
   const [newComment, setNewComment] = useState('')
@@ -27,6 +29,15 @@ export default function ReviewComments({
   useEffect(() => {
     loadComments()
   }, [reviewId])
+
+  useEffect(() => {
+    if (selectedCommentId) {
+      const element = document.getElementById(`comment-${selectedCommentId}`)
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' })
+      }
+    }
+  }, [selectedCommentId])
 
   const loadComments = async () => {
     try {
@@ -124,8 +135,13 @@ export default function ReviewComments({
       <div className="space-y-4">
         {comments.map((comment) => (
           <div 
-            key={comment.id} 
-            className="bg-gray-50 rounded-lg p-4 relative group"
+            key={comment.id}
+            id={`comment-${comment.id}`}
+            className={`p-4 rounded-lg ${
+              comment.id === selectedCommentId 
+                ? 'bg-blue-50 border border-blue-200' 
+                : 'bg-gray-50'
+            }`}
           >
             <div className="flex justify-between items-start">
               <div className="flex items-start space-x-3">

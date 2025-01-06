@@ -53,7 +53,7 @@ export default function Header({ username, currentUserId, profile }: HeaderProps
           <div className="flex items-center space-x-4">
             {currentUserId ? (
               <>
-                <NotificationBell currentUserId={currentUserId} />
+                <NotificationBell userId={currentUserId} />
                 <Link
                   href="/profile"
                   className="text-gray-700 hover:text-primary-600 transition-colors font-medium flex items-center gap-2 group"

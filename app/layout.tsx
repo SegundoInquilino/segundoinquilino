@@ -21,7 +21,7 @@ export default async function RootLayout({
   const { data: { user } } = await supabase.auth.getUser()
   
   let username = ''
-  let profile = null
+  let profile: { avatar_url?: string } | undefined = undefined
 
   if (user) {
     const { data } = await supabase
@@ -33,7 +33,7 @@ export default async function RootLayout({
     if (data) {
       username = data.username
       profile = {
-        avatar_url: data.avatar_url
+        avatar_url: data.avatar_url || undefined
       }
     }
   }
