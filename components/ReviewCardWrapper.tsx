@@ -7,6 +7,7 @@ import { createClientComponentClient } from '@/utils/supabase-client-component'
 import { useRouter } from 'next/navigation'
 import type { Review } from '@/types/review'
 import { createClient } from '@/utils/supabase-client'
+import { AMENITIES } from '@/types/amenities'
 
 interface ReviewCardWrapperProps {
   review: Review
@@ -208,7 +209,7 @@ export default function ReviewCardWrapper({
         </div>
       </div>
 
-      <div className={layout === 'square' ? 'h-1/2 overflow-auto' : ''}>
+      <div className={layout === 'square' ? 'h-1/2 overflow-auto p-4' : 'p-4'}>
         <ReviewCard
           review={{
             ...review,
@@ -220,6 +221,29 @@ export default function ReviewCardWrapper({
           onClick={() => setShowModal(true)}
           layout={layout}
         />
+
+        {/* Amenidades com ícones */}
+        {review.amenities && review.amenities.length > 0 && (
+          <div className="mt-4">
+            <h4 className="text-sm font-medium text-gray-700 mb-2">Comodidades:</h4>
+            <div className="flex flex-wrap gap-2">
+              {review.amenities.map((amenityId) => {
+                const amenity = AMENITIES.find(a => a.id === amenityId)
+                if (!amenity) return null
+                
+                return (
+                  <span 
+                    key={amenityId}
+                    className="inline-flex items-center px-2.5 py-1.5 rounded-full text-xs font-medium bg-purple-50 text-purple-700 border border-purple-100"
+                  >
+                    <span className="mr-1">{amenity.icon}</span>
+                    {amenity.label}
+                  </span>
+                )
+              })}
+            </div>
+          </div>
+        )}
       </div>
 
       {showModal && (

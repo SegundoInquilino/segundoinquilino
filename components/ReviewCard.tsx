@@ -80,11 +80,11 @@ export default function ReviewCard({
     : review.likes_count || 0
 
   return (
-    <>
-      <div 
-        onClick={onClick}
-        className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow cursor-pointer"
-      >
+    <div 
+      onClick={onClick}
+      className={`cursor-pointer ${layout === 'square' ? 'h-full' : ''}`}
+    >
+      <div className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
         <div className="p-6">
           <h2 className="text-xl font-bold text-gray-800 mb-2">{address}</h2>
           <div className="space-y-1">
@@ -149,26 +149,6 @@ export default function ReviewCard({
           userMap={userMap}
         />
       )}
-
-      {review.amenities && review.amenities.length > 0 && (
-        <div className="px-6 py-3 border-t border-gray-100">
-          <div className="flex flex-wrap gap-2">
-            {review.amenities.map(amenityId => {
-              const amenity = AMENITIES.find(a => a.id === amenityId)
-              if (!amenity) return null
-              
-              return (
-                <span
-                  key={amenityId}
-                  className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800"
-                >
-                  {amenity.label}
-                </span>
-              )
-            })}
-          </div>
-        </div>
-      )}
-    </>
+    </div>
   )
 } 

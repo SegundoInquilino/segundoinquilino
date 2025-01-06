@@ -17,8 +17,16 @@ export interface Review {
   comment: string
   created_at: string
   images?: string[]
-  apartments: Apartment
-  likes_count: number | {
-    count: number
+  amenities?: string[]
+  apartments: {
+    id: string
+    name: string
+    property_type: 'house' | 'apartment'
+    address: string
+    neighborhood: string
+    city: string
+    state: string
+    zip_code: string
   }
+  likes_count: number | { count: number }
 } 

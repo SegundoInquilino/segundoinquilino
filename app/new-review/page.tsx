@@ -21,7 +21,7 @@ export default function NewReview() {
   const [imageUrls, setImageUrls] = useState<string[]>([])
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
-  const [selectedAmenities, setSelectedAmenities] = useState<string[]>([])
+  const [amenities, setAmenities] = useState<string[]>([])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -61,7 +61,7 @@ export default function NewReview() {
           rating: formData.rating,
           comment: formData.comment,
           images: imageUrls,
-          amenities: selectedAmenities
+          amenities: amenities
         })
 
       if (reviewError) throw reviewError
@@ -252,8 +252,8 @@ export default function NewReview() {
             Características do Imóvel
           </label>
           <AmenitiesSelector
-            selectedAmenities={selectedAmenities}
-            onChange={setSelectedAmenities}
+            selectedAmenities={amenities}
+            onChange={setAmenities}
           />
         </div>
 
