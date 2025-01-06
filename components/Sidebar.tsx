@@ -17,8 +17,18 @@ export default function Sidebar({ isOpen, onClose, currentUserId }: SidebarProps
   const supabase = createClient()
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut()
-    router.push('/')
+    try {
+      await supabase.auth.signOut()
+      
+      // Fechar o sidebar
+      onClose()
+      
+      // Redirecionar e forçar refresh
+      router.push('/')
+      router.refresh()
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error)
+    }
   }
 
   return (

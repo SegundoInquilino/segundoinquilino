@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
-import Navbar from '@/components/Navbar'
 import { createClient } from '@/utils/supabase-server'
 import { AuthProvider } from '@/contexts/AuthContext'
 import Header from '@/components/Header'
@@ -25,8 +24,8 @@ export default async function RootLayout({
     <html lang="pt-BR">
       <body className={inter.className}>
         <AuthProvider>
-          <Header currentUserId={user?.id} />
-          <main>
+          {user && <Header currentUserId={user.id} />}
+          <main className={user ? 'pt-16' : ''}>
             {children}
           </main>
         </AuthProvider>
