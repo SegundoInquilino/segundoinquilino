@@ -1,7 +1,5 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { createClient } from '@/utils/supabase-client'
 import ReviewCardWrapper from './ReviewCardWrapper'
 import type { Review } from '@/types/review'
 
@@ -20,34 +18,11 @@ export default function ReviewsList({
   onReviewDeleted,
   layout = 'grid'
 }: ReviewsListProps) {
-  const [viewMode, setViewMode] = useState('grid')
-  
-  useEffect(() => {
-    loadUserSettings()
-  }, [])
-
-  const loadUserSettings = async () => {
-    const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    
-    if (user) {
-      const { data: settings } = await supabase
-        .from('user_settings')
-        .select('default_view')
-        .eq('user_id', user.id)
-        .single()
-      
-      if (settings?.default_view) {
-        setViewMode(settings.default_view)
-      }
-    }
-  }
-
   return (
     <div className={`grid gap-6 ${
-      viewMode === 'grid' 
-        ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
-        : 'grid-cols-1'
+      layout === 'square' 
+        ? 'grid-cols-1 md:grid-cols-2' 
+        : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
     }`}>
       {reviews?.map((review) => (
         <ReviewCardWrapper

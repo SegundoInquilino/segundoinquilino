@@ -2,44 +2,30 @@ import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-export async function middleware(req: NextRequest) {
+export async function middleware(request: NextRequest) {
   const res = NextResponse.next()
-  const supabase = createMiddlewareClient({ req, res })
+  const supabase = createMiddlewareClient({ req: request, res })
 
   const {
     data: { session },
   } = await supabase.auth.getSession()
 
-  // Se não estiver autenticado e tentar acessar rotas protegidas
+  // Se não houver sessão e o usuário estiver tentando acessar uma rota protegida
   if (!session && (
-    req.nextUrl.pathname.startsWith('/settings') ||
-    req.nextUrl.pathname.startsWith('/profile') ||
-    req.nextUrl.pathname.startsWith('/new-review') ||
-    req.nextUrl.pathname.startsWith('/favorites') ||
-    req.nextUrl.pathname.startsWith('/reviews')
+    request.nextUrl.pathname.startsWith('/reviews') ||
+    request.nextUrl.pathname.startsWith('/new-review')
   )) {
-    const redirectUrl = req.nextUrl.clone()
-    redirectUrl.pathname = '/auth'
-    return NextResponse.redirect(redirectUrl)
+    return NextResponse.redirect(new URL('/', request.url))
   }
 
-  // Se estiver autenticado e tentar acessar /auth
-  if (session && req.nextUrl.pathname.startsWith('/auth')) {
-    const redirectUrl = req.nextUrl.clone()
-    redirectUrl.pathname = '/reviews'
-    return NextResponse.redirect(redirectUrl)
+  // Se houver sessão e o usuário estiver na página inicial
+  if (session && request.nextUrl.pathname === '/') {
+    return NextResponse.redirect(new URL('/reviews', request.url))
   }
 
   return res
 }
 
 export const config = {
-  matcher: [
-    '/auth/:path*',
-    '/settings/:path*',
-    '/profile/:path*',
-    '/new-review/:path*',
-    '/favorites/:path*',
-    '/reviews/:path*'
-  ]
+  matcher: ['/', '/reviews/:path*', '/new-review/:path*']
 }

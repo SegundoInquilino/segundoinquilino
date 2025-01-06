@@ -17,11 +17,6 @@ interface Filters {
   amenities?: string[]
 }
 
-interface UserSettings {
-  reviews_per_page: number
-  sort_by: 'recent' | 'rating' | 'likes'
-}
-
 export default function ReviewsPage() {
   const [reviews, setReviews] = useState<Review[]>([])
   const [loading, setLoading] = useState(true)
@@ -31,36 +26,6 @@ export default function ReviewsPage() {
   const [selectedCommentId, setSelectedCommentId] = useState<string | null>(null)
   const [showModal, setShowModal] = useState(false)
   const [selectedReview, setSelectedReview] = useState<Review | null>(null)
-  const [pageSize, setPageSize] = useState(20)
-  const [settings, setSettings] = useState<UserSettings>({
-    reviews_per_page: 20,
-    sort_by: 'recent'
-  })
-
-  useEffect(() => {
-    loadUserSettings()
-  }, [])
-
-  const loadUserSettings = async () => {
-    try {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      
-      if (user) {
-        const { data: userSettings } = await supabase
-          .from('user_settings')
-          .select('reviews_per_page, sort_by')
-          .eq('user_id', user.id)
-          .single()
-        
-        if (userSettings) {
-          setSettings(userSettings)
-        }
-      }
-    } catch (error) {
-      console.error('Erro ao carregar configurações:', error)
-    }
-  }
 
   useEffect(() => {
     loadReviews()
@@ -88,43 +53,15 @@ export default function ReviewsPage() {
       const { data: { user } } = await supabase.auth.getUser()
       setCurrentUserId(user?.id || null)
 
-      // Construir a query base
-      let query = supabase
+      // Carregar reviews
+      const { data: reviewsData } = await supabase
         .from('reviews')
         .select(`
           *,
           apartments (*),
-          likes:review_likes(count)
+          likes_count:review_likes(count)
         `)
-
-      // Aplicar ordenação baseada nas configurações
-      switch(settings.sort_by) {
-        case 'recent':
-          query = query.order('created_at', { ascending: false })
-          break
-        case 'rating':
-          query = query.order('rating', { ascending: false })
-          break
-        case 'likes':
-          // Precisamos usar uma subquery para ordenar por contagem de likes
-          query = query
-            .select(`
-              *,
-              apartments (*),
-              likes:review_likes(count)
-            `)
-            .order('likes.count', { ascending: false })
-          break
-        default:
-          query = query.order('created_at', { ascending: false })
-      }
-
-      // Aplicar paginação
-      query = query.range(0, settings.reviews_per_page - 1)
-
-      const { data: reviewsData, error } = await query
-
-      if (error) throw error
+        .order('created_at', { ascending: false })
 
       if (reviewsData) {
         setReviews(reviewsData as Review[])
@@ -148,11 +85,6 @@ export default function ReviewsPage() {
       setLoading(false)
     }
   }
-
-  // Recarregar reviews quando as configurações mudarem
-  useEffect(() => {
-    loadReviews()
-  }, [settings])
 
   useEffect(() => {
     // Verificar parâmetros da URL
