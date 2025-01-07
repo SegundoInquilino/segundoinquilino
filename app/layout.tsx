@@ -11,6 +11,42 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'Segundo Inquilino',
   description: 'Avaliações de apartamentos para aluguel',
+  icons: {
+    icon: [
+      {
+        url: '/images/Logo_SI_icon_160x160.png',
+        sizes: '160x160',
+        type: 'image/png',
+      }
+    ],
+    // Para iOS
+    apple: [
+      {
+        url: '/images/Logo_SI_icon_160x160.png',
+        sizes: '160x160',
+        type: 'image/png',
+      }
+    ],
+    // Para PWA
+    shortcut: [
+      {
+        url: '/images/Logo_SI_icon_160x160.png',
+        sizes: '160x160',
+        type: 'image/png',
+      }
+    ],
+  },
+  // Para dispositivos Apple
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Segundo Inquilino',
+  },
+  // Para manifestos de aplicativo web
+  manifest: '/manifest.json',
+  // Para tema do navegador móvel
+  themeColor: '#6B46C1', // Cor roxa do tema
+  viewport: 'width=device-width, initial-scale=1, maximum-scale=1',
 }
 
 export default async function RootLayout({
