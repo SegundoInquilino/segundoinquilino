@@ -9,7 +9,33 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'Segundo Inquilino',
-  description: 'Avaliações de apartamentos para aluguel',
+  description: 'Avaliações e reviews de apartamentos e casas para alugar',
+  openGraph: {
+    title: 'Segundo Inquilino',
+    description: 'Avaliações e reviews de apartamentos e casas para alugar',
+    url: 'https://segundoinquilino.com.br',
+    siteName: 'Segundo Inquilino',
+    images: [
+      {
+        url: '/images/Logo_SI_icon_160x160.png',
+        width: 160,
+        height: 160,
+        alt: 'Segundo Inquilino Logo',
+      }
+    ],
+    locale: 'pt_BR',
+    type: 'website',
+  },
+  icons: {
+    icon: '/images/Logo_SI_icon_160x160.png',
+    apple: '/images/Logo_SI_icon_160x160.png',
+  },
+  twitter: {
+    card: 'summary',
+    title: 'Segundo Inquilino',
+    description: 'Avaliações e reviews de apartamentos e casas para alugar',
+    images: ['/images/Logo_SI_icon_160x160.png'],
+  },
 }
 
 export default async function RootLayout({

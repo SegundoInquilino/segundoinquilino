@@ -45,13 +45,10 @@ export default function Header({ username, currentUserId, profile }: HeaderProps
 
           {/* Logo/Brand */}
           <div className="flex items-center space-x-2">
-            <Image
+            <img
               src="/images/Logo_SI.png"
               alt="Segundo Inquilino Logo"
-              width={120}
-              height={40}
-              className="object-contain"
-              priority
+              className="h-8 w-auto object-contain"
             />
           </div>
 
