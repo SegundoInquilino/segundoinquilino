@@ -4,6 +4,7 @@ import './globals.css'
 import { createClient } from '@/utils/supabase-server'
 import { AuthProvider } from '@/contexts/AuthContext'
 import Header from '@/components/Header'
+import Footer from '@/components/Footer'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -68,14 +69,17 @@ export default async function RootLayout({
     <html lang="pt-BR">
       <body className={inter.className}>
         <AuthProvider>
-          <Header 
-            currentUserId={user?.id} 
-            username={username}
-            profile={profile}
-          />
-          <main className={user ? 'pt-16' : ''}>
-            {children}
-          </main>
+          <div className="flex flex-col min-h-screen">
+            <Header 
+              currentUserId={user?.id} 
+              username={username}
+              profile={profile}
+            />
+            <main className={`flex-grow ${user ? 'pt-16' : ''}`}>
+              {children}
+            </main>
+            <Footer />
+          </div>
         </AuthProvider>
       </body>
     </html>
