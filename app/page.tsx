@@ -8,7 +8,7 @@ export default function HomePage() {
           <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
             Bem-vindo ao
             <span className="block text-purple-800">Segundo Inquilino</span>
-          </h1>
+            </h1>
           
           <p className="mt-6 text-xl text-gray-600 max-w-2xl mx-auto">
             A plataforma que conecta inquilinos e compartilha experiências reais sobre apartamentos.
@@ -16,22 +16,22 @@ export default function HomePage() {
           </p>
 
           <div className="mt-12 flex justify-center">
-            <Link 
-              href="/auth"
+              <Link
+                href="/auth"
               className="inline-flex items-center px-12 py-4 border border-transparent text-lg font-medium rounded-md text-white bg-purple-800 hover:bg-purple-900 transition-colors duration-200 shadow-sm hover:shadow-md"
             >
               Comece Agora
-            </Link>
+              </Link>
+            </div>
           </div>
         </div>
-      </div>
 
       <div className="bg-white py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
               Como funciona o Segundo Inquilino
-            </h2>
+          </h2>
             <p className="mt-4 text-lg text-gray-600">
               Conectamos pessoas que já moraram em um apartamento com futuros inquilinos
             </p>
@@ -55,11 +55,11 @@ export default function HomePage() {
                 <h3 className="text-xl font-semibold text-gray-900 mb-4">
                   Informações Detalhadas
                 </h3>
-                <p className="text-gray-600">
+              <p className="text-gray-600">
                   Saiba tudo sobre o apartamento: qualidade da construção, 
                   vizinhança, barulhos, administração do condomínio e muito mais.
-                </p>
-              </div>
+              </p>
+            </div>
 
               <div className="bg-gray-50 rounded-xl p-8 hover:shadow-lg transition-shadow">
                 <div className="text-purple-800 text-4xl font-bold mb-4">03</div>
@@ -122,7 +122,7 @@ export default function HomePage() {
                   <li className="flex items-start">
                     <svg className="h-6 w-6 text-purple-800 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                    </svg>
+                </svg>
                     <span className="text-gray-600">Contribua para decisões mais conscientes</span>
                   </li>
                 </ul>
@@ -131,6 +131,6 @@ export default function HomePage() {
           </div>
         </div>
       </div>
-    </div>
+        </div>
   )
 } 

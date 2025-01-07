@@ -4,39 +4,12 @@ import './globals.css'
 import { createClient } from '@/utils/supabase-server'
 import { AuthProvider } from '@/contexts/AuthContext'
 import Header from '@/components/Header'
-import Footer from '@/components/Footer'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'Segundo Inquilino',
-  description: 'Avaliações e reviews de apartamentos e casas para alugar',
-  openGraph: {
-    title: 'Segundo Inquilino',
-    description: 'Avaliações e reviews de apartamentos e casas para alugar',
-    url: 'https://segundoinquilino.com.br',
-    siteName: 'Segundo Inquilino',
-    images: [
-      {
-        url: '/images/Logo_SI_icon_160x160.png',
-        width: 160,
-        height: 160,
-        alt: 'Segundo Inquilino Logo',
-      }
-    ],
-    locale: 'pt_BR',
-    type: 'website',
-  },
-  icons: {
-    icon: '/images/Logo_SI_icon_160x160.png',
-    apple: '/images/Logo_SI_icon_160x160.png',
-  },
-  twitter: {
-    card: 'summary',
-    title: 'Segundo Inquilino',
-    description: 'Avaliações e reviews de apartamentos e casas para alugar',
-    images: ['/images/Logo_SI_icon_160x160.png'],
-  },
+  description: 'Avaliações de apartamentos para aluguel',
 }
 
 export default async function RootLayout({
@@ -69,17 +42,14 @@ export default async function RootLayout({
     <html lang="pt-BR">
       <body className={inter.className}>
         <AuthProvider>
-          <div className="flex flex-col min-h-screen">
-            <Header 
-              currentUserId={user?.id} 
-              username={username}
-              profile={profile}
-            />
-            <main className={`flex-grow ${user ? 'pt-16' : ''}`}>
-              {children}
-            </main>
-            <Footer />
-          </div>
+          <Header 
+            currentUserId={user?.id} 
+            username={username}
+            profile={profile}
+          />
+          <main className={user ? 'pt-16' : ''}>
+            {children}
+          </main>
         </AuthProvider>
       </body>
     </html>

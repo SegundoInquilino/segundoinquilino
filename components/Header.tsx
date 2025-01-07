@@ -5,7 +5,6 @@ import Link from 'next/link'
 import NotificationBell from './NotificationBell'
 import Sidebar from './Sidebar'
 import { useRouter } from 'next/navigation'
-import Image from 'next/image'
 
 interface HeaderProps {
   currentUserId?: string
@@ -44,13 +43,11 @@ export default function Header({ username, currentUserId, profile }: HeaderProps
           </button>
 
           {/* Logo/Brand */}
-          <div className="flex items-center space-x-2">
-            <img
-              src="/images/Logo_SI.png"
-              alt="Segundo Inquilino Logo"
-              className="h-8 w-auto object-contain"
-            />
-          </div>
+          <Link href="/home" className="flex items-center">
+            <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent">
+              Segundo Inquilino
+            </span>
+          </Link>
 
           {/* Right Section */}
           <div className="flex items-center space-x-4">
