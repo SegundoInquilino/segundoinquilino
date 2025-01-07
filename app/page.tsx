@@ -1,10 +1,22 @@
 import Link from 'next/link'
+import Image from 'next/image'
 
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
-      <div className="max-w-4xl mx-auto px-4 py-16 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto px-4 pt-24 pb-16 sm:px-6 lg:px-8">
         <div className="text-center">
+          <div className="flex justify-center mb-12">
+            <Image
+              src="/images/Logo_SI.png"
+              alt="Segundo Inquilino Logo"
+              width={200}
+              height={200}
+              className="h-auto w-auto"
+              priority
+            />
+          </div>
+
           <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
             Bem-vindo ao
             <span className="block text-purple-800">Segundo Inquilino</span>
