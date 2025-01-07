@@ -43,11 +43,13 @@ export default async function RootLayout({
     <html lang="pt-BR">
       <body className={inter.className}>
         <AuthProvider>
-          <Header 
-            currentUserId={user?.id} 
-            username={username}
-            profile={profile}
-          />
+          {user && (
+            <Header 
+              currentUserId={user.id} 
+              username={username}
+              profile={profile}
+            />
+          )}
           <main className={user ? 'pt-16' : ''}>
             {children}
           </main>
