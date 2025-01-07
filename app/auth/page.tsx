@@ -5,6 +5,7 @@ import LoginForm from '@/components/auth/LoginForm'
 import RegisterForm from '@/components/auth/RegisterForm'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
+import Link from 'next/link'
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true)
@@ -34,13 +35,23 @@ export default function AuthPage() {
           <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
             {isLogin ? <LoginForm /> : <RegisterForm />}
             
-            <div className="mt-6">
+            <div className="mt-6 space-y-4">
               <button
                 onClick={() => setIsLogin(!isLogin)}
                 className="w-full text-center text-sm text-blue-600 hover:text-blue-500"
               >
                 {isLogin ? 'Não tem uma conta? Registre-se' : 'Já tem uma conta? Entre'}
               </button>
+
+              <div className="text-center text-xs text-gray-500">
+                Ao continuar, você concorda com nossos{' '}
+                <Link 
+                  href="/terms" 
+                  className="text-purple-600 hover:text-purple-500 hover:underline"
+                >
+                  Termos e Condições
+                </Link>
+              </div>
             </div>
           </div>
         </div>
