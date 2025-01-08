@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
+import ExampleReviewCarousel from '@/components/ExampleReviewCarousel'
 
 export default function HomePage() {
   return (
@@ -20,7 +21,7 @@ export default function HomePage() {
           <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
             Bem-vindo ao
             <span className="block text-purple-800">Segundo Inquilino</span>
-          </h1>
+            </h1>
           
           <p className="mt-6 text-xl text-gray-600 max-w-2xl mx-auto">
             A plataforma que conecta inquilinos e compartilha experiências reais sobre apartamentos.
@@ -43,6 +44,19 @@ export default function HomePage() {
             >
               Comece Agora
             </Link>
+          </div>
+
+          <div className="mt-16">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
+                Veja exemplos de avaliações
+              </h2>
+              <p className="mt-4 text-lg text-gray-600">
+                Descubra o tipo de informação que você encontrará em nossa plataforma
+              </p>
+            </div>
+            
+            <ExampleReviewCarousel />
           </div>
         </div>
       </div>
@@ -151,6 +165,19 @@ export default function HomePage() {
             </div>
           </div>
         </div>
+      </div>
+
+      <div className="max-w-4xl mx-auto px-4 mt-32 sm:px-6 lg:px-8">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
+            Veja como são as avaliações
+          </h2>
+          <p className="mt-4 text-lg text-gray-600">
+            Um exemplo do tipo de informação que você encontrará em nossa plataforma
+          </p>
+        </div>
+        
+        <ExampleReviewCarousel />
       </div>
         </div>
   )
