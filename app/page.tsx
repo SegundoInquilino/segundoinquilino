@@ -20,23 +20,32 @@ export default function HomePage() {
           <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
             Bem-vindo ao
             <span className="block text-purple-800">Segundo Inquilino</span>
-            </h1>
+          </h1>
           
           <p className="mt-6 text-xl text-gray-600 max-w-2xl mx-auto">
             A plataforma que conecta inquilinos e compartilha experiências reais sobre apartamentos.
             Tome decisões mais seguras baseadas em avaliações autênticas.
           </p>
 
+          <div className="mt-8 max-w-3xl mx-auto px-6 py-5 bg-purple-50 rounded-xl border border-purple-100 shadow-sm">
+            <p className="text-lg md:text-xl text-purple-800 font-medium leading-relaxed">
+              "Ajude outros inquilinos a escolherem melhor - 
+              <span className="block mt-1 text-purple-700">
+                sua experiência pode evitar dores de cabeça e garantir um lar mais seguro e confiável"
+              </span>
+            </p>
+          </div>
+
           <div className="mt-12 flex justify-center">
-              <Link
-                href="/auth"
+            <Link
+              href="/auth"
               className="inline-flex items-center px-12 py-4 border border-transparent text-lg font-medium rounded-md text-white bg-purple-800 hover:bg-purple-900 transition-colors duration-200 shadow-sm hover:shadow-md"
             >
               Comece Agora
-              </Link>
-            </div>
+            </Link>
           </div>
         </div>
+      </div>
 
       <div className="bg-white py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
