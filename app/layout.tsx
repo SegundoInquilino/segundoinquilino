@@ -6,6 +6,7 @@ import { AuthProvider } from '@/contexts/AuthContext'
 import Header from '@/components/Header'
 import Link from 'next/link'
 import { siteMetadata } from '@/lib/metadata'
+import SessionAlert from '@/components/SessionAlert'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -67,6 +68,7 @@ export default async function RootLayout({
     <html lang="pt-BR">
       <body className={inter.className}>
         <AuthProvider>
+          <SessionAlert />
           {user && (
             <Header 
               currentUserId={user.id} 
