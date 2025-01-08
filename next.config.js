@@ -1,7 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['ejoivntarqlinulkiure.supabase.co', 'www.segundoinquilino.com.br'],
+    domains: ['seu-dominio.com'],
+  },
+  poweredByHeader: false,
+  compress: true,
+  i18n: {
+    locales: ['pt-BR'],
+    defaultLocale: 'pt-BR',
   },
   async headers() {
     return [
@@ -9,27 +15,17 @@ const nextConfig = {
         source: '/:path*',
         headers: [
           {
-            key: 'Content-Security-Policy',
-            value: `
-              default-src 'self';
-              connect-src 'self' https://*.supabase.co wss://*.supabase.co;
-              img-src 'self' data: blob: https://*.supabase.co;
-              script-src 'self' 'unsafe-inline' 'unsafe-eval';
-              style-src 'self' 'unsafe-inline';
-              frame-ancestors 'none';
-            `.replace(/\s{2,}/g, ' ').trim()
+            key: 'X-DNS-Prefetch-Control',
+            value: 'on'
+          },
+          {
+            key: 'X-XSS-Protection',
+            value: '1; mode=block'
           }
-        ]
-      }
+        ],
+      },
     ]
-  },
-  webpack: (config) => {
-    config.externals.push({
-      'utf-8-validate': 'commonjs utf-8-validate',
-      'bufferutil': 'commonjs bufferutil',
-    })
-    return config
-  },
+  }
 }
 
 module.exports = nextConfig 

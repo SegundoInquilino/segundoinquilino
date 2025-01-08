@@ -5,48 +5,36 @@ import { createClient } from '@/utils/supabase-server'
 import { AuthProvider } from '@/contexts/AuthContext'
 import Header from '@/components/Header'
 import Link from 'next/link'
+import { siteMetadata } from '@/lib/metadata'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Segundo Inquilino',
-  description: 'Avaliações de apartamentos para aluguel',
-  icons: {
-    icon: [
-      {
-        url: '/images/Logo_SI_icon_160x160.png',
-        sizes: '160x160',
-        type: 'image/png',
-      }
-    ],
-    // Para iOS
-    apple: [
-      {
-        url: '/images/Logo_SI_icon_160x160.png',
-        sizes: '160x160',
-        type: 'image/png',
-      }
-    ],
-    // Para PWA
-    shortcut: [
-      {
-        url: '/images/Logo_SI_icon_160x160.png',
-        sizes: '160x160',
-        type: 'image/png',
-      }
-    ],
+  metadataBase: new URL(siteMetadata.siteUrl),
+  title: {
+    default: siteMetadata.title,
+    template: `%s | ${siteMetadata.title}`
   },
-  // Para dispositivos Apple
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: 'default',
-    title: 'Segundo Inquilino',
+  description: siteMetadata.description,
+  keywords: siteMetadata.keywords,
+  openGraph: {
+    ...siteMetadata.openGraph,
+    images: siteMetadata.openGraph.images
   },
-  // Para manifestos de aplicativo web
-  manifest: '/manifest.json',
-  // Para tema do navegador móvel
-  themeColor: '#6B46C1', // Cor roxa do tema
-  viewport: 'width=device-width, initial-scale=1, maximum-scale=1',
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  verification: {
+    google: 'seu-código-de-verificação', // Adicione o código do Google Search Console
+  }
 }
 
 export default async function RootLayout({
