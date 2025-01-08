@@ -13,13 +13,31 @@ interface ReviewCommentsProps {
   selectedCommentId?: string | null
 }
 
+interface CommentAuthor {
+  id: string
+  username: string
+  full_name?: string
+}
+
+interface Comment {
+  id: string
+  user_id: string
+  review_id: string
+  comment: string
+  created_at: string
+  profiles?: {
+    username: string
+    full_name?: string
+  }
+}
+
 export default function ReviewComments({ 
   reviewId, 
   currentUserId, 
   userMap,
   selectedCommentId
 }: ReviewCommentsProps) {
-  const [comments, setComments] = useState<any[]>([])
+  const [comments, setComments] = useState<Comment[]>([])
   const [newComment, setNewComment] = useState('')
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
@@ -45,7 +63,10 @@ export default function ReviewComments({
         .from('review_comments')
         .select(`
           *,
-          profiles:user_id (username)
+          profiles:user_id (
+            username,
+            full_name
+          )
         `)
         .eq('review_id', reviewId)
         .order('created_at', { ascending: true })
@@ -147,14 +168,14 @@ export default function ReviewComments({
               <div className="flex items-start space-x-3">
                 {/* Avatar */}
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center text-white text-sm font-medium">
-                  {(comment.profiles?.username || userMap[comment.user_id] || 'U')[0].toUpperCase()}
+                  {(comment.profiles?.full_name || comment.profiles?.username || userMap[comment.user_id] || 'U')[0].toUpperCase()}
                 </div>
                 
                 {/* Conteúdo do comentário */}
                 <div>
                   <div className="flex items-center space-x-2">
                     <span className="font-medium text-gray-900">
-                      {comment.profiles?.username || userMap[comment.user_id] || 'Usuário'}
+                      {comment.profiles?.full_name || comment.profiles?.username || userMap[comment.user_id] || 'Usuário'}
                     </span>
                     <span className="text-sm text-gray-500">
                       {formatDistanceToNow(new Date(comment.created_at), {
