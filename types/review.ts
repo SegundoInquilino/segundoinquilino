@@ -6,6 +6,7 @@ export interface Apartment {
   state: string
   zip_code: string
   property_type: 'house' | 'apartment'
+  building_name?: string
 }
 
 export interface Review {
@@ -16,14 +17,6 @@ export interface Review {
   user_id: string
   images?: string[]
   amenities?: string[]
-  apartments: {
-    id: string
-    address: string
-    city: string
-    state: string
-    zip_code: string
-    neighborhood: string
-    property_type: string
-  }
+  apartments: Apartment
   likes_count: number | { count: number }
 } 

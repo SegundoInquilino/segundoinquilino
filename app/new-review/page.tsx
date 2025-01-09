@@ -10,6 +10,7 @@ export default function NewReview() {
   const router = useRouter()
   const [formData, setFormData] = useState({
     address: '',
+    buildingName: '',
     neighborhood: '',
     city: '',
     state: '',
@@ -41,6 +42,7 @@ export default function NewReview() {
         .from('apartments')
         .insert({
           address: formData.address,
+          building_name: formData.propertyType === 'apartment' ? formData.buildingName || null : null,
           neighborhood: formData.neighborhood,
           city: formData.city,
           state: formData.state,
@@ -50,7 +52,14 @@ export default function NewReview() {
         .select()
         .single()
 
-      if (propertyError) throw propertyError
+      if (propertyError) {
+        console.error('Erro ao criar apartamento:', propertyError)
+        throw new Error(`Erro ao criar apartamento: ${propertyError.message}`)
+      }
+
+      if (!property) {
+        throw new Error('Apartamento não foi criado corretamente')
+      }
 
       // Criar review com amenidades
       const { error: reviewError } = await supabase
@@ -64,7 +73,10 @@ export default function NewReview() {
           amenities: amenities
         })
 
-      if (reviewError) throw reviewError
+      if (reviewError) {
+        console.error('Erro ao criar review:', reviewError)
+        throw new Error(`Erro ao criar review: ${reviewError.message}`)
+      }
 
       // Emitir evento de atualização
       const event = new CustomEvent('reviewCreated')
@@ -72,8 +84,8 @@ export default function NewReview() {
       
       router.push('/home')
     } catch (error) {
-      console.error('Erro:', error)
-      setError('Erro ao criar review')
+      console.error('Erro detalhado:', error)
+      setError(error instanceof Error ? error.message : 'Erro ao criar review')
     } finally {
       setSubmitting(false)
     }
@@ -137,6 +149,23 @@ export default function NewReview() {
               <option value="house">Casa</option>
             </select>
           </div>
+
+          {formData.propertyType === 'apartment' && (
+            <div>
+              <label htmlFor="buildingName" className="block text-sm font-medium text-gray-700">
+                Nome do Prédio
+              </label>
+              <input
+                type="text"
+                id="buildingName"
+                name="buildingName"
+                value={formData.buildingName}
+                onChange={handleChange}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                placeholder="Ex: Edifício Aurora, Residencial Flores..."
+              />
+            </div>
+          )}
 
           <div>
             <label htmlFor="address" className="block text-sm font-medium text-gray-700">

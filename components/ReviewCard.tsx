@@ -33,15 +33,18 @@ export default function ReviewCard({
     >
       <div className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
         <div className="p-6">
-          <h2 className="text-xl font-bold text-gray-800 mb-2">{address}</h2>
-          <div className="space-y-1">
-            <p className="text-secondary-600">
-              {neighborhood ? `${neighborhood}, ` : ''}{city}
+          <div className="mb-4">
+            {review.apartments.building_name && (
+              <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                {review.apartments.building_name}
+              </h3>
+            )}
+            <p className="text-gray-600">
+              <span className="font-semibold">{address}</span>
+              {neighborhood && <span>, {neighborhood}</span>}
             </p>
-            <p className="text-gray-500 text-sm">
-              {state}
-              {state && zip_code ? ' - ' : ''}
-              {zip_code}
+            <p className="text-gray-600">
+              {city} - {state}
             </p>
           </div>
           

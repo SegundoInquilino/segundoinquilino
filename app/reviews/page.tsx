@@ -132,37 +132,68 @@ export default function ReviewsPage() {
     const supabase = createClient()
     
     try {
-      let query = supabase
+      const { data } = await supabase
         .from('reviews')
         .select(`
           *,
-          apartments!inner (*),
+          apartments (*),
           likes_count:review_likes(count)
         `)
 
-      // Filtros
-      if (filters.search?.trim()) {
-        query = query.ilike('apartments.address', `%${filters.search.trim()}%`)
+      if (data) {
+        let filtered = data
+        
+        // Filtro de busca (nome do prédio, endereço, bairro)
+        if (filters.search?.trim()) {
+          const searchTerm = filters.search.trim().toLowerCase()
+          filtered = filtered.filter(review => 
+            review.apartments.building_name?.toLowerCase().includes(searchTerm) ||
+            review.apartments.address.toLowerCase().includes(searchTerm) ||
+            review.apartments.neighborhood.toLowerCase().includes(searchTerm)
+          )
+        }
+
+        // Filtro de cidade
+        if (filters.city && filters.city !== 'all') {
+          filtered = filtered.filter(review =>
+            review.apartments.city.toLowerCase().includes(filters.city!.toLowerCase())
+          )
+        }
+
+        // Filtro de avaliação
+        if (typeof filters.rating === 'number') {
+          filtered = filtered.filter(review => review.rating >= filters.rating!)
+        }
+
+        // Filtro de amenidades
+        if (filters.amenities?.length) {
+          filtered = filtered.filter(review =>
+            filters.amenities!.every(amenity => 
+              review.amenities?.includes(amenity)
+            )
+          )
+        }
+
+        // Ordenação
+        if (filters.orderBy) {
+          filtered = [...filtered].sort((a, b) => {
+            switch (filters.orderBy) {
+              case 'recent':
+                return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+              case 'rating':
+                return b.rating - a.rating
+              case 'likes':
+                const likesA = typeof a.likes_count === 'number' ? a.likes_count : a.likes_count.count
+                const likesB = typeof b.likes_count === 'number' ? b.likes_count : b.likes_count.count
+                return likesB - likesA
+              default:
+                return 0
+            }
+          })
+        }
+
+        setReviews(filtered as Review[])
       }
-
-      if (filters.city && filters.city !== 'all') {
-        query = query.ilike('apartments.city', `%${filters.city}%`)
-      }
-
-      if (typeof filters.rating === 'number') {
-        query = query.gte('rating', filters.rating)
-      }
-
-      if (filters.amenities?.length) {
-        query = query.overlaps('amenities', filters.amenities)
-      }
-
-      // Ordenação
-      const { data, error } = await query.order('created_at', { ascending: false })
-
-      if (error) throw error
-      if (data) setReviews(data as Review[])
-
     } catch (error) {
       console.error('Erro ao filtrar reviews:', error)
     }
