@@ -44,14 +44,14 @@ export default function ReviewFilters({ onFilterChange }: ReviewFiltersProps) {
       {/* Buscar localização */}
       <div className="mb-6">
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Buscar localização
+          Buscar
         </label>
         <div className="relative">
           <input
             type="text"
             value={search}
             onChange={(e) => handleChange('search', e.target.value)}
-            placeholder="Avenida dos Estados"
+            placeholder="Nome do prédio, endereço ou bairro..."
             className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
           <span className="absolute left-3 top-2.5 text-gray-400">

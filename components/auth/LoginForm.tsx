@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import ForgotPasswordForm from './ForgotPasswordForm'
 
 export default function LoginForm() {
   const [email, setEmail] = useState('')
@@ -10,6 +11,7 @@ export default function LoginForm() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
+  const [showForgotPassword, setShowForgotPassword] = useState(false)
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -29,6 +31,10 @@ export default function LoginForm() {
     }
     
     setLoading(false)
+  }
+
+  if (showForgotPassword) {
+    return <ForgotPasswordForm onBack={() => setShowForgotPassword(false)} />
   }
 
   return (
@@ -64,6 +70,18 @@ export default function LoginForm() {
       </div>
 
       {error && <div className="text-red-500 text-sm">{error}</div>}
+
+      <div className="flex items-center justify-between">
+        <div className="text-sm">
+          <button
+            type="button"
+            onClick={() => setShowForgotPassword(true)}
+            className="text-primary-600 hover:text-primary-500"
+          >
+            Esqueceu sua senha?
+          </button>
+        </div>
+      </div>
 
       <button
         type="submit"
