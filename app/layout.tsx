@@ -7,6 +7,7 @@ import Header from '@/components/Header'
 import Link from 'next/link'
 import { siteMetadata } from '@/lib/metadata'
 import SessionAlert from '@/components/SessionAlert'
+import GoogleAnalytics from '@/components/GoogleAnalytics'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -66,6 +67,9 @@ export default async function RootLayout({
 
   return (
     <html lang="pt-BR">
+      <head>
+        <GoogleAnalytics />
+      </head>
       <body className={inter.className}>
         <AuthProvider>
           <SessionAlert />
