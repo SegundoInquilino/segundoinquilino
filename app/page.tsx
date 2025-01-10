@@ -39,12 +39,83 @@ export default function HomePage() {
             <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
               Bem-vindo ao
               <span className="block text-purple-800">Segundo Inquilino</span>
-              </h1>
+            </h1>
             
             <p className="mt-6 text-xl text-gray-600 max-w-2xl mx-auto">
               A plataforma que conecta inquilinos e compartilha experiências reais sobre apartamentos.
               Tome decisões mais seguras baseadas em avaliações autênticas.
             </p>
+
+            <div className="mt-8 flex justify-center">
+              <Link
+                href="/auth"
+                className="inline-flex items-center px-12 py-4 border border-transparent text-lg font-medium rounded-md text-white bg-purple-800 hover:bg-purple-900 transition-colors duration-200 shadow-sm hover:shadow-md"
+              >
+                Crie uma conta e faça uma review agora
+              </Link>
+            </div>
+
+            <div className="mt-12 bg-purple-50 py-12 rounded-3xl">
+              <div className="max-w-4xl mx-auto px-4">
+                <h2 className="text-2xl font-bold text-center text-gray-900 mb-8">
+                  O que você quer saber sobre o apartamento? 🤔
+                </h2>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                    <div className="text-4xl mb-3">🏊‍♂️</div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      Possui piscina?
+                    </h3>
+                    <p className="text-sm text-gray-600">
+                      Descubra as áreas de lazer
+                    </p>
+                  </div>
+
+                  <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                    <div className="text-4xl mb-3">🛡️</div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      É um lugar seguro?
+                    </h3>
+                    <p className="text-sm text-gray-600">
+                      Avalie a segurança da região
+                    </p>
+                  </div>
+
+                  <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                    <div className="text-4xl mb-3">🛒</div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      Tem mercado perto?
+                    </h3>
+                    <p className="text-sm text-gray-600">
+                      Veja a localização e serviços
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                  <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                    <div className="text-4xl mb-3">👋</div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      Os vizinhos são legais?
+                    </h3>
+                    <p className="text-sm text-gray-600">
+                      Conheça o perfil da vizinhança
+                    </p>
+                  </div>
+
+                  <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                    <div className="text-4xl mb-3">🌙</div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      Muito barulho à noite?
+                    </h3>
+                    <p className="text-sm text-gray-600">
+                      Saiba sobre a tranquilidade do local
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
 
             <div className="mt-8 max-w-3xl mx-auto px-6 py-5 bg-purple-50 rounded-xl border border-purple-100 shadow-sm">
               <p className="text-lg md:text-xl text-purple-800 font-medium leading-relaxed">
@@ -53,15 +124,6 @@ export default function HomePage() {
                   sua experiência pode evitar dores de cabeça e garantir um lar mais seguro e confiável"
                 </span>
               </p>
-            </div>
-
-            <div className="mt-12 flex justify-center">
-              <Link
-                href="/auth"
-                className="inline-flex items-center px-12 py-4 border border-transparent text-lg font-medium rounded-md text-white bg-purple-800 hover:bg-purple-900 transition-colors duration-200 shadow-sm hover:shadow-md"
-              >
-                Faça uma review agora
-              </Link>
             </div>
 
             <div className="mt-16">
@@ -123,6 +185,68 @@ export default function HomePage() {
                     Tome sua decisão com base em experiências reais. 
                     Evite surpresas desagradáveis e encontre o lar ideal para você.
                   </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-16 bg-purple-50 py-16 rounded-3xl">
+              <div className="max-w-4xl mx-auto px-4">
+                <h2 className="text-3xl font-bold text-center text-gray-900 mb-8">
+                  Encontre o que você procura! 🔍
+                </h2>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                  <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                    <div className="text-4xl mb-4">🏊‍♂️</div>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                      Possui piscina?
+                    </h3>
+                    <p className="text-gray-600">
+                      Descubra apartamentos com áreas de lazer completas
+                    </p>
+                  </div>
+
+                  <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                    <div className="text-4xl mb-4">🚗️</div>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                      É um lugar seguro?
+                    </h3>
+                    <p className="text-gray-600">
+                      Saiba tudo sobre a segurança do local e da região
+                    </p>
+                  </div>
+
+                  <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                    <div className="text-4xl mb-4">🛒</div>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                      Tem mercado por perto?
+                    </h3>
+                    <p className="text-gray-600">
+                      Confira a proximidade com comércios e serviços
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+                  <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                    <div className="text-4xl mb-4">🔇</div>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                      Como é o barulho?
+                    </h3>
+                    <p className="text-gray-600">
+                      Avaliações sobre acústica e ruídos do apartamento
+                    </p>
+                  </div>
+
+                  <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                    <div className="text-4xl mb-4">🚗</div>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                      Tem garagem?
+                    </h3>
+                    <p className="text-gray-600">
+                      Informações sobre estacionamento e vagas
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
