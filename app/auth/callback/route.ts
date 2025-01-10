@@ -10,15 +10,52 @@ export async function GET(request: Request) {
     const code = requestUrl.searchParams.get('code')
 
     if (code) {
-      const cookieStore = cookies()
-      const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
-      await supabase.auth.exchangeCodeForSession(code)
+      const supabase = createRouteHandlerClient({ cookies })
+      const { data: { user } } = await supabase.auth.exchangeCodeForSession(code)
+
+      if (user?.email) {
+        // Verificar se usuário já tem username
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('username')
+          .eq('id', user.id)
+          .single()
+
+        if (!profile?.username) {
+          // Gerar username a partir do email
+          let suggestedUsername = user.email.split('@')[0]
+          
+          // Verificar se username já existe
+          const { data: existing } = await supabase
+            .from('profiles')
+            .select('username')
+            .eq('username', suggestedUsername)
+            .single()
+
+          if (existing) {
+            // Se já existe, adiciona números aleatórios
+            suggestedUsername = `${suggestedUsername}${Math.floor(Math.random() * 1000)}`
+          }
+
+          // Criar perfil com username gerado
+          await supabase
+            .from('profiles')
+            .upsert({
+              id: user.id,
+              username: suggestedUsername,
+              email: user.email,
+              updated_at: new Date().toISOString()
+            })
+        }
+      }
+
+      // Redirecionar para home
+      return NextResponse.redirect(new URL('/', requestUrl.origin))
     }
 
-    // Redirecionando para a página de reviews após o login
-    return NextResponse.redirect(new URL('/reviews', requestUrl.origin))
+    return NextResponse.redirect(new URL('/', requestUrl.origin))
   } catch (error) {
-    console.error('Erro no callback de autenticação:', error)
-    return NextResponse.redirect(new URL('/auth/error', request.url))
+    console.error('Erro no callback:', error)
+    return NextResponse.redirect(new URL('/auth/error', requestUrl.origin))
   }
 } 
