@@ -48,7 +48,7 @@ export default function HomePage() {
 
             <div className="mt-8 max-w-3xl mx-auto px-6 py-5 bg-purple-50 rounded-xl border border-purple-100 shadow-sm">
               <p className="text-lg md:text-xl text-purple-800 font-medium leading-relaxed">
-                "Ajude outros inquilinos a escolherem melhor - 
+                <b>"Ajude outros inquilinos a escolherem melhor!</b>
                 <span className="block mt-1 text-purple-700">
                   sua experiência pode evitar dores de cabeça e garantir um lar mais seguro e confiável"
                 </span>
@@ -60,7 +60,7 @@ export default function HomePage() {
                 href="/auth"
                 className="inline-flex items-center px-12 py-4 border border-transparent text-lg font-medium rounded-md text-white bg-purple-800 hover:bg-purple-900 transition-colors duration-200 shadow-sm hover:shadow-md"
               >
-                Comece Agora
+                Faça uma review agora
               </Link>
             </div>
 

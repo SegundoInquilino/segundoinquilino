@@ -80,7 +80,7 @@ export default async function HomePage() {
                          hover:bg-purple-50 transition-all duration-200 
                          shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
               >
-                Criar Nova Review
+                Faça uma review agora
                 <svg 
                   className="ml-2 -mr-1 w-5 h-5" 
                   fill="none" 

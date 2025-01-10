@@ -29,7 +29,9 @@ export default function SessionAlert() {
         localStorage.setItem('hadPreviousSession', 'true')
         setShowAlert(false)
       } else if (event === 'SIGNED_OUT') {
-        setShowAlert(true)
+        // Não mostrar o alerta em caso de logout manual
+        localStorage.removeItem('hadPreviousSession')
+        setShowAlert(false)
       }
     })
 
@@ -59,7 +61,7 @@ export default function SessionAlert() {
               </svg>
             </span>
             <p className="ml-3 font-medium text-yellow-700">
-              Sua sessão expirou. Por favor, faça login novamente.
+              Faça o login para continuar no site Segundo Inquilino.
             </p>
           </div>
           <div className="flex-shrink-0">
