@@ -39,20 +39,19 @@ export default function LoginForm() {
 
   const handleGoogleLogin = async () => {
     try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
+      const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
-          }
+          },
+          skipBrowserRedirect: false
         }
       })
 
       if (error) throw error
-
-      // O redirecionamento será automático após sucesso
     } catch (error) {
       console.error('Erro no login com Google:', error)
       setError('Erro ao fazer login com Google')
@@ -131,6 +130,9 @@ export default function LoginForm() {
         </svg>
         Google
       </button>
+      <p className="text-xs text-gray-500 text-center mt-2">
+        Use sua conta Google para entrar ou criar uma nova conta
+      </p>
 
       <button
         type="submit"
