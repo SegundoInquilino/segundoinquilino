@@ -61,16 +61,37 @@ export default async function HomePage() {
       userMap={userMap}
       currentUserId={currentUserId}
     >
-      <div className="relative pt-16 sm:pt-20 bg-white">
+      <div className="relative pt-16 pb-24 sm:pt-20 sm:pb-32 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
+          <div className="text-center space-y-6">
             <h1 className="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
-              <span className="block">Bem-vindo ao</span>
+              <span className="block mb-2">Bem-vindo ao</span>
               <span className="block text-purple-800">Segundo Inquilino</span>
             </h1>
-            <p className="mt-3 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
+            <p className="mt-6 max-w-2xl mx-auto text-xl text-gray-600">
               Encontre avaliações reais de apartamentos e compartilhe suas experiências.
             </p>
+            <div className="mt-4">
+              <Link
+                href="/reviews"
+                className="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-purple-800 hover:bg-purple-900 transition-colors duration-200 shadow-sm hover:shadow-md"
+              >
+                <svg 
+                  className="w-5 h-5 mr-2" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    strokeWidth="2" 
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" 
+                  />
+                </svg>
+                Busque Reviews
+              </Link>
+            </div>
           </div>
         </div>
       </div>
