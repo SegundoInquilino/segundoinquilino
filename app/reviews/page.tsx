@@ -20,7 +20,7 @@ interface Filters {
 export default function ReviewsPage() {
   const [reviews, setReviews] = useState<Review[]>([])
   const [loading, setLoading] = useState(true)
-  const { currentUserId, setCurrentUserId } = useAuth()
+  const { currentUserId } = useAuth()
   const [userMap, setUserMap] = useState<Record<string, string>>({})
   const [selectedReviewId, setSelectedReviewId] = useState<string | null>(null)
   const [selectedCommentId, setSelectedCommentId] = useState<string | null>(null)
@@ -49,10 +49,6 @@ export default function ReviewsPage() {
     try {
       const supabase = createClient()
       
-      // Carregar usuário atual
-      const { data: { user } } = await supabase.auth.getUser()
-      setCurrentUserId(user?.id || null)
-
       // Carregar reviews
       const { data: reviewsData } = await supabase
         .from('reviews')

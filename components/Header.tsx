@@ -22,7 +22,6 @@ export default function Header({ username, currentUserId, profile }: HeaderProps
   const [avatarUrl, setAvatarUrl] = useState(profile?.avatar_url)
 
   useEffect(() => {
-    // Verifica se tem uma sessão ativa
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) {
@@ -31,6 +30,14 @@ export default function Header({ username, currentUserId, profile }: HeaderProps
     }
 
     checkSession()
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT') {
+        router.push('/auth')
+      }
+    })
+
+    return () => subscription.unsubscribe()
   }, [router])
 
   const handleLogout = async () => {

@@ -7,7 +7,7 @@ import { createClient } from '@/utils/supabase-client'
 import { useState, useEffect } from 'react'
 
 export default function Navbar() {
-  const { currentUserId, setCurrentUserId } = useAuth()
+  const { currentUserId } = useAuth()
   const [username, setUsername] = useState<string>('')
   const supabase = createClient()
 
@@ -36,7 +36,6 @@ export default function Navbar() {
   const handleLogout = async () => {
     try {
       await supabase.auth.signOut()
-      setCurrentUserId(null)
       window.location.href = '/auth'
     } catch (error) {
       console.error('Erro ao fazer logout:', error)
