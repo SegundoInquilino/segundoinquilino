@@ -28,37 +28,8 @@ export async function GET(request: Request) {
             onConflict: 'id'
           })
 
-        // Força redirecionamento com script e cookie de sessão
-        const html = `
-          <!DOCTYPE html>
-          <html>
-            <head>
-              <meta charset="utf-8">
-              <title>Redirecionando...</title>
-              <script>
-                // Força o redirecionamento para o domínio com www
-                window.location.replace('https://www.segundoinquilino.com.br/reviews');
-                // Se não redirecionar em 1 segundo, tenta novamente
-                setTimeout(function() {
-                  if (window.location.hostname !== 'www.segundoinquilino.com.br') {
-                    window.location.href = 'https://www.segundoinquilino.com.br/reviews';
-                  }
-                }, 1000);
-              </script>
-            </head>
-            <body>
-              <p>Redirecionando para a página de reviews...</p>
-            </body>
-          </html>
-        `
-
-        return new NextResponse(html, {
-          headers: {
-            'Content-Type': 'text/html; charset=utf-8',
-            'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
-            'Set-Cookie': `sb-access-token=${session.access_token}; Path=/; HttpOnly; Secure; SameSite=Lax; Domain=.segundoinquilino.com.br`
-          }
-        })
+        // Redireciona para reviews, igual ao login normal
+        return NextResponse.redirect('https://www.segundoinquilino.com.br/reviews')
       }
     } catch (error) {
       console.error('Erro no callback:', error)
