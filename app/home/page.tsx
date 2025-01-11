@@ -48,7 +48,7 @@ export default async function HomePage() {
     .select('id, username')
     .in('id', userIds)
 
-  // Criar mapa de usuários com tipagem correta
+  // Criar mapa de usuários
   const userMap: UserMap = {}
   profiles?.forEach((profile: Profile) => {
     userMap[profile.id] = profile.username || 'Usuário'
@@ -61,51 +61,18 @@ export default async function HomePage() {
       userMap={userMap}
       currentUserId={currentUserId}
     >
-      <div className="relative bg-gradient-to-br from-purple-900 via-purple-800 to-gray-900 py-24">
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
+      <div className="relative pt-16 sm:pt-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-5xl font-extrabold text-white tracking-tight sm:text-6xl md:text-7xl">
-              Segundo Inquilino
+            <h1 className="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
+              <span className="block">Bem-vindo ao</span>
+              <span className="block text-purple-800">Segundo Inquilino</span>
             </h1>
-            
-            <p className="mt-6 text-xl text-purple-100 max-w-2xl mx-auto">
-              Encontre e compartilhe experiências reais sobre apartamentos para alugar
+            <p className="mt-3 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
+              Encontre avaliações reais de apartamentos e compartilhe suas experiências.
             </p>
-
-            <div className="mt-10">
-              <Link
-                href="/new-review"
-                className="inline-flex items-center px-8 py-3 border border-transparent 
-                         text-base font-medium rounded-full text-purple-900 bg-white 
-                         hover:bg-purple-50 transition-all duration-200 
-                         shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-              >
-                Faça uma review agora
-                <svg 
-                  className="ml-2 -mr-1 w-5 h-5" 
-                  fill="none" 
-                  stroke="currentColor" 
-                  viewBox="0 0 24 24"
-                >
-                  <path 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round" 
-                    strokeWidth={2} 
-                    d="M13 7l5 5m0 0l-5 5m5-5H6"
-                  />
-                </svg>
-              </Link>
-            </div>
           </div>
         </div>
-
-        {/* Efeito de gradiente decorativo */}
-        <div className="absolute inset-x-0 bottom-0">
-          <div className="h-1 bg-gradient-to-r from-transparent via-purple-300 to-transparent opacity-20"></div>
-        </div>
-
-        {/* Efeito de fundo adicional */}
-        <div className="absolute inset-0 bg-gradient-to-b from-purple-900/50 to-transparent"></div>
       </div>
     </HomeContent>
   )

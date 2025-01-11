@@ -48,10 +48,10 @@ export default function HomePage() {
 
             <div className="mt-8 flex justify-center">
               <Link
-                href="/auth"
+                href="/home"
                 className="inline-flex items-center px-12 py-4 border border-transparent text-lg font-medium rounded-md text-white bg-purple-800 hover:bg-purple-900 transition-colors duration-200 shadow-sm hover:shadow-md"
               >
-                Crie uma conta e faça uma review agora
+                Veja alguns dos reviews
               </Link>
             </div>
 

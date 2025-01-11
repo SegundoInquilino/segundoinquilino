@@ -45,16 +45,16 @@ export default async function RootLayout({
   children: React.ReactNode
 }) {
   const supabase = createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { data: { session } } = await supabase.auth.getSession()
   
   let username = ''
   let profile: { avatar_url?: string } | undefined = undefined
 
-  if (user) {
+  if (session?.user) {
     const { data } = await supabase
       .from('profiles')
       .select('username, avatar_url')
-      .eq('id', user.id)
+      .eq('id', session.user.id)
       .single()
     
     if (data) {
@@ -73,14 +73,14 @@ export default async function RootLayout({
       <body className={inter.className}>
         <AuthProvider>
           <SessionAlert />
-          {user && (
+          {session?.user && (
             <Header 
-              currentUserId={user.id} 
+              currentUserId={session.user.id} 
               username={username}
               profile={profile}
             />
           )}
-          <main className={user ? 'pt-16' : ''}>
+          <main className={session?.user ? 'pt-16' : ''}>
             {children}
           </main>
           

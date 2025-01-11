@@ -18,19 +18,23 @@ export default function LoginForm() {
     setLoading(true)
     setError(null)
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      })
 
-    if (error) {
-      setError(error.message)
-    } else {
-      router.push('/')
-      router.refresh() // Força a atualização dos dados
+      if (error) throw error
+
+      // Redireciona diretamente para /reviews
+      window.location.href = '/reviews'
+
+    } catch (error) {
+      console.error('Erro no login:', error)
+      setError('Email ou senha incorretos')
+    } finally {
+      setLoading(false)
     }
-    
-    setLoading(false)
   }
 
   if (showForgotPassword) {
