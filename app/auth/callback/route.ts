@@ -9,28 +9,46 @@ export async function GET(request: Request) {
   if (code) {
     const supabase = createRouteHandlerClient({ cookies })
     
-    await supabase.auth.exchangeCodeForSession(code)
+    // Troca o código por uma sessão
+    const { data: { session }, error: sessionError } = await supabase.auth.exchangeCodeForSession(code)
+    
+    if (sessionError) {
+      console.error('Erro na sessão:', sessionError)
+      return NextResponse.redirect(new URL('/auth', requestUrl.origin))
+    }
 
-    const { data: { user } } = await supabase.auth.getUser()
+    if (session?.user) {
+      const username = session.user.email?.split('@')[0] || 'user'
 
-    if (user?.email) {
-      const username = user.email.split('@')[0]
-
-      await supabase
+      // Atualiza ou cria o perfil
+      const { error: profileError } = await supabase
         .from('profiles')
         .upsert({
-          id: user.id,
+          id: session.user.id,
           username: username,
           updated_at: new Date().toISOString(),
+          avatar_url: session.user.user_metadata?.avatar_url
         }, {
           onConflict: 'id'
         })
-    }
 
-    // Redireciona para /reviews após login bem-sucedido
-    return NextResponse.redirect(new URL('/reviews', requestUrl.origin))
+      if (profileError) {
+        console.error('Erro ao criar perfil:', profileError)
+      }
+
+      // Define o cookie de sessão
+      cookies().set('sb-auth-token', session.access_token, {
+        path: '/',
+        secure: true,
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 7 // 7 dias
+      })
+
+      // Redireciona para reviews com a sessão ativa
+      return NextResponse.redirect(new URL('/reviews', requestUrl.origin))
+    }
   }
 
-  // Se algo der errado, redireciona para a home
-  return NextResponse.redirect(new URL('/', requestUrl.origin))
+  // Se algo der errado, volta para o login
+  return NextResponse.redirect(new URL('/auth', requestUrl.origin))
 } 

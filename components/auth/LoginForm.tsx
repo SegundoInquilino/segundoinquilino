@@ -39,10 +39,10 @@ export default function LoginForm() {
 
   const handleGoogleLogin = async () => {
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: 'https://ejoivntarqlinulkiure.supabase.co/auth/v1/callback',
+          redirectTo: `${window.location.origin}/auth/callback`,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
@@ -51,6 +51,8 @@ export default function LoginForm() {
       })
 
       if (error) throw error
+
+      // O redirecionamento será automático após sucesso
     } catch (error) {
       console.error('Erro no login com Google:', error)
       setError('Erro ao fazer login com Google')
