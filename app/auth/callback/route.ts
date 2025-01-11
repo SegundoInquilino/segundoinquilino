@@ -2,23 +2,35 @@ import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 
-export const dynamic = 'force-dynamic'
-
 export async function GET(request: Request) {
-  try {
-    const requestUrl = new URL(request.url)
-    const code = requestUrl.searchParams.get('code')
+  const requestUrl = new URL(request.url)
+  const code = requestUrl.searchParams.get('code')
 
-    if (code) {
-      const cookieStore = cookies()
-      const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
-      await supabase.auth.exchangeCodeForSession(code)
+  if (code) {
+    const supabase = createRouteHandlerClient({ cookies })
+    
+    await supabase.auth.exchangeCodeForSession(code)
+
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (user?.email) {
+      const username = user.email.split('@')[0]
+
+      await supabase
+        .from('profiles')
+        .upsert({
+          id: user.id,
+          username: username,
+          updated_at: new Date().toISOString(),
+        }, {
+          onConflict: 'id'
+        })
     }
 
-    // Redirecionando para a página de reviews após o login
+    // Redireciona para /reviews após login bem-sucedido
     return NextResponse.redirect(new URL('/reviews', requestUrl.origin))
-  } catch (error) {
-    console.error('Erro no callback de autenticação:', error)
-    return NextResponse.redirect(new URL('/auth/error', request.url))
   }
+
+  // Se algo der errado, redireciona para a home
+  return NextResponse.redirect(new URL('/', requestUrl.origin))
 } 
