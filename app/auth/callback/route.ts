@@ -28,15 +28,14 @@ export async function GET(request: Request) {
             onConflict: 'id'
           })
 
-        // Sempre redireciona para /reviews após autenticação bem-sucedida
-        return NextResponse.redirect(new URL('/reviews', requestUrl.origin))
+        // Redireciona direto para reviews após confirmar a sessão
+        return NextResponse.redirect('https://www.segundoinquilino.com.br/reviews')
       }
     } catch (error) {
       console.error('Erro no callback:', error)
-      return NextResponse.redirect(new URL('/auth', requestUrl.origin))
     }
   }
 
   // Se algo der errado, volta para o login
-  return NextResponse.redirect(new URL('/auth', requestUrl.origin))
+  return NextResponse.redirect('https://www.segundoinquilino.com.br/auth')
 } 

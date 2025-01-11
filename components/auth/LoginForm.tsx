@@ -42,7 +42,7 @@ export default function LoginForm() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: 'https://www.segundoinquilino.com.br/auth/callback',
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
@@ -52,7 +52,6 @@ export default function LoginForm() {
       })
 
       if (error) throw error
-      // O redirecionamento para /reviews será feito pelo callback
     } catch (error) {
       console.error('Erro no login com Google:', error)
       setError('Erro ao fazer login com Google')
