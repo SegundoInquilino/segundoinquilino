@@ -8,10 +8,6 @@
   ],
   "routes": [
     {
-      "src": "/auth/callback",
-      "dest": "/api/auth/callback"
-    },
-    {
       "src": "/(.*)",
       "dest": "/$1"
     }
@@ -19,29 +15,5 @@
   "env": {
     "NEXT_PUBLIC_SUPABASE_URL": "@next_public_supabase_url",
     "NEXT_PUBLIC_SUPABASE_ANON_KEY": "@next_public_supabase_anon_key"
-  },
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-store, max-age=0"
-        }
-      ]
-    }
-  ],
-  "redirects": [
-    {
-      "source": "/:path*",
-      "has": [
-        {
-          "type": "host",
-          "value": "segundoinquilino.com.br"
-        }
-      ],
-      "destination": "https://www.segundoinquilino.com.br/:path*",
-      "permanent": true
-    }
-  ]
+  }
 } 

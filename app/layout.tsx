@@ -66,32 +66,25 @@ export default async function RootLayout({
   children: React.ReactNode
 }) {
   const supabase = createClient()
+  const { data: { session } } = await supabase.auth.getSession()
   
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
-
   let username = ''
   let profile: { avatar_url?: string } | undefined = undefined
 
   if (session?.user) {
-    try {
-      const { data } = await supabase
-        .from('profiles')
-        .select('username, avatar_url')
-        .eq('id', session.user.id)
-        .single()
-      
-      if (data) {
-        username = data.username
-        profile = {
-          avatar_url: data.avatar_url || session.user.user_metadata?.avatar_url
-        }
-      } else {
-        username = session.user.email?.split('@')[0] || 'user'
+    const { data } = await supabase
+      .from('profiles')
+      .select('username, avatar_url')
+      .eq('id', session.user.id)
+      .single()
+    
+    if (data) {
+      username = data.username
+      profile = {
+        avatar_url: data.avatar_url || session.user.user_metadata?.avatar_url
       }
-    } catch (error) {
-      console.error('Erro ao buscar perfil:', error)
+    } else {
+      username = session.user.email?.split('@')[0] || 'user'
     }
   }
 
@@ -101,7 +94,7 @@ export default async function RootLayout({
         <GoogleAnalytics />
       </head>
       <body className={inter.className}>
-        <AuthProvider session={session}>
+        <AuthProvider>
           <SessionAlert />
           {session?.user && (
             <Header 
