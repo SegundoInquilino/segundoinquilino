@@ -28,14 +28,29 @@ export async function GET(request: Request) {
             onConflict: 'id'
           })
 
-        // Força o redirecionamento com a URL completa e recarrega a página
-        return NextResponse.redirect('https://www.segundoinquilino.com.br/reviews', {
-          status: 302,
-          headers: {
-            'Cache-Control': 'no-store, max-age=0',
-            'Refresh': '0;url=https://www.segundoinquilino.com.br/reviews'
+        // Força redirecionamento com script de redirecionamento
+        return new NextResponse(
+          `
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <meta http-equiv="refresh" content="0; url=https://www.segundoinquilino.com.br/reviews">
+              <script>
+                window.location.replace('https://www.segundoinquilino.com.br/reviews');
+              </script>
+            </head>
+            <body>
+              Redirecionando...
+            </body>
+          </html>
+          `,
+          {
+            headers: {
+              'Content-Type': 'text/html',
+              'Cache-Control': 'no-store, max-age=0'
+            }
           }
-        })
+        )
       }
     } catch (error) {
       console.error('Erro no callback:', error)

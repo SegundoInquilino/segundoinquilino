@@ -47,12 +47,19 @@ export default function HomePage() {
               Tome decisões mais seguras baseadas em avaliações autênticas.
             </p>
 
-            <div className="mt-8 flex justify-center">
+            <div className="mt-8 flex justify-center space-x-4">
               <Link
                 href="/home"
-                className="inline-flex items-center px-12 py-4 border border-transparent text-lg font-medium rounded-md text-white bg-purple-800 hover:bg-purple-900 transition-colors duration-200 shadow-sm hover:shadow-md"
+                className="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-purple-800 hover:bg-purple-900 transition-colors duration-200 shadow-sm hover:shadow-md"
               >
                 Veja alguns dos reviews
+              </Link>
+
+              <Link
+                href="/auth"
+                className="inline-flex items-center px-8 py-3 border border-purple-800 text-base font-medium rounded-md text-purple-800 bg-white hover:bg-purple-50 transition-colors duration-200 shadow-sm hover:shadow-md"
+              >
+                Faça login ou cadastre-se
               </Link>
             </div>
 
