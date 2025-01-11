@@ -28,7 +28,7 @@ export async function GET(request: Request) {
             onConflict: 'id'
           })
 
-        // Redireciona para reviews
+        // Sempre redireciona para /reviews após autenticação bem-sucedida
         return NextResponse.redirect(new URL('/reviews', requestUrl.origin))
       }
     } catch (error) {

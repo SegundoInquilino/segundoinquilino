@@ -81,7 +81,7 @@ export default async function RootLayout({
     if (data) {
       username = data.username
       profile = {
-        avatar_url: data.avatar_url || undefined
+        avatar_url: data.avatar_url || session.user.user_metadata?.avatar_url
       }
     }
   }

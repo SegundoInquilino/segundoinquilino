@@ -52,6 +52,7 @@ export default function LoginForm() {
       })
 
       if (error) throw error
+      // O redirecionamento para /reviews será feito pelo callback
     } catch (error) {
       console.error('Erro no login com Google:', error)
       setError('Erro ao fazer login com Google')
