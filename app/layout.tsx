@@ -21,7 +21,14 @@ export const metadata: Metadata = {
   keywords: siteMetadata.keywords,
   openGraph: {
     ...siteMetadata.openGraph,
-    images: siteMetadata.openGraph.images
+    images: [
+      {
+        url: '/images/Logo_SI_icon.png',
+        width: 200,
+        height: 200,
+        alt: 'Segundo Inquilino Logo'
+      }
+    ]
   },
   robots: {
     index: true,
@@ -35,8 +42,22 @@ export const metadata: Metadata = {
     },
   },
   verification: {
-    google: 'seu-código-de-verificação', // Adicione o código do Google Search Console
-  }
+    google: 'seu-código-de-verificação',
+  },
+  icons: {
+    icon: [
+      { url: '/images/Logo_SI_icon_160x160.png' },
+      { url: '/images/Logo_SI_icon_160x160.png', sizes: '16x16', type: 'image/png' },
+      { url: '/images/Logo_SI_icon_160x160.png', sizes: '32x32', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/images/Logo_SI_icon.png' },
+    ],
+    shortcut: [
+      { url: '/images/Logo_SI_icon.png' }
+    ],
+  },
+  manifest: '/site.webmanifest',
 }
 
 export default async function RootLayout({
