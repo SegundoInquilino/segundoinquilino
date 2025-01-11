@@ -21,7 +21,7 @@ export default function AuthPage() {
           if (error) throw error
 
           if (session) {
-            window.location.replace('https://www.segundoinquilino.com.br/reviews')
+            window.location.href = '/reviews'
           }
         } catch (error) {
           console.error('Erro ao processar código:', error)
