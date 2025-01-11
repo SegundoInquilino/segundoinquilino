@@ -27,7 +27,7 @@ export default function LoginForm() {
       if (error) throw error
 
       // Redireciona para /reviews após login bem-sucedido
-      window.location.href = '/reviews'
+      window.location.href = 'https://www.segundoinquilino.com.br/reviews'
 
     } catch (error) {
       console.error('Erro no login:', error)

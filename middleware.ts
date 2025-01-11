@@ -21,12 +21,6 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL('/auth', req.url))
   }
 
-  // Adiciona o user ao request para uso posterior
-  if (session) {
-    req.headers.set('x-user-id', session.user.id)
-    req.headers.set('x-user-email', session.user.email || '')
-  }
-
   return res
 }
 

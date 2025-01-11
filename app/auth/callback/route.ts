@@ -28,7 +28,7 @@ export async function GET(request: Request) {
             onConflict: 'id'
           })
 
-        // Redireciona direto para reviews após confirmar a sessão
+        // Redireciona para a página de reviews no domínio principal
         return NextResponse.redirect('https://www.segundoinquilino.com.br/reviews')
       }
     } catch (error) {

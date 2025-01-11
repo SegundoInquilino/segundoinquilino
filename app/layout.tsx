@@ -83,6 +83,8 @@ export default async function RootLayout({
       profile = {
         avatar_url: data.avatar_url || session.user.user_metadata?.avatar_url
       }
+    } else {
+      username = session.user.email?.split('@')[0] || 'user'
     }
   }
 
@@ -105,7 +107,6 @@ export default async function RootLayout({
             {children}
           </main>
           
-          {/* Footer */}
           <footer className="bg-gray-50 border-t">
             <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
               <div className="text-center text-sm text-gray-500">
