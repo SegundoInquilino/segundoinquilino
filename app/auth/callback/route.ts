@@ -17,6 +17,7 @@ export async function GET(request: Request) {
       if (session?.user) {
         const username = session.user.email?.split('@')[0] || 'user'
 
+        // Cria/atualiza o perfil
         await supabase
           .from('profiles')
           .upsert({
@@ -28,7 +29,15 @@ export async function GET(request: Request) {
             onConflict: 'id'
           })
 
-        // Redireciona para a página de reviews no domínio principal
+        // Define cookies de sessão
+        cookies().set('sb-access-token', session.access_token, {
+          path: '/',
+          secure: true,
+          sameSite: 'lax',
+          maxAge: 60 * 60 * 24 * 7 // 7 dias
+        })
+
+        // Redireciona para a página de reviews
         return NextResponse.redirect('https://www.segundoinquilino.com.br/reviews')
       }
     } catch (error) {
@@ -36,6 +45,5 @@ export async function GET(request: Request) {
     }
   }
 
-  // Se algo der errado, volta para o login
   return NextResponse.redirect('https://www.segundoinquilino.com.br/auth')
 } 
