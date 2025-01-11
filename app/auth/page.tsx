@@ -1,36 +1,15 @@
 'use client'
 
-import { useEffect } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
+import { useState } from 'react'
 import LoginForm from '@/components/auth/LoginForm'
+import RegisterForm from '@/components/auth/RegisterForm'
+import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 
 export default function AuthPage() {
+  const [isLogin, setIsLogin] = useState(true)
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const code = searchParams.get('code')
-
-  useEffect(() => {
-    const handleCode = async () => {
-      if (code) {
-        try {
-          const { data: { session }, error } = await supabase.auth.exchangeCodeForSession(code)
-          
-          if (error) throw error
-
-          if (session) {
-            window.location.href = '/reviews'
-          }
-        } catch (error) {
-          console.error('Erro ao processar código:', error)
-        }
-      }
-    }
-
-    handleCode()
-  }, [code])
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -48,15 +27,22 @@ export default function AuthPage() {
 
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Entre na sua conta
+            {isLogin ? 'Entre na sua conta' : 'Crie sua conta'}
           </h2>
         </div>
 
         <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
           <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-            <LoginForm />
+            {isLogin ? <LoginForm /> : <RegisterForm />}
             
-            <div className="mt-6">
+            <div className="mt-6 space-y-4">
+              <button
+                onClick={() => setIsLogin(!isLogin)}
+                className="w-full text-center text-sm text-blue-600 hover:text-blue-500"
+              >
+                {isLogin ? 'Não tem uma conta? Registre-se' : 'Já tem uma conta? Entre'}
+              </button>
+
               <div className="text-center text-xs text-gray-500">
                 Ao continuar, você concorda com nossos{' '}
                 <Link 

@@ -1,11 +1,10 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
-import { useRouter } from 'next/navigation'
 import NotificationBell from './NotificationBell'
 import Sidebar from './Sidebar'
+import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 
 interface HeaderProps {
@@ -19,27 +18,9 @@ interface HeaderProps {
 export default function Header({ username, currentUserId, profile }: HeaderProps) {
   const router = useRouter()
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
-  const [avatarUrl, setAvatarUrl] = useState(profile?.avatar_url)
-
-  useEffect(() => {
-    // Verifica se tem uma sessão ativa
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) {
-        router.push('/auth')
-      }
-    }
-
-    checkSession()
-  }, [router])
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut()
-    router.push('/auth')
-  }
 
   return (
-    <header className="fixed top-0 left-0 right-0 bg-white shadow-sm z-50">
+    <header className="fixed top-0 left-0 right-0 bg-white shadow-sm z-40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Menu Button */}

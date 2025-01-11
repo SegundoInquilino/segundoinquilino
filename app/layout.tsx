@@ -72,29 +72,17 @@ export default async function RootLayout({
   let profile: { avatar_url?: string } | undefined = undefined
 
   if (session?.user) {
-    try {
-      const { data } = await supabase
-        .from('profiles')
-        .select('username, avatar_url')
-        .eq('id', session.user.id)
-        .single()
-      
-      if (data) {
-        username = data.username
-        profile = {
-          avatar_url: data.avatar_url || session.user.user_metadata?.avatar_url
-        }
-      } else {
-        username = session.user.email?.split('@')[0] || 'user'
+    const { data } = await supabase
+      .from('profiles')
+      .select('username, avatar_url')
+      .eq('id', session.user.id)
+      .single()
+    
+    if (data) {
+      username = data.username
+      profile = {
+        avatar_url: data.avatar_url || undefined
       }
-
-      // Refresh do token se necessário
-      const { error: refreshError } = await supabase.auth.refreshSession()
-      if (refreshError) {
-        console.error('Erro ao atualizar sessão:', refreshError)
-      }
-    } catch (error) {
-      console.error('Erro ao buscar perfil:', error)
     }
   }
 
@@ -117,6 +105,7 @@ export default async function RootLayout({
             {children}
           </main>
           
+          {/* Footer */}
           <footer className="bg-gray-50 border-t">
             <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
               <div className="text-center text-sm text-gray-500">
