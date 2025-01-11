@@ -52,7 +52,6 @@ export default function LoginForm() {
 
       if (error) throw error
 
-      // Se tiver uma URL para redirecionar, use-a
       if (data?.url) {
         window.location.href = data.url
       }

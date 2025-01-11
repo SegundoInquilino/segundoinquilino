@@ -44,13 +44,13 @@ export async function GET(request: Request) {
             ])
         }
 
-        // Redireciona para reviews com URL limpa
-        return NextResponse.redirect(`${requestUrl.origin}/reviews`)
+        // Redireciona sempre para o domínio principal
+        return NextResponse.redirect('https://segundoinquilino.com.br/reviews')
       }
     }
 
-    // Se algo der errado, redireciona para página de erro
-    return NextResponse.redirect(`${requestUrl.origin}/auth/error`)
+    // Se algo der errado, redireciona para página de erro no domínio principal
+    return NextResponse.redirect('https://segundoinquilino.com.br/auth/error')
   } catch (error) {
     console.error('Erro no callback de autenticação:', error)
     return NextResponse.redirect(`${requestUrl.origin}/auth/error`)
