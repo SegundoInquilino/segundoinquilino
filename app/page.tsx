@@ -42,7 +42,8 @@ export default function HomePage() {
             </h1>
             
             <p className="mt-6 text-xl text-gray-600 max-w-2xl mx-auto">
-              A plataforma que conecta inquilinos e compartilha experiências reais sobre apartamentos.
+            
+              <b>Está gostando do Imóvel que alugou?</b> Segundo Inquilino é a plataforma que conecta inquilinos e compartilha experiências reais sobre apartamentos.
               Tome decisões mais seguras baseadas em avaliações autênticas.
             </p>
 
@@ -60,6 +61,8 @@ export default function HomePage() {
                 <h2 className="text-2xl font-bold text-center text-gray-900 mb-8">
                   O que você quer saber sobre o apartamento? 🤔
                 </h2>
+
+              
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
