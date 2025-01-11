@@ -5,12 +5,14 @@ import { NextResponse } from 'next/server'
 export const dynamic = 'force-dynamic'
 
 export async function GET(request: Request) {
+  const requestUrl = new URL(request.url)
+  
   try {
-    const requestUrl = new URL(request.url)
     const code = requestUrl.searchParams.get('code')
 
     if (code) {
-      const supabase = createRouteHandlerClient({ cookies })
+      const cookieStore = cookies()
+      const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
       
       // Troca o código pelo token e estabelece a sessão
       const { data: { session }, error } = await supabase.auth.exchangeCodeForSession(code)
@@ -42,20 +44,15 @@ export async function GET(request: Request) {
             ])
         }
 
-        // Define um cookie de sessão
-        cookies().set('supabase-auth-token', session.access_token, {
-          path: '/',
-          maxAge: 60 * 60 * 24 * 7, // 7 dias
-          httpOnly: true,
-          secure: process.env.NODE_ENV === 'production'
-        })
+        // Redireciona para reviews com URL limpa
+        return NextResponse.redirect(`${requestUrl.origin}/reviews`)
       }
     }
 
-    // Redireciona para reviews após criar/verificar perfil
-    return NextResponse.redirect(new URL('/reviews', requestUrl.origin))
+    // Se algo der errado, redireciona para página de erro
+    return NextResponse.redirect(`${requestUrl.origin}/auth/error`)
   } catch (error) {
     console.error('Erro no callback de autenticação:', error)
-    return NextResponse.redirect(new URL('/auth/error', requestUrl.origin))
+    return NextResponse.redirect(`${requestUrl.origin}/auth/error`)
   }
 } 
