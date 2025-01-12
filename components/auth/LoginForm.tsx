@@ -39,15 +39,10 @@ export default function LoginForm() {
 
   const handleGoogleLogin = async () => {
     try {
-      // Determina a URL de callback baseada no ambiente atual
-      const redirectUrl = window.location.hostname.includes('netlify.app')
-        ? 'https://jovial-kheer-90cc3d.netlify.app/auth/callback'
-        : 'https://segundoinquilino.com.br/auth/callback'
-
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: redirectUrl,
+          redirectTo: 'https://ejolvntarqlinulkiure.supabase.co/auth/v1/callback',
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
@@ -55,9 +50,13 @@ export default function LoginForm() {
         }
       })
 
-      if (error) throw error
+      if (error) {
+        console.error('OAuth error:', error)
+        throw error
+      }
 
       if (data?.url) {
+        console.log('OAuth URL:', data.url)
         window.location.href = data.url
       }
 
