@@ -6,12 +6,15 @@ import NotificationBell from './NotificationBell'
 import Sidebar from './Sidebar'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
+import { getInitials } from '@/utils/string'
 
 interface HeaderProps {
   currentUserId?: string
   username?: string
   profile?: {
     avatar_url?: string
+    full_name?: string
   }
 }
 
@@ -65,9 +68,12 @@ export default function Header({ username, currentUserId, profile }: HeaderProps
                   className="text-gray-700 hover:text-primary-600 transition-colors font-medium flex items-center gap-2 group"
                 >
                   <div className="relative">
-                    <div className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-white font-medium group-hover:bg-purple-700 transition-colors">
-                      {username?.charAt(0).toUpperCase()}
-                    </div>
+                    <Avatar className="w-8 h-8">
+                      <AvatarImage src={profile?.avatar_url || ''} />
+                      <AvatarFallback className="bg-black text-white font-bold">
+                        {getInitials(profile?.full_name || username || 'Usuário')}
+                      </AvatarFallback>
+                    </Avatar>
                     <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
                   </div>
                   <span className="hover:underline">{username}</span>
