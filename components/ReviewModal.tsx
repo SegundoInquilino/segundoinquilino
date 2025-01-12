@@ -222,12 +222,14 @@ export default function ReviewModal({
         <h3 className="text-lg font-semibold text-gray-800 mb-6">
           Comentários
         </h3>
-        <ReviewComments
-          reviewId={review.id}
-          currentUserId={currentUserId}
-          userMap={userMap}
-          selectedCommentId={selectedCommentId}
-        />
+        <div className="sticky bottom-0 bg-white pt-2 pb-4">
+          <ReviewComments
+            reviewId={review.id}
+            currentUserId={currentUserId}
+            userMap={userMap}
+            selectedCommentId={selectedCommentId}
+          />
+        </div>
       </div>
 
       {/* Botões de ação */}

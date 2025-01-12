@@ -47,7 +47,7 @@ export default function HomePage() {
               Tome decisões mais seguras baseadas em avaliações autênticas.
             </p>
 
-            <div className="mt-8 flex justify-center space-x-4">
+            <div className="mt-8 flex flex-col items-center space-y-4">
               <Link
                 href="/home"
                 className="inline-flex items-center px-8 py-4 border border-transparent text-lg font-medium rounded-md text-white bg-purple-800 hover:bg-purple-900 transition-colors duration-200 shadow-sm hover:shadow-md"
