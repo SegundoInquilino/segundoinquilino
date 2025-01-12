@@ -221,25 +221,24 @@ export default function ReviewComments({
 
       {/* Formulário de novo comentário */}
       {currentUserId && (
-        <form onSubmit={handleSubmit} className="mt-6">
-          <div className="flex gap-4">
+        <div className="sticky bottom-0 bg-white pt-2 pb-4">
+          <div className="flex flex-col space-y-2">
             <input
               type="text"
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               placeholder="Escreva um comentário..."
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              disabled={submitting}
+              className="w-full rounded-lg border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
             />
             <button
-              type="submit"
-              disabled={submitting || !newComment.trim()}
-              className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 transition-colors"
+              onClick={handleSubmit}
+              disabled={!newComment.trim()}
+              className="w-full py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50"
             >
-              {submitting ? 'Enviando...' : 'Comentar'}
+              Comentar
             </button>
           </div>
-        </form>
+        </div>
       )}
     </div>
   )
