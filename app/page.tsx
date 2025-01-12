@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import ExampleReviewCarousel from '@/components/ExampleReviewCarousel'
+import ReviewCardWrapper from '@/components/ReviewCardWrapper'
 
 const jsonLd = {
   '@context': 'https://schema.org',

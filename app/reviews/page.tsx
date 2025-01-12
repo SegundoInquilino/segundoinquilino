@@ -201,8 +201,8 @@ export default function ReviewsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50 py-16">
-        <div className="container mx-auto px-4 text-center">
+      <div className="min-h-screen py-16 bg-gradient-to-br from-primary-50 to-secondary-50">
+        <div className="container px-4 mx-auto text-center">
           Carregando reviews...
         </div>
       </div>
@@ -210,16 +210,16 @@ export default function ReviewsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50 py-12">
-      <div className="max-w-7xl mx-auto px-4">
+    <div className="min-h-screen py-12 bg-gradient-to-br from-primary-50 to-secondary-50">
+      <div className="px-4 mx-auto max-w-7xl">
         {/* Header roxo */}
-        <div className="bg-gradient-to-r from-primary-600 to-secondary-600 rounded-2xl p-8 mb-8 text-white">
-          <div className="flex justify-between items-center mb-6">
+        <div className="p-8 mb-8 text-white bg-gradient-to-r from-primary-600 to-secondary-600 rounded-2xl">
+          <div className="flex items-center justify-between mb-6">
             <h1 className="text-3xl font-bold">Reviews</h1>
             {currentUserId && (
               <Link
                 href="/new-review"
-                className="inline-flex items-center px-4 py-2 bg-white text-primary-600 rounded-lg hover:bg-primary-50 transition-colors"
+                className="inline-flex items-center px-4 py-2 transition-colors bg-white rounded-lg text-primary-600 hover:bg-primary-50"
               >
                 <svg
                   className="w-5 h-5 mr-2"
@@ -238,7 +238,7 @@ export default function ReviewsPage() {
               </Link>
             )}
           </div>
-          <p className="text-primary-100 mb-4">
+          <p className="mb-4 text-primary-100">
             Compartilhe suas experiências e ajude outros inquilinos a encontrar o lugar ideal.
           </p>
         </div>
@@ -257,7 +257,7 @@ export default function ReviewsPage() {
       {/* Modal */}
       {showModal && selectedReview && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50"
           onClick={() => {
             setShowModal(false)
             setSelectedReview(null)
@@ -265,7 +265,7 @@ export default function ReviewsPage() {
           }}
         >
           <div 
-            className="bg-white rounded-lg w-full max-w-xl flex flex-col"
+            className="flex flex-col w-full max-w-xl bg-white rounded-lg"
             onClick={e => e.stopPropagation()}
           >
             {/* Header do Modal com botão de fechar */}
@@ -276,7 +276,7 @@ export default function ReviewsPage() {
                   setSelectedReview(null)
                   setSelectedCommentId(null)
                 }}
-                className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                className="p-2 transition-colors rounded-full hover:bg-gray-100"
                 aria-label="Fechar modal"
               >
                 <svg 

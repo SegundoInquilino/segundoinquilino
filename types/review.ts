@@ -9,14 +9,25 @@ export interface Apartment {
   building_name?: string
 }
 
+export interface Profile {
+  avatar_url?: string
+  full_name?: string
+}
+
 export interface Review {
   id: string
   rating: number
   comment: string
+  content: string
+  title: string
   created_at: string
   user_id: string
-  images?: string[]
-  amenities?: string[]
+  likes_count: number
+  profiles?: Profile
+  apartment_info?: {
+    neighborhood?: string
+    city?: string
+  }
   apartments: Apartment
-  likes_count: number | { count: number }
+  amenities?: string[]
 } 

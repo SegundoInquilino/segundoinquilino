@@ -7,6 +7,17 @@ import type { Review } from '@/types/review'
 import { formatDistanceToNow } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { AMENITIES } from '@/types/amenities'
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
+
+const getInitials = (name?: string) => {
+  if (!name) return ''
+  return name
+    .split(' ')
+    .map(word => word[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2)
+}
 
 type ReviewModalProps = {
   review: {
@@ -25,6 +36,11 @@ type ReviewModalProps = {
       state: string
       zip_code: string
       neighborhood: string
+    }
+    profiles?: {
+      avatar_url?: string
+      avatar_fallback_class?: string
+      full_name?: string
     }
   }
   username: string
@@ -203,9 +219,12 @@ export default function ReviewModal({
 
         <div className="flex items-center justify-between text-sm text-gray-500">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-white font-medium">
-              {username.charAt(0).toUpperCase()}
-            </div>
+            <Avatar className="w-10 h-10">
+              <AvatarImage src={review.profiles?.avatar_url || ''} />
+              <AvatarFallback className={review.profiles?.avatar_fallback_class || "bg-black text-white font-bold"}>
+                {getInitials(review.profiles?.full_name || userMap[review.user_id] || 'Usuário')}
+              </AvatarFallback>
+            </Avatar>
             <span className="font-medium text-gray-900">{username}</span>
           </div>
           <time>
