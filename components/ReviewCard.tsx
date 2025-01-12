@@ -12,6 +12,13 @@ import { Button } from '@/components/ui/button'
 import { StarRating } from '@/components/ui/star-rating'
 import AuthModal from './AuthModal'
 import { AMENITIES } from '@/types/amenities'
+import { 
+  getReviewTitle, 
+  getReviewLocation, 
+  getReviewAddress,
+  getReviewAuthor,
+  getReviewSummary 
+} from '@/utils/review'
 
 // Funções auxiliares
 const getInitials = (name?: string) => {
@@ -74,12 +81,12 @@ export default function ReviewCard({
                 <Avatar className="w-8 h-8">
                   <AvatarImage src={review.profiles?.avatar_url || ''} />
                   <AvatarFallback className="bg-black text-white font-bold">
-                    {getInitials(review.profiles?.full_name || userMap[review.user_id] || 'Usuário')}
+                    {getInitials(getReviewAuthor(review, userMap))}
                   </AvatarFallback>
                 </Avatar>
                 <div>
                   <h3 className="font-semibold text-sm">
-                    {review.profiles?.full_name || userMap[review.user_id] || 'Usuário'}
+                    {getReviewAuthor(review, userMap)}
                   </h3>
                   <p className="text-xs text-gray-500">{formatDate(review.created_at)}</p>
                 </div>
@@ -89,23 +96,17 @@ export default function ReviewCard({
               </div>
             </div>
 
-            <h2 className="font-semibold mb-1 line-clamp-1">{review.title}</h2>
+            <h2 className="font-semibold mb-1 line-clamp-1">
+              {getReviewTitle(review)}
+            </h2>
             
             <div className="mb-3 text-sm text-gray-600">
-              <p className="line-clamp-1">
-                {review.apartments?.building_name && (
-                  <span className="font-medium">{review.apartments.building_name} - </span>
-                )}
-                {review.apartments?.address}
-              </p>
-              <p className="text-gray-500">
-                {review.apartments?.neighborhood || review.apartment_info?.neighborhood}, 
-                {review.apartments?.city || review.apartment_info?.city}
-              </p>
+              <p className="line-clamp-1">{getReviewAddress(review)}</p>
+              <p className="text-gray-500">{getReviewLocation(review)}</p>
             </div>
 
             <p className="text-sm text-gray-600 line-clamp-2 mb-3">
-              {review.content || review.comment}
+              {getReviewSummary(review)}
             </p>
 
             {review.amenities && review.amenities.length > 0 && (
