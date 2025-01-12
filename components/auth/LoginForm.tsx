@@ -46,6 +46,7 @@ export default function LoginForm() {
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
+            next_url: `${window.location.origin}/reviews`
           }
         }
       })
