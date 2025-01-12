@@ -14,7 +14,6 @@ export async function GET(request: Request) {
       const cookieStore = cookies()
       const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
       
-      // Troca o código pelo token e estabelece a sessão
       const { data: { session }, error } = await supabase.auth.exchangeCodeForSession(code)
       
       if (error) throw error
@@ -43,16 +42,12 @@ export async function GET(request: Request) {
               }
             ])
         }
-
-        // Redireciona sempre para o domínio principal
-        return NextResponse.redirect('https://segundoinquilino.com.br/reviews')
       }
     }
 
-    // Se algo der errado, redireciona para página de erro no domínio principal
-    return NextResponse.redirect('https://segundoinquilino.com.br/auth/error')
+    return NextResponse.redirect(new URL('/reviews', requestUrl.origin))
   } catch (error) {
     console.error('Erro no callback de autenticação:', error)
-    return NextResponse.redirect(`${requestUrl.origin}/auth/error`)
+    return NextResponse.redirect(new URL('/auth/error', requestUrl.origin))
   }
 } 
