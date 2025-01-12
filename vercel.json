@@ -6,8 +6,14 @@
       "use": "@vercel/next"
     }
   ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
+  ],
   "env": {
-    "NEXT_PUBLIC_SUPABASE_URL": "https://ejolvntarqlinulkiure.supabase.co",
-    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVqb2l2bnRhcnFsaW51bGtpdXJlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU5MTc0MzYsImV4cCI6MjA1MTQ5MzQzNn0.hlYlyDCe-oi6KdTRoLY0R07nqO4gk62qqNHHj9SRAts"
+    "NEXT_PUBLIC_SUPABASE_URL": "@next_public_supabase_url",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "@next_public_supabase_anon_key"
   }
 } 

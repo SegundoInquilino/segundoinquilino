@@ -10,19 +10,23 @@ export async function middleware(req: NextRequest) {
     data: { session },
   } = await supabase.auth.getSession()
 
-  // Se tiver uma sessão, permite o acesso
-  if (session) {
-    return res
-  }
-
-  // Se não tiver sessão e estiver tentando acessar uma rota protegida
-  if (req.nextUrl.pathname.startsWith('/reviews')) {
-    return NextResponse.redirect(new URL('/auth', req.url))
+  // Se estiver na raiz e estiver logado, redireciona para /reviews
+  if (req.nextUrl.pathname === '/' && session) {
+    return NextResponse.redirect(new URL('/reviews', req.url))
   }
 
   return res
 }
 
 export const config = {
-  matcher: ['/reviews/:path*', '/new-review/:path*']
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+  ],
 }

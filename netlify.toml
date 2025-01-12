@@ -1,16 +1,16 @@
 [build]
-  command = "rm -rf .next && npm run build"
+  command = "npm run build"
   publish = ".next"
 
-[[plugins]]
-  package = "@netlify/plugin-nextjs"
-
 [build.environment]
-  NEXT_PUBLIC_SUPABASE_URL = "https://ejolvntarqlinulkiure.supabase.co"
+  NEXT_PUBLIC_SUPABASE_URL = "https://ejoivntarqlinulkiure.supabase.co"
   NEXT_PUBLIC_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVqb2l2bnRhcnFsaW51bGtpdXJlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU5MTc0MzYsImV4cCI6MjA1MTQ5MzQzNn0.hlYlyDCe-oi6KdTRoLY0R07nqO4gk62qqNHHj9SRAts"
   NEXT_TELEMETRY_DISABLED = "1"
   SKIP_TYPE_CHECK = "true"
   NEXT_PUBLIC_GA_ID = "AW-11553438817"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
 
 [functions]
   directory = "netlify/functions" 
