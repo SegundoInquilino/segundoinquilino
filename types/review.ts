@@ -19,10 +19,10 @@ export interface Review {
   rating: number
   comment: string
   content: string
-  title: string
+  title?: string
   created_at: string
   user_id: string
-  likes_count: number
+  likes_count: number | { count: number }
   profiles?: Profile
   apartment_info?: {
     neighborhood?: string

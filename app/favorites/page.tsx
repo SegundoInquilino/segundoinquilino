@@ -44,9 +44,11 @@ export default function FavoritesPage() {
 
       const formattedReviews = reviewsData.map(review => ({
         ...review,
+        likes_count: typeof review.likes_count === 'object' 
+          ? review.likes_count.count || 0 
+          : review.likes_count || 0,
         apartments: review.apartments,
-        likes_count: review.review_likes?.[0]?.count || 0
-      }))
+      })) as Review[]
 
       const userIds = [...new Set(formattedReviews.map(r => r.user_id))]
       const { data: profiles } = await supabase
