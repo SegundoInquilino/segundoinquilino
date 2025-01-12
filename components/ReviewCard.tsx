@@ -96,10 +96,6 @@ export default function ReviewCard({
               </div>
             </div>
 
-            <h2 className="font-semibold mb-1 line-clamp-1">
-              {getReviewTitle(review)}
-            </h2>
-            
             <div className="mb-3 text-sm text-gray-600">
               <p className="line-clamp-1">{getReviewAddress(review)}</p>
               <p className="text-gray-500">{getReviewLocation(review)}</p>
