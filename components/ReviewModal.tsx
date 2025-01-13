@@ -9,6 +9,7 @@ import { ptBR } from 'date-fns/locale'
 import { AMENITIES } from '@/types/amenities'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { StarRating } from '@/components/ui/star-rating'
+import ImageModal from './ImageModal'
 
 const getInitials = (name?: string) => {
   if (!name) return ''
@@ -44,6 +45,7 @@ type ReviewModalProps = {
       state: string
       zip_code: string
       neighborhood: string
+      building_name: string
     }
     profiles?: {
       avatar_url?: string
@@ -67,6 +69,8 @@ export default function ReviewModal({
   currentUserId,
   userMap = {}
 }: ReviewModalProps) {
+  const [selectedImage, setSelectedImage] = useState<string | null>(null)
+
   return (
     <div className="p-6">
       <div className="flex justify-between items-start mb-6">
@@ -89,6 +93,10 @@ export default function ReviewModal({
 
         <StarRating rating={review.rating} size="lg" />
       </div>
+
+      <h2 className="text-2xl font-bold text-gray-900 mb-4">
+        {review.apartments.building_name}
+      </h2>
 
       <div className="mb-6">
         <div className="text-sm text-gray-600 mb-2">
@@ -134,11 +142,15 @@ export default function ReviewModal({
           <h4 className="font-medium mb-2">Fotos</h4>
           <div className="grid grid-cols-2 gap-2">
             {review.images.map((image, index) => (
-              <div key={index} className="aspect-square relative rounded-lg overflow-hidden">
+              <div 
+                key={index} 
+                className="aspect-square relative rounded-lg overflow-hidden cursor-pointer"
+                onClick={() => setSelectedImage(image)}
+              >
                 <img
                   src={image}
                   alt={`Foto ${index + 1}`}
-                  className="absolute inset-0 w-full h-full object-cover"
+                  className="absolute inset-0 w-full h-full object-cover hover:opacity-90 transition-opacity"
                 />
               </div>
             ))}
@@ -150,6 +162,14 @@ export default function ReviewModal({
         <h4 className="font-medium mb-4">Comentários</h4>
         <ReviewComments reviewId={review.id} currentUserId={currentUserId} userMap={userMap} />
       </div>
+
+      {selectedImage && (
+        <ImageModal
+          src={selectedImage}
+          alt="Foto expandida"
+          onClose={() => setSelectedImage(null)}
+        />
+      )}
     </div>
   )
 } 

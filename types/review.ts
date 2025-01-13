@@ -1,12 +1,12 @@
 export interface Apartment {
   id: string
+  building_name: string
   address: string
   neighborhood: string
   city: string
   state: string
   zip_code: string
   property_type: 'house' | 'apartment'
-  building_name?: string
 }
 
 export interface Profile {
@@ -31,13 +31,5 @@ export interface Review {
     avatar_url?: string
     full_name?: string
   }
-  apartments: {
-    id: string
-    building_name: string
-    address: string
-    neighborhood: string
-    city: string
-    state: string
-    zip_code: string
-  }
+  apartments: Apartment
 } 

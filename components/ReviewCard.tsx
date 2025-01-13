@@ -19,7 +19,7 @@ import {
   getReviewAuthor,
   getReviewSummary 
 } from '@/utils/review'
-import { TrashIcon } from '@heroicons/react/24/outline'
+import { TrashIcon, HomeIcon, BuildingOfficeIcon } from '@heroicons/react/24/outline'
 import { createClient } from '@/utils/supabase-client'
 
 // Funções auxiliares
@@ -136,6 +136,17 @@ export default function ReviewCard({
                   </button>
                 )}
               </div>
+            </div>
+
+            <div className="flex items-center gap-2 mb-2">
+              {(review.apartments.property_type || 'apartment') === 'house' ? (
+                <HomeIcon className="w-5 h-5 text-gray-500" />
+              ) : (
+                <BuildingOfficeIcon className="w-5 h-5 text-gray-500" />
+              )}
+              <h3 className="text-lg font-bold text-gray-900">
+                {review.apartments.building_name}
+              </h3>
             </div>
 
             <div className="mb-3 text-sm text-gray-600">
