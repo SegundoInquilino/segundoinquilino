@@ -16,18 +16,28 @@ export interface Profile {
 
 export interface Review {
   id: string
+  apartment_id: string
+  user_id: string
   rating: number
   comment: string
-  content: string
-  title?: string
+  content: string | null
   created_at: string
-  user_id: string
+  images: string[]
+  amenities: string[]
+  pros: string | null
+  cons: string | null
   likes_count: number | { count: number }
-  profiles?: Profile
-  apartment_info?: {
-    neighborhood?: string
-    city?: string
+  profiles?: {
+    avatar_url?: string
+    full_name?: string
   }
-  apartments: Apartment
-  amenities?: string[]
+  apartments: {
+    id: string
+    building_name: string
+    address: string
+    neighborhood: string
+    city: string
+    state: string
+    zip_code: string
+  }
 } 

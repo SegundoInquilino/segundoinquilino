@@ -5,6 +5,13 @@ import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
 import { createClient } from '@/utils/supabase-client'
 import NotificationBell from './NotificationBell'
+import { 
+  HomeIcon, 
+  PlusCircleIcon, 
+  UserCircleIcon, 
+  BuildingOfficeIcon,
+  ArrowRightOnRectangleIcon
+} from '@heroicons/react/24/outline'
 
 interface SidebarProps {
   isOpen: boolean
@@ -110,66 +117,77 @@ export default function Sidebar({ isOpen, onClose, currentUserId }: SidebarProps
           {/* Menu de navegação */}
           <div className="flex-1 p-6">
             <nav className="space-y-2">
-              <Link 
-                href="/home"
-                className={`block px-4 py-2.5 rounded-lg transition-all duration-200 ${
-                  isCurrentPath('/home')
-                    ? 'bg-white text-purple-900 font-medium shadow-sm'
-                    : 'text-gray-200 hover:bg-purple-800/50 hover:text-white'
-                }`}
-              >
-                Início
-              </Link>
-              <Link 
-                href="/reviews"
-                className={`block px-4 py-2.5 rounded-lg transition-all duration-200 ${
-                  isCurrentPath('/reviews')
-                    ? 'bg-white text-purple-900 font-medium shadow-sm'
-                    : 'text-gray-200 hover:bg-purple-800/50 hover:text-white'
-                }`}
-              >
-                Reviews
-              </Link>
               {currentUserId && (
                 <>
                   <Link 
+                    href="/home"
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded-lg transition-all duration-200 ${
+                      isCurrentPath('/home')
+                        ? 'bg-white text-purple-900 font-medium shadow-sm'
+                        : 'text-gray-200 hover:bg-purple-800/50 hover:text-white'
+                    }`}
+                  >
+                    <HomeIcon className="w-5 h-5" />
+                    <span>Home</span>
+                  </Link>
+
+                  <Link 
                     href="/new-review"
-                    className={`block px-4 py-2.5 rounded-lg transition-all duration-200 ${
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded-lg transition-all duration-200 ${
                       isCurrentPath('/new-review')
                         ? 'bg-white text-purple-900 font-medium shadow-sm'
                         : 'text-gray-200 hover:bg-purple-800/50 hover:text-white'
                     }`}
                   >
-                    Nova Review
+                    <PlusCircleIcon className="w-5 h-5" />
+                    <span>Nova Review</span>
                   </Link>
+
                   <Link 
                     href="/profile"
-                    className={`block px-4 py-2.5 rounded-lg transition-all duration-200 ${
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded-lg transition-all duration-200 ${
                       isCurrentPath('/profile')
                         ? 'bg-white text-purple-900 font-medium shadow-sm'
                         : 'text-gray-200 hover:bg-purple-800/50 hover:text-white'
                     }`}
                   >
-                    Perfil
+                    <UserCircleIcon className="w-5 h-5" />
+                    <span>Perfil</span>
                   </Link>
+
+                  <Link 
+                    href="/buildings"
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded-lg transition-all duration-200 ${
+                      isCurrentPath('/buildings')
+                        ? 'bg-white text-purple-900 font-medium shadow-sm'
+                        : 'text-gray-200 hover:bg-purple-800/50 hover:text-white'
+                    }`}
+                  >
+                    <BuildingOfficeIcon className="w-5 h-5" />
+                    <span>Apartamentos</span>
+                  </Link>
+
                   <button
                     onClick={handleSignOut}
-                    className="w-full text-left px-4 py-2.5 text-gray-300 hover:bg-purple-800/50 hover:text-white rounded-lg transition-all duration-200"
+                    className="w-full flex items-center gap-2 px-4 py-2.5 text-gray-300 hover:bg-purple-800/50 hover:text-white rounded-lg transition-all duration-200"
                   >
-                    Sair
+                    <ArrowRightOnRectangleIcon className="w-5 h-5" />
+                    <span>Log out</span>
                   </button>
                 </>
               )}
+
               {!currentUserId && (
                 <Link 
                   href="/auth"
-                  className={`block px-4 py-2.5 rounded-lg transition-all duration-200 ${
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-lg transition-all duration-200 ${
                     isCurrentPath('/auth')
                       ? 'bg-white text-purple-900 font-medium shadow-sm'
                       : 'text-gray-200 hover:bg-purple-800/50 hover:text-white'
                   }`}
                 >
-                  Entrar
+                  <ArrowRightOnRectangleIcon className="w-5 h-5" />
+                  <span>Entrar</span>
                 </Link>
               )}
             </nav>

@@ -13,6 +13,7 @@ interface ReviewCardWrapperProps {
   username?: string
   currentUserId?: string | null
   userMap?: Record<string, string>
+  onDelete?: (reviewId: string) => void
 }
 
 export default function ReviewCardWrapper({ 
@@ -21,7 +22,8 @@ export default function ReviewCardWrapper({
   onReviewDeleted,
   username,
   currentUserId: propCurrentUserId,
-  userMap = {}
+  userMap = {},
+  onDelete
 }: ReviewCardWrapperProps) {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const { currentUserId: authCurrentUserId } = useAuth()
@@ -37,6 +39,7 @@ export default function ReviewCardWrapper({
         layout={layout}
         username={username}
         userMap={userMap}
+        onDelete={onDelete}
       />
       
       {isModalOpen && (
@@ -57,6 +60,7 @@ export default function ReviewCardWrapper({
               currentUserId={currentUserId}
               username={username}
               userMap={userMap}
+              onDelete={onDelete}
             />
           </div>
         </div>

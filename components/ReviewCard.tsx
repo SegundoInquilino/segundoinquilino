@@ -19,6 +19,8 @@ import {
   getReviewAuthor,
   getReviewSummary 
 } from '@/utils/review'
+import { TrashIcon } from '@heroicons/react/24/outline'
+import { createClient } from '@/utils/supabase-client'
 
 // Funções auxiliares
 const getInitials = (name?: string) => {
@@ -46,6 +48,7 @@ interface ReviewCardProps {
   onOpenModal?: () => void
   username?: string
   userMap?: Record<string, string>
+  onDelete?: (reviewId: string) => void
 }
 
 export default function ReviewCard({
@@ -55,12 +58,14 @@ export default function ReviewCard({
   isModal = false,
   onOpenModal,
   username,
-  userMap = {}
+  userMap = {},
+  onDelete
 }: ReviewCardProps) {
   const [showModal, setShowModal] = useState(false)
   const [showAuthModal, setShowAuthModal] = useState(false)
   const { currentUserId: authUserId } = useAuth()
   const router = useRouter()
+  const [isDeleting, setIsDeleting] = useState(false)
 
   const handleCardClick = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -68,6 +73,29 @@ export default function ReviewCard({
       setShowAuthModal(true)
     } else if (onOpenModal) {
       onOpenModal()
+    }
+  }
+
+  const handleDeleteReview = async () => {
+    if (!confirm('Tem certeza que deseja deletar esta review?')) return
+
+    setIsDeleting(true)
+    const supabase = createClient()
+
+    try {
+      const { error } = await supabase
+        .from('reviews')
+        .delete()
+        .eq('id', review.id)
+
+      if (error) throw error
+
+      onDelete?.(review.id)
+    } catch (error) {
+      console.error('Erro ao deletar review:', error)
+      alert('Erro ao deletar review. Tente novamente.')
+    } finally {
+      setIsDeleting(false)
     }
   }
 
@@ -91,8 +119,22 @@ export default function ReviewCard({
                   <p className="text-xs text-gray-500">{formatDate(review.created_at)}</p>
                 </div>
               </div>
+              
               <div className="flex items-center gap-2">
                 <StarRating rating={review.rating} size="sm" />
+                {currentUserId === review.user_id && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleDeleteReview()
+                    }}
+                    disabled={isDeleting}
+                    className="text-gray-400 hover:text-red-500 transition-colors p-2 rounded-full hover:bg-red-50"
+                    title="Deletar review"
+                  >
+                    <TrashIcon className="w-5 h-5" />
+                  </button>
+                )}
               </div>
             </div>
 

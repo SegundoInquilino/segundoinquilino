@@ -1,30 +1,25 @@
 import type { Review } from '@/types/review'
 
 export const getReviewTitle = (review: Review) => {
-  return review.title || review.content?.split('\n')[0] || 'Sem título'
+  return review.comment?.split('\n')[0] || review.content?.split('\n')[0] || 'Sem título'
 }
 
 export const getReviewLocation = (review: Review) => {
-  const neighborhood = review.apartments?.neighborhood || review.apartment_info?.neighborhood
-  const city = review.apartments?.city || review.apartment_info?.city
-  return `${neighborhood}, ${city}`
+  if (!review.apartments) return 'Localização não disponível'
+  return `${review.apartments.neighborhood}, ${review.apartments.city}`
 }
 
 export const getReviewAddress = (review: Review) => {
-  if (review.apartments?.building_name) {
-    return `${review.apartments.building_name} - ${review.apartments.address}`
-  }
-  return review.apartments?.address || ''
+  if (!review.apartments) return 'Endereço não disponível'
+  return review.apartments.address
 }
 
 export const getReviewAuthor = (review: Review, userMap: Record<string, string>) => {
-  return review.profiles?.full_name || userMap[review.user_id] || 'Usuário'
+  return userMap[review.user_id] || review.profiles?.full_name || 'Usuário'
 }
 
-export const getReviewSummary = (review: Review, maxLength = 150) => {
-  const content = review.content || review.comment || ''
-  if (content.length <= maxLength) return content
-  return content.slice(0, maxLength).trim() + '...'
+export const getReviewSummary = (review: Review) => {
+  return review.comment || review.content || 'Sem descrição'
 }
 
 export const getReviewLikesCount = (review: Review) => {
