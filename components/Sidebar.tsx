@@ -164,7 +164,7 @@ export default function Sidebar({ isOpen, onClose, currentUserId }: SidebarProps
                     }`}
                   >
                     <BuildingOfficeIcon className="w-5 h-5" />
-                    <span>Apartamentos</span>
+                    <span>Prédios</span>
                   </Link>
 
                   <button
