@@ -8,6 +8,7 @@ import Link from 'next/link'
 import { siteMetadata } from '@/lib/metadata'
 import SessionAlert from '@/components/SessionAlert'
 import GoogleAnalytics from '@/components/GoogleAnalytics'
+import LoginBanner from '@/components/LoginBanner'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -94,14 +95,17 @@ export default async function RootLayout({
       <body className={inter.className}>
         <AuthProvider>
           <SessionAlert />
-          {session?.user && (
+          <LoginBanner show={!session?.user} />
+          {session?.user ? (
             <Header 
               currentUserId={session.user.id} 
               username={username}
               profile={profile}
             />
+          ) : (
+            <div className="h-8" />
           )}
-          <main className={session?.user ? 'pt-16' : ''}>
+          <main className="pt-16">
             {children}
           </main>
           

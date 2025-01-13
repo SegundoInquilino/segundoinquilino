@@ -21,15 +21,17 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             Para ver os detalhes completos da review, você precisa estar logado.
           </p>
           <div className="flex flex-col gap-3">
-            <Link href="/auth" className="w-full">
-              <Button className="w-full" variant="default">
-                Fazer login
-              </Button>
+            <Link
+              href="/auth"
+              className="w-full inline-flex justify-center items-center px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
+            >
+              Fazer login
             </Link>
-            <Link href="/auth?mode=signup" className="w-full">
-              <Button className="w-full" variant="outline">
-                Criar uma conta
-              </Button>
+            <Link
+              href="/auth?mode=signup"
+              className="w-full inline-flex justify-center items-center px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+            >
+              Criar uma conta
             </Link>
           </div>
         </div>

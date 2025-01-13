@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { getInitials } from '@/utils/string'
+import { MagnifyingGlassIcon } from '@heroicons/react/24/outline'
 
 interface HeaderProps {
   currentUserId?: string
@@ -29,10 +30,10 @@ export default function Header({ username, currentUserId, profile }: HeaderProps
           {/* Menu Button */}
           <button
             onClick={() => setIsSidebarOpen(true)}
-            className="p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none"
+            className="p-2 text-white bg-black hover:bg-gray-800 rounded-full transition-colors focus:outline-none"
           >
             <svg
-              className="h-6 w-6"
+              className="h-5 w-5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -60,6 +61,14 @@ export default function Header({ username, currentUserId, profile }: HeaderProps
 
           {/* Right Section */}
           <div className="flex items-center space-x-4">
+            <Link 
+              href="/reviews"
+              className="p-2 text-white bg-black hover:bg-gray-800 rounded-full transition-colors"
+              title="Buscar reviews"
+            >
+              <MagnifyingGlassIcon className="w-5 h-5" />
+            </Link>
+
             {currentUserId ? (
               <>
                 <NotificationBell userId={currentUserId} />
