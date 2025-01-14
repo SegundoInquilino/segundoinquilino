@@ -104,6 +104,19 @@ export default function TermsPage() {
             </div>
           </section>
 
+          <div className="mt-8 p-4 bg-gray-50 rounded-lg">
+            <h2 className="text-lg font-semibold mb-2">Contato</h2>
+            <p className="text-gray-600">
+              Para dúvidas, sugestões ou reclamações, entre em contato conosco através do email:{' '}
+              <a 
+                href="mailto:contato@segundoinquilino.com.br"
+                className="text-blue-600 hover:underline"
+              >
+                contato@segundoinquilino.com.br
+              </a>
+            </p>
+          </div>
+
           {/* Assinatura */}
           <div className="mt-16 pt-8 border-t border-gray-200">
             <div className="flex flex-col items-center space-y-4">
