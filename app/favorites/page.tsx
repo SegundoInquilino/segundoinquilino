@@ -89,6 +89,10 @@ export default function FavoritesPage() {
     loadFavorites()
   }, [currentUserId])
 
+  const handleReviewDeleted = (reviewId: string) => {
+    setReviews(prevReviews => prevReviews.filter(review => review.id !== reviewId))
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50 py-12">
