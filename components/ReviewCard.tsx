@@ -21,6 +21,7 @@ import {
 } from '@/utils/review'
 import { TrashIcon, HomeIcon, BuildingOfficeIcon } from '@heroicons/react/24/outline'
 import { createClient } from '@/utils/supabase-client'
+import Link from 'next/link'
 
 // Funções auxiliares
 const getInitials = (name?: string) => {
@@ -150,7 +151,35 @@ export default function ReviewCard({
             </div>
 
             <div className="mb-3 text-sm text-gray-600">
-              <p className="line-clamp-1">{getReviewAddress(review)}</p>
+              <a 
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                  `${review.apartments.building_name} ${review.apartments.address}, ${review.apartments.neighborhood}, ${review.apartments.city}, ${review.apartments.state}`
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-black transition-colors flex items-center gap-1"
+              >
+                <svg 
+                  className="w-4 h-4" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    strokeWidth={2} 
+                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                  />
+                  <path 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    strokeWidth={2} 
+                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                </svg>
+                <span className="line-clamp-1">{getReviewAddress(review)}</span>
+              </a>
               <p className="text-gray-500">{getReviewLocation(review)}</p>
             </div>
 
