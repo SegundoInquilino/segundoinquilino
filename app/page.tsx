@@ -1,7 +1,12 @@
+'use client'
+
 import Link from 'next/link'
 import Image from 'next/image'
 import ExampleReviewCarousel from '@/components/ExampleReviewCarousel'
 import ReviewCardWrapper from '@/components/ReviewCardWrapper'
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import type { Review } from '@/types/review'
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -17,6 +22,14 @@ const jsonLd = {
 }
 
 export default function HomePage() {
+  const [reviews, setReviews] = useState<Review[]>([])
+  const router = useRouter()
+
+  const handleDeleteReview = (reviewId: string) => {
+    setReviews(prevReviews => prevReviews.filter(review => review.id !== reviewId))
+    router.refresh()
+  }
+
   return (
     <>
       <script

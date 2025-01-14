@@ -7,7 +7,7 @@ interface ReviewsListProps {
   reviews: Review[]
   userMap: Record<string, string>
   currentUserId?: string | null
-  onReviewDeleted?: (reviewId: string) => void
+  onDeleteReview?: (reviewId: string) => void
   layout?: 'grid' | 'square'
 }
 
@@ -15,7 +15,7 @@ export default function ReviewsList({
   reviews, 
   userMap, 
   currentUserId,
-  onReviewDeleted,
+  onDeleteReview,
   layout = 'grid'
 }: ReviewsListProps) {
   return (
@@ -30,7 +30,7 @@ export default function ReviewsList({
           review={review}
           username={userMap[review.user_id]}
           currentUserId={currentUserId}
-          onReviewDeleted={() => onReviewDeleted?.(review.id)}
+          onDeleteReview={onDeleteReview}
           layout={layout}
           userMap={userMap}
         />

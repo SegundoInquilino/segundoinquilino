@@ -8,6 +8,7 @@ import Link from 'next/link'
 import type { Review } from '@/types/review'
 import ReviewModal from '@/components/ReviewModal'
 import { useAuth } from '@/contexts/AuthContext'
+import ReviewCard from '@/components/ReviewCard'
 
 interface Filters {
   search?: string
@@ -199,6 +200,13 @@ export default function ReviewsPage() {
     }
   }
 
+  const handleDeleteReview = (reviewId: string) => {
+    setReviews(prevReviews => prevReviews.filter(review => review.id !== reviewId))
+    // Fechar o modal se estiver aberto
+    setShowModal(false)
+    setSelectedReview(null)
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen py-16 bg-gradient-to-br from-primary-50 to-secondary-50">
@@ -251,6 +259,7 @@ export default function ReviewsPage() {
           reviews={reviews}
           userMap={userMap}
           currentUserId={currentUserId}
+          onDeleteReview={handleDeleteReview}
         />
       </div>
 

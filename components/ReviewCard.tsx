@@ -84,6 +84,11 @@ export default function ReviewCard({
     const supabase = createClient()
 
     try {
+      await supabase
+        .from('comments')
+        .delete()
+        .eq('review_id', review.id)
+
       const { error } = await supabase
         .from('reviews')
         .delete()
@@ -92,6 +97,10 @@ export default function ReviewCard({
       if (error) throw error
 
       onDelete?.(review.id)
+      setShowModal(false)
+      
+      // Revalida os dados sem recarregar a página inteira
+      router.refresh()
     } catch (error) {
       console.error('Erro ao deletar review:', error)
       alert('Erro ao deletar review. Tente novamente.')
@@ -159,9 +168,9 @@ export default function ReviewCard({
                 rel="noopener noreferrer"
                 className="hover:text-black transition-colors flex items-center gap-2 group"
               >
-                <div className="bg-blue-50 p-1.5 rounded-lg group-hover:bg-blue-100 transition-colors">
+                <div className="bg-blue-600 p-1.5 rounded-lg group-hover:bg-blue-700 transition-colors">
                   <svg 
-                    className="w-4 h-4 text-blue-600" 
+                    className="w-4 h-4 text-white" 
                     fill="none" 
                     stroke="currentColor" 
                     viewBox="0 0 24 24"

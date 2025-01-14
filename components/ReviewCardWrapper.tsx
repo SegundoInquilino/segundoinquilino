@@ -7,46 +7,42 @@ import { useAuth } from '@/contexts/AuthContext'
 
 interface ReviewCardWrapperProps {
   review: Review
-  layout?: 'grid' | 'square'
-  onReviewDeleted?: () => void
-  key?: string
-  username?: string
+  username: string
   currentUserId?: string | null
-  userMap?: Record<string, string>
-  onDelete?: (reviewId: string) => void
+  layout?: 'grid' | 'square'
+  userMap: Record<string, string>
+  onDeleteReview?: (reviewId: string) => void
 }
 
-export default function ReviewCardWrapper({ 
-  review, 
-  layout,
-  onReviewDeleted,
+export default function ReviewCardWrapper({
+  review,
   username,
-  currentUserId: propCurrentUserId,
-  userMap = {},
-  onDelete
+  currentUserId,
+  layout,
+  userMap,
+  onDeleteReview
 }: ReviewCardWrapperProps) {
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const { currentUserId: authCurrentUserId } = useAuth()
-  
-  const currentUserId = propCurrentUserId || authCurrentUserId
+  const [showModal, setShowModal] = useState(false)
 
   return (
     <>
-      <ReviewCard
-        review={review}
-        currentUserId={currentUserId}
-        onOpenModal={() => setIsModalOpen(true)}
-        layout={layout}
-        username={username}
-        userMap={userMap}
-        onDelete={onDelete}
-      />
-      
-      {isModalOpen && (
+      <div onClick={() => setShowModal(true)}>
+        <ReviewCard
+          review={review}
+          username={username}
+          currentUserId={currentUserId}
+          layout={layout}
+          userMap={userMap}
+          onDelete={onDeleteReview}
+          isModal={false}
+        />
+      </div>
+
+      {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
           <div className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-white rounded-lg">
             <button
-              onClick={() => setIsModalOpen(false)}
+              onClick={() => setShowModal(false)}
               className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
             >
               <span className="sr-only">Fechar</span>
@@ -60,7 +56,7 @@ export default function ReviewCardWrapper({
               currentUserId={currentUserId}
               username={username}
               userMap={userMap}
-              onDelete={onDelete}
+              onDelete={onDeleteReview}
             />
           </div>
         </div>

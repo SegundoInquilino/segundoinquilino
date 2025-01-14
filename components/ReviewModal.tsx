@@ -106,9 +106,9 @@ export default function ReviewModal({
             rel="noopener noreferrer"
             className="hover:text-black transition-colors flex items-center gap-2 group"
           >
-            <div className="bg-blue-50 p-1.5 rounded-lg group-hover:bg-blue-100 transition-colors">
+            <div className="bg-blue-600 p-1.5 rounded-lg group-hover:bg-blue-700 transition-colors">
               <svg 
-                className="w-4 h-4 text-blue-600" 
+                className="w-4 h-4 text-white" 
                 fill="none" 
                 stroke="currentColor" 
                 viewBox="0 0 24 24"
@@ -134,9 +134,15 @@ export default function ReviewModal({
       </div>
 
       {review.comment && (
-        <div className="mb-6">
-          <h4 className="font-medium mb-2">Comentário</h4>
-          <p className="text-gray-600 whitespace-pre-wrap">{review.comment}</p>
+        <div className="mt-8 space-y-4">
+          <div className="inline-block">
+            <h4 className="font-medium px-3 py-1 bg-black text-white rounded-lg text-sm">
+              Comentário
+            </h4>
+          </div>
+          <p className="text-gray-600 whitespace-pre-wrap leading-relaxed">
+            {review.comment}
+          </p>
         </div>
       )}
 
