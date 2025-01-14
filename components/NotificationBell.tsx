@@ -85,20 +85,16 @@ export default function NotificationBell({ userId }: NotificationBellProps) {
         .limit(10)
 
       if (error) {
-        console.error('Erro na query do Supabase:', error.message, error.details)
-        return
-      }
-
-      if (!data) {
-        console.log('Nenhuma notificação encontrada')
+        console.error('Erro na query do Supabase:', error.message)
         setNotifications([])
         return
       }
 
-      // Log para debug
-      console.log('Dados retornados:', data)
+      if (!data || data.length === 0) {
+        setNotifications([])
+        return
+      }
 
-      // Formatar os dados corretamente
       const formattedData = data.map(notification => ({
         id: notification.id,
         user_id: notification.user_id,
@@ -107,32 +103,31 @@ export default function NotificationBell({ userId }: NotificationBellProps) {
         read: notification.read,
         created_at: notification.created_at,
         reviews: [{
-          id: notification.reviews[0]?.id || '',
+          id: notification.reviews?.[0]?.id || '',
           apartments: [
             {
-              address: notification.reviews[0]?.apartments[0]?.address || '',
-              building_name: notification.reviews[0]?.apartments[0]?.building_name || ''
+              address: notification.reviews?.[0]?.apartments?.[0]?.address || '',
+              building_name: notification.reviews?.[0]?.apartments?.[0]?.building_name || ''
             }
           ]
         }],
-        review_comments: notification.review_comments?.map(comment => ({
-          id: comment.id,
-          comment: comment.comment,
-          created_at: comment.created_at,
-          profiles: comment.profiles || []
-        })) || []
+        review_comments: Array.isArray(notification.review_comments) 
+          ? notification.review_comments.map(comment => ({
+              id: comment?.id || '',
+              comment: comment?.comment || '',
+              created_at: comment?.created_at || '',
+              profiles: Array.isArray(comment?.profiles) ? comment.profiles : []
+            }))
+          : []
       }))
 
       setNotifications(formattedData)
+
     } catch (error) {
-      if (error instanceof Error) {
-        console.error('Erro ao carregar notificações:', {
-          message: error.message,
-          stack: error.stack
-        })
-      } else {
-        console.error('Erro desconhecido ao carregar notificações:', error)
-      }
+      console.error('Erro ao carregar notificações:', {
+        error: error instanceof Error ? error.message : 'Erro desconhecido'
+      })
+      setNotifications([])
     } finally {
       setLoading(false)
     }
