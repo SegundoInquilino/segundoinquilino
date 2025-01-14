@@ -166,7 +166,7 @@ export default function NewReview() {
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-white bg-black px-2 py-1 rounded inline-block">
               Tipo de Imóvel
             </label>
             <select
@@ -183,8 +183,8 @@ export default function NewReview() {
 
           {formData.propertyType === 'apartment' && (
             <div>
-              <label htmlFor="buildingName" className="block text-sm font-medium text-gray-700">
-                Nome do Prédio
+              <label htmlFor="buildingName" className="block text-sm font-medium text-black">
+                Nome do Prédio *
               </label>
               <input
                 type="text"
@@ -192,6 +192,7 @@ export default function NewReview() {
                 name="buildingName"
                 value={formData.buildingName}
                 onChange={handleChange}
+                required
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                 placeholder="Ex: Edifício Aurora, Residencial Flores..."
               />
@@ -199,21 +200,23 @@ export default function NewReview() {
           )}
 
           <div>
-            <label htmlFor="address" className="block text-sm font-medium text-gray-700">
-              Endereço
+            <label htmlFor="address" className="block text-sm font-medium text-black">
+              Endereço *
             </label>
             <input
               type="text"
               id="address"
+              name="address"
               value={formData.address}
-              onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              onChange={handleChange}
               required
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              placeholder="Ex: Rua das Flores, 123"
             />
           </div>
 
           <div>
-            <label htmlFor="neighborhood" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="neighborhood" className="block text-sm font-medium text-black">
               Bairro
             </label>
             <input
@@ -228,7 +231,7 @@ export default function NewReview() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">Cidade</label>
+            <label className="block text-sm font-medium text-black">Cidade</label>
             <input
               type="text"
               name="city"
@@ -240,7 +243,7 @@ export default function NewReview() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">Estado</label>
+            <label className="block text-sm font-medium text-black">Estado</label>
             <select
               id="state"
               name="state"
@@ -259,7 +262,7 @@ export default function NewReview() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">CEP</label>
+            <label className="block text-sm font-medium text-black">CEP</label>
             <input
               type="text"
               name="zipCode"
@@ -272,7 +275,7 @@ export default function NewReview() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">Avaliação</label>
+          <label className="block text-sm font-medium text-black">Avaliação</label>
           <div className="mt-1 flex items-center gap-2">
             {[1, 2, 3, 4, 5].map((star) => (
               <button
@@ -288,7 +291,7 @@ export default function NewReview() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">Comentário</label>
+          <label className="block text-sm font-medium text-black">Comentário</label>
           <textarea
             name="comment"
             value={formData.comment}
@@ -301,7 +304,7 @@ export default function NewReview() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-black mb-2">
             Fotos do Apartamento
           </label>
           <ImageUpload
@@ -311,7 +314,7 @@ export default function NewReview() {
         </div>
 
         <div className="space-y-4">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-black mb-2">
             Características do Imóvel
           </label>
           <AmenitiesSelector
@@ -327,7 +330,7 @@ export default function NewReview() {
         <button
           type="submit"
           disabled={submitting}
-          className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
+          className="w-full bg-yellow-400 text-black py-2 px-4 rounded-md hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 disabled:opacity-50 font-medium transition-colors"
         >
           {submitting ? 'Enviando...' : 'Criar Review'}
         </button>

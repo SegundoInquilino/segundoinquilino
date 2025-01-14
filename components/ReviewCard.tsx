@@ -115,11 +115,11 @@ export default function ReviewCard({
                 <div>
                   <h3 className="font-semibold text-sm">
                     {getReviewAuthor(review, userMap)}
-                  </h3>
+                </h3>
                   <p className="text-xs text-gray-500">{formatDate(review.created_at)}</p>
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-2">
                 <StarRating rating={review.rating} size="sm" />
                 {currentUserId === review.user_id && (
@@ -178,7 +178,7 @@ export default function ReviewCard({
                   {review.amenities.length > 3 && (
                     <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
                       +{review.amenities.length - 3}
-                    </span>
+                </span>
                   )}
                 </div>
               </div>
@@ -191,7 +191,7 @@ export default function ReviewCard({
             </div>
           </>
         ) : (
-          <ReviewModal
+        <ReviewModal
             review={{
               ...review,
               profiles: {
@@ -200,11 +200,11 @@ export default function ReviewCard({
               }
             }}
             username={username || review.profiles?.full_name || userMap[review.user_id] || 'Usuário'}
-            currentUserId={currentUserId}
-            userMap={userMap}
-          />
-        )}
-      </div>
+          currentUserId={currentUserId}
+          userMap={userMap}
+        />
+      )}
+              </div>
 
       <AuthModal 
         isOpen={showAuthModal} 

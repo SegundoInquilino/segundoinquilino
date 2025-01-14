@@ -63,7 +63,7 @@ export default function Header({ username, currentUserId, profile }: HeaderProps
           <div className="flex items-center space-x-4">
             <Link 
               href="/reviews"
-              className="p-2 text-white bg-black hover:bg-gray-800 rounded-full transition-colors"
+              className="p-2 text-gray-600 hover:text-gray-900 rounded-full transition-colors"
               title="Buscar reviews"
             >
               <MagnifyingGlassIcon className="w-5 h-5" />

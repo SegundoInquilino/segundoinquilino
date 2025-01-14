@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/utils/supabase-client'
 import { useRouter } from 'next/navigation'
+import { formatDistanceToNow } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
 
 interface Notification {
   id: string
@@ -13,15 +15,20 @@ interface Notification {
   created_at: string
   reviews: {
     id: string
+    title?: string
     apartments: {
       address: string
+      building_name: string
     }
   }
   profiles: {
     username: string
+    full_name?: string
+    avatar_url?: string
   }[]
   review_comments?: Array<{
     comment: string
+    created_at: string
   }>
 }
 
@@ -57,19 +64,19 @@ export default function NotificationBell({ userId }: NotificationBellProps) {
           reviews!inner (
             id,
             apartments!inner (
-              address
+              address,
+              building_name
             )
           ),
           review_comments (
             id,
             comment,
-            user_id,
+            created_at,
             profiles:user_id (
-              username
+              username,
+              full_name,
+              avatar_url
             )
-          ),
-          from_user:from_user_id (
-            username
           )
         `)
         .eq('user_id', userId)
@@ -102,7 +109,8 @@ export default function NotificationBell({ userId }: NotificationBellProps) {
         reviews: {
           id: notification.reviews[0]?.id || '',
           apartments: {
-            address: notification.reviews[0]?.apartments[0]?.address || ''
+            address: notification.reviews[0]?.apartments[0]?.address || '',
+            building_name: notification.reviews[0]?.apartments[0]?.building_name || ''
           }
         },
         profiles: notification.from_user || [],
@@ -189,10 +197,24 @@ export default function NotificationBell({ userId }: NotificationBellProps) {
 
   const unreadCount = notifications.filter(n => !n.read).length
 
+  const clearAllNotifications = async () => {
+    try {
+      const { error } = await supabase
+        .from('notifications')
+        .update({ deleted_at: new Date().toISOString() })
+        .eq('user_id', userId)
+
+      if (error) throw error
+      setNotifications([])
+    } catch (error) {
+      console.error('Erro ao limpar notificações:', error)
+    }
+  }
+
   return (
     <div className="relative">
       <button 
-        className="relative p-2"
+        className="relative p-2.5 hover:bg-gray-100 rounded-full transition-all duration-200"
         onClick={() => setIsOpen(!isOpen)}
       >
         <svg
@@ -209,61 +231,111 @@ export default function NotificationBell({ userId }: NotificationBellProps) {
           />
         </svg>
         {unreadCount > 0 && (
-          <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">
+          <span className="absolute -top-1 -right-1 flex items-center justify-center min-w-[20px] h-5 px-1.5 text-xs font-bold text-white bg-red-500 rounded-full ring-2 ring-white">
             {unreadCount}
           </span>
         )}
       </button>
 
-      {isOpen && notifications.length > 0 && (
-        <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg z-50">
-          <div className="p-4 space-y-4">
-            {notifications.map((notification) => (
-              <div
-                key={notification.id}
-                className={`
-                  flex items-start space-x-4 p-3 rounded-lg cursor-pointer relative group
-                  ${notification.read 
-                    ? 'bg-gray-50 hover:bg-gray-100' 
-                    : 'bg-blue-50 hover:bg-blue-100'
-                  }
-                  transition-colors duration-200
-                `}
-                onClick={() => {
-                  handleNotificationClick(notification)
-                  setIsOpen(false)
-                }}
-              >
-                {/* Indicador de não lida */}
-                {!notification.read && (
-                  <div className="absolute left-1 top-1/2 -translate-y-1/2">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                  </div>
-                )}
-                
-                <div className="flex-1 pl-4">
-                  <p className={`text-sm ${notification.read ? 'text-gray-600' : 'text-gray-900'}`}>
-                    <span className="font-medium">
-                      {notification.profiles[0]?.username || 'Usuário'}
-                    </span>{' '}
-                    comentou em sua review do endereço{' '}
-                    <span className="font-medium">
-                      {notification.reviews?.apartments?.address}
-                    </span>
-                  </p>
-                  <p className={`text-xs mt-1 ${notification.read ? 'text-gray-400' : 'text-gray-500'}`}>
-                    {notification.review_comments?.[0]?.comment}
-                  </p>
-                </div>
-
-                {/* Botão de deletar */}
+      {isOpen && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center sm:absolute sm:inset-auto sm:right-0 sm:top-full sm:mt-2">
+          <div className="w-full max-w-xl bg-white rounded-xl shadow-2xl border border-gray-100 mt-16 sm:mt-0">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+              <h3 className="font-semibold text-gray-900 text-lg">
+                Notificações {notifications.length > 0 && `(${notifications.length})`}
+              </h3>
+              {notifications.length > 0 && (
                 <button
-                  onClick={(e) => deleteNotification(e, notification.id)}
-                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-gray-200 rounded-full"
-                  title="Remover notificação"
+                  onClick={clearAllNotifications}
+                  className="text-sm text-gray-500 hover:text-gray-700 px-3 py-1 rounded-full hover:bg-gray-100 transition-colors"
                 >
+                  Limpar todas
+                </button>
+              )}
+            </div>
+
+            {notifications.length > 0 ? (
+              <div className="max-h-[70vh] sm:max-h-[500px] overflow-y-auto">
+                <div className="divide-y divide-gray-100">
+                  {notifications.map((notification) => (
+                    <div
+                      key={notification.id}
+                      className={`
+                        relative px-6 py-5 hover:bg-gray-50 cursor-pointer group
+                        ${notification.read ? 'bg-white' : 'bg-blue-50/60'}
+                        transition-colors duration-200
+                      `}
+                      onClick={() => handleNotificationClick(notification)}
+                    >
+                      <div className="flex items-start gap-4">
+                        <div className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 text-gray-600 flex-shrink-0">
+                          <svg
+                            className="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                            />
+                          </svg>
+                        </div>
+
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between mb-2">
+                            <p className="text-sm font-medium text-gray-900">
+                              Há um comentário novo no seu review
+                            </p>
+                            <span className="text-xs text-gray-500 flex-shrink-0 ml-4">
+                              {formatDistanceToNow(new Date(notification.created_at), {
+                                addSuffix: true,
+                                locale: ptBR
+                              })}
+                            </span>
+                          </div>
+
+                          <div className="bg-gray-50 rounded-lg p-3 mt-2">
+                            <p className="text-sm text-gray-600 line-clamp-3">
+                              {notification.review_comments?.[0]?.comment}
+                            </p>
+                          </div>
+                        </div>
+
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            deleteNotification(e, notification.id)
+                          }}
+                          className="opacity-0 group-hover:opacity-100 p-2 hover:bg-gray-100 rounded-full transition-all duration-200"
+                          title="Remover notificação"
+                        >
+                          <svg
+                            className="w-4 h-4 text-gray-400 hover:text-gray-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M6 18L18 6M6 6l12 12"
+                            />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="px-6 py-12 text-center">
+                <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center rounded-full bg-gray-100">
                   <svg
-                    className="w-4 h-4 text-gray-500"
+                    className="w-8 h-8 text-gray-400"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -272,12 +344,13 @@ export default function NotificationBell({ userId }: NotificationBellProps) {
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
+                      d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
                     />
                   </svg>
-                </button>
+                </div>
+                <p className="text-gray-500">Nenhuma notificação no momento</p>
               </div>
-            ))}
+            )}
           </div>
         </div>
       )}
