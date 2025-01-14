@@ -65,19 +65,23 @@ export default function ReviewModal({
   return (
     <div className="p-6">
       <div className="flex justify-between items-start mb-6">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 mb-6">
           <Avatar className="w-10 h-10">
             <AvatarImage src={review.profiles?.avatar_url || ''} />
-            <AvatarFallback className={review.profiles?.avatar_fallback_class}>
-              {getInitials(username)}
+            <AvatarFallback className="bg-black text-white font-bold">
+              {getInitials(username || 'Usuário')}
             </AvatarFallback>
           </Avatar>
+          
           <div>
-            <h3 className="font-semibold">
-              {username}
+            <h3 className="font-medium text-gray-900">
+              {username || 'Usuário'}
             </h3>
             <p className="text-sm text-gray-500">
-              {formatDate(review.created_at)}
+              {formatDistanceToNow(new Date(review.created_at), {
+                addSuffix: true,
+                locale: ptBR
+              })}
             </p>
           </div>
         </div>

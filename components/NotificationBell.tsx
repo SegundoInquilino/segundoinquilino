@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/utils/supabase-client'
 import { useRouter } from 'next/navigation'
 import { formatDistanceToNow } from 'date-fns'
@@ -42,6 +42,7 @@ export default function NotificationBell({ userId }: NotificationBellProps) {
   const [isOpen, setIsOpen] = useState(false)
   const supabase = createClient()
   const router = useRouter()
+  const menuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (userId) {
@@ -49,6 +50,19 @@ export default function NotificationBell({ userId }: NotificationBellProps) {
       subscribeToNotifications()
     }
   }, [userId])
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
 
   const loadNotifications = async () => {
     try {
@@ -213,7 +227,7 @@ export default function NotificationBell({ userId }: NotificationBellProps) {
   }
 
   return (
-    <div className="relative">
+    <div className="relative" ref={menuRef}>
       <button 
         className="relative p-2.5 hover:bg-gray-100 rounded-full transition-all duration-200"
         onClick={() => setIsOpen(!isOpen)}
@@ -241,14 +255,14 @@ export default function NotificationBell({ userId }: NotificationBellProps) {
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-start justify-center sm:absolute sm:inset-auto sm:right-0 sm:top-full sm:mt-2">
           <div className="w-full max-w-xl bg-white rounded-xl shadow-2xl border border-gray-100 mt-16 sm:mt-0">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-              <h3 className="font-semibold text-gray-900 text-lg">
+            <div className="flex items-center justify-between px-6 py-3 border-b border-gray-100">
+              <h3 className="font-bold text-base text-gray-900">
                 Notificações {notifications.length > 0 && `(${notifications.length})`}
               </h3>
               {notifications.length > 0 && (
                 <button
                   onClick={clearAllNotifications}
-                  className="text-sm text-gray-500 hover:text-gray-700 px-3 py-1 rounded-full hover:bg-gray-100 transition-colors"
+                  className="text-xs text-gray-500 hover:text-gray-700 px-3 py-1 rounded-full hover:bg-gray-100 transition-colors"
                 >
                   Limpar todas
                 </button>
@@ -287,7 +301,7 @@ export default function NotificationBell({ userId }: NotificationBellProps) {
 
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between mb-2">
-                            <p className="text-sm font-medium text-gray-900">
+                            <p className="text-xs font-medium text-gray-900">
                               Há um comentário novo no seu review
                             </p>
                             <span className="text-xs text-gray-500 flex-shrink-0 ml-4">
@@ -299,7 +313,7 @@ export default function NotificationBell({ userId }: NotificationBellProps) {
                           </div>
 
                           <div className="bg-gray-50 rounded-lg p-3 mt-2">
-                            <p className="text-sm text-gray-600 line-clamp-3">
+                            <p className="text-xs text-gray-600 line-clamp-3">
                               {notification.review_comments?.[0]?.comment}
                             </p>
                           </div>
