@@ -130,7 +130,8 @@ export default function BuildingPageClient({ buildingName }: BuildingPageClientP
                   review={review}
                   currentUserId={currentUserId}
                   userMap={userMap}
-                  onDelete={handleDeleteReview}
+                  onDeleteReview={handleDeleteReview}
+                  username={userMap[review.user_id] || 'Usuário'}
                 />
               ))}
             </div>

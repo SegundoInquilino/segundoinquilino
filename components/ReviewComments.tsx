@@ -5,6 +5,8 @@ import { createClient } from '@/utils/supabase-client'
 import { formatDistanceToNow } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { Trash2, MoreVertical } from 'lucide-react'
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
+import { getInitials } from '@/utils/string'
 
 interface ReviewCommentsProps {
   reviewId: string
@@ -28,6 +30,7 @@ interface Comment {
   profiles?: {
     username: string
     full_name?: string
+    avatar_url?: string
   }
 }
 
@@ -166,25 +169,28 @@ export default function ReviewComments({
           >
             <div className="flex justify-between items-start">
               <div className="flex items-start space-x-3">
-                {/* Avatar */}
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center text-white text-sm font-medium">
-                  {(comment.profiles?.full_name || comment.profiles?.username || userMap[comment.user_id] || 'U')[0].toUpperCase()}
-                </div>
+                <Avatar className="w-8 h-8">
+                  <AvatarImage src={comment.profiles?.avatar_url || ''} />
+                  <AvatarFallback className="bg-black text-white font-bold">
+                    {getInitials(userMap[comment.user_id] || 'Usuário')}
+                  </AvatarFallback>
+                </Avatar>
                 
-                {/* Conteúdo do comentário */}
-                <div>
-                  <div className="flex items-center space-x-2">
-                    <span className="font-medium text-gray-900">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <p className="font-medium text-sm">
                       {comment.profiles?.full_name || comment.profiles?.username || userMap[comment.user_id] || 'Usuário'}
-                    </span>
-                    <span className="text-sm text-gray-500">
+                    </p>
+                    <span className="text-xs text-gray-500">
                       {formatDistanceToNow(new Date(comment.created_at), {
                         addSuffix: true,
                         locale: ptBR
                       })}
                     </span>
                   </div>
-                  <p className="text-gray-700 mt-1">{comment.comment}</p>
+                  <p className="text-sm text-gray-600 break-words">
+                    {comment.comment}
+                  </p>
                 </div>
               </div>
 
