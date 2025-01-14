@@ -15,21 +15,21 @@ interface Notification {
   created_at: string
   reviews: {
     id: string
-    title?: string
     apartments: {
       address: string
       building_name: string
-    }
-  }
-  profiles: {
-    username: string
-    full_name?: string
-    avatar_url?: string
+    }[]
   }[]
-  review_comments?: Array<{
+  review_comments: {
+    id: string
     comment: string
     created_at: string
-  }>
+    profiles: {
+      username: string
+      full_name?: string
+      avatar_url?: string
+    }[]
+  }[]
 }
 
 interface NotificationBellProps {
@@ -113,7 +113,7 @@ export default function NotificationBell({ userId }: NotificationBellProps) {
             building_name: notification.reviews[0]?.apartments[0]?.building_name || ''
           }
         },
-        profiles: notification.from_user || [],
+        profiles: notification.review_comments?.[0]?.profiles || [],
         review_comments: notification.review_comments || []
       }))
 
