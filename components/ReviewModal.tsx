@@ -10,6 +10,14 @@ import { AMENITIES } from '@/types/amenities'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { StarRating } from '@/components/ui/star-rating'
 import ImageModal from './ImageModal'
+import { HomeIcon, BuildingOfficeIcon } from '@heroicons/react/24/outline'
+import { 
+  getReviewTitle, 
+  getReviewLocation, 
+  getReviewAddress,
+  getReviewAuthor,
+  getReviewSummary 
+} from '@/utils/review'
 
 const getInitials = (name?: string) => {
   if (!name) return ''
@@ -29,24 +37,7 @@ const formatDate = (date: string) => {
 }
 
 type ReviewModalProps = {
-  review: {
-    id: string
-    rating: number
-    comment: string
-    created_at: string
-    user_id: string
-    likes_count: { count: number } | number
-    images?: string[]
-    amenities?: string[]
-    apartments: {
-      id: string
-      address: string
-      city: string
-      state: string
-      zip_code: string
-      neighborhood: string
-      building_name: string
-    }
+  review: Review & {
     profiles?: {
       avatar_url?: string
       avatar_fallback_class?: string
@@ -94,17 +85,51 @@ export default function ReviewModal({
         <StarRating rating={review.rating} size="lg" />
       </div>
 
-      <h2 className="text-2xl font-bold text-gray-900 mb-4">
-        {review.apartments.building_name}
-      </h2>
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          {review.apartments.property_type === 'house' ? (
+            <HomeIcon className="w-5 h-5 text-gray-500" />
+          ) : (
+            <BuildingOfficeIcon className="w-5 h-5 text-gray-500" />
+          )}
+          <h3 className="text-xl font-bold text-gray-900">
+            {review.apartments.building_name}
+          </h3>
+        </div>
 
-      <div className="mb-6">
-        <div className="text-sm text-gray-600 mb-2">
-          <p>{review.apartments.address}</p>
-          <p>
-            {review.apartments.neighborhood}, {review.apartments.city} - {review.apartments.state}
-          </p>
-          <p>{review.apartments.zip_code}</p>
+        <div className="text-gray-600">
+          <a 
+            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+              `${review.apartments.building_name} ${review.apartments.address}, ${review.apartments.neighborhood}, ${review.apartments.city}, ${review.apartments.state}`
+            )}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-black transition-colors flex items-center gap-2 group"
+          >
+            <div className="bg-blue-50 p-1.5 rounded-lg group-hover:bg-blue-100 transition-colors">
+              <svg 
+                className="w-4 h-4 text-blue-600" 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth={2} 
+                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                />
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth={2} 
+                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+              </svg>
+            </div>
+            <span>{getReviewAddress(review)}</span>
+          </a>
+          <p className="text-gray-500 mt-1">{getReviewLocation(review)}</p>
         </div>
       </div>
 

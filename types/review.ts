@@ -7,8 +7,6 @@ export interface Apartment {
   state: string
   zip_code: string
   property_type: 'house' | 'apartment'
-  latitude?: number
-  longitude?: number
 }
 
 export interface Profile {
@@ -34,6 +32,4 @@ export interface Review {
     full_name?: string
   }
   apartments: Apartment
-  latitude?: number
-  longitude?: number
 } 
