@@ -41,27 +41,20 @@ export default function ReviewFilters({ onFilterChange }: ReviewFiltersProps) {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-      {/* Buscar localização */}
+    <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
+      {/* Campo de busca */}
       <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Buscar
-        </label>
-        <div className="relative">
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => handleChange('search', e.target.value)}
-            placeholder="Nome do prédio, endereço ou bairro..."
-            className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-          />
-          <span className="absolute left-3 top-2.5 text-gray-400">
-            🔍
-          </span>
-        </div>
+        <input
+          type="text"
+          placeholder="Buscar por nome do prédio, endereço ou bairro..."
+          value={search}
+          onChange={(e) => handleChange('search', e.target.value)}
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+        />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Grid de filtros mais responsivo */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {/* Cidade */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -116,12 +109,13 @@ export default function ReviewFilters({ onFilterChange }: ReviewFiltersProps) {
         </div>
       </div>
 
-      <AmenitiesSelector
-        selectedAmenities={selectedAmenities}
-        onChange={(amenities) => {
-          handleChange('amenities', amenities)
-        }}
-      />
+      {/* Amenidades com melhor espaçamento */}
+      <div className="mt-6">
+        <AmenitiesSelector
+          selectedAmenities={selectedAmenities}
+          onChange={(amenities) => handleChange('amenities', amenities)}
+        />
+      </div>
     </div>
   )
 } 

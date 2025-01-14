@@ -254,7 +254,7 @@ export default function NotificationBell({ userId }: NotificationBellProps) {
 
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-start justify-center sm:absolute sm:inset-auto sm:right-0 sm:top-full sm:mt-2">
-          <div className="w-full max-w-xl bg-white rounded-xl shadow-2xl border border-gray-100 mt-16 sm:mt-0">
+          <div className="relative w-full max-w-xl bg-white rounded-xl shadow-2xl border border-gray-100 mt-16 sm:mt-0">
             <div className="flex items-center justify-between px-6 py-3 border-b border-gray-100">
               <h3 className="font-bold text-base text-gray-900">
                 Notificações {notifications.length > 0 && `(${notifications.length})`}
@@ -366,6 +366,15 @@ export default function NotificationBell({ userId }: NotificationBellProps) {
                 <p className="text-gray-500">Nenhuma notificação no momento</p>
               </div>
             )}
+
+            <div className="px-6 py-4 border-t border-gray-100">
+              <button
+                onClick={() => setIsOpen(false)}
+                className="w-full px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                Fechar
+              </button>
+            </div>
           </div>
         </div>
       )}
