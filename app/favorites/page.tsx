@@ -127,6 +127,9 @@ export default function FavoritesPage() {
                 review={review}
                 currentUserId={currentUserId}
                 userMap={userMap}
+                onDeleteReview={handleReviewDeleted}
+                username={userMap[review.user_id] || 'Usuário'}
+                layout="square"
               />
             ))}
           </div>
