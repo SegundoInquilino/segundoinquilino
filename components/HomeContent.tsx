@@ -71,7 +71,7 @@ export default function HomeContent({
             reviews={reviews}
             userMap={userMap}
             currentUserId={currentUserId}
-            onReviewDeleted={handleReviewDeleted}
+            onDeleteReview={handleReviewDeleted}
           />
         </section>
 
@@ -81,7 +81,7 @@ export default function HomeContent({
             reviews={topRatedReviews}
             userMap={userMap}
             currentUserId={currentUserId}
-            onReviewDeleted={handleReviewDeleted}
+            onDeleteReview={handleReviewDeleted}
           />
         </section>
       </main>

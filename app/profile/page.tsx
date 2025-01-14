@@ -346,7 +346,7 @@ export default function ProfilePage() {
                 reviews={reviews}
                 userMap={userMap}
                 currentUserId={currentUserId}
-                onReviewDeleted={() => {
+                onDeleteReview={() => {
                   loadProfile()
                 }}
                 layout="square"
