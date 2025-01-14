@@ -106,15 +106,21 @@ export default function NotificationBell({ userId }: NotificationBellProps) {
         comment_id: notification.comment_id,
         read: notification.read,
         created_at: notification.created_at,
-        reviews: {
+        reviews: [{
           id: notification.reviews[0]?.id || '',
-          apartments: {
-            address: notification.reviews[0]?.apartments[0]?.address || '',
-            building_name: notification.reviews[0]?.apartments[0]?.building_name || ''
-          }
-        },
-        profiles: notification.review_comments?.[0]?.profiles || [],
-        review_comments: notification.review_comments || []
+          apartments: [
+            {
+              address: notification.reviews[0]?.apartments[0]?.address || '',
+              building_name: notification.reviews[0]?.apartments[0]?.building_name || ''
+            }
+          ]
+        }],
+        review_comments: notification.review_comments?.map(comment => ({
+          id: comment.id,
+          comment: comment.comment,
+          created_at: comment.created_at,
+          profiles: comment.profiles || []
+        })) || []
       }))
 
       setNotifications(formattedData)
