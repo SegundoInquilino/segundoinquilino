@@ -218,43 +218,35 @@ export default function ReviewsPage() {
   }
 
   return (
-    <div className="min-h-screen py-12 bg-gradient-to-br from-primary-50 to-secondary-50">
-      <div className="px-4 mx-auto max-w-7xl">
-        {/* Header roxo */}
-        <div className="p-8 mb-8 text-white bg-gradient-to-r from-primary-600 to-secondary-600 rounded-2xl">
-          <div className="flex items-center justify-between mb-6">
-            <h1 className="text-3xl font-bold">Reviews</h1>
-            {currentUserId && (
-              <Link
-                href="/new-review"
-                className="inline-flex items-center px-4 py-2 transition-colors bg-white rounded-lg text-primary-600 hover:bg-primary-50"
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">Reviews</h1>
+          {currentUserId && (
+            <Link
+              href="/new-review"
+              className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+            >
+              <svg
+                className="w-5 h-5 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
               >
-                <svg
-                  className="w-5 h-5 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 4v16m8-8H4"
-                  />
-                </svg>
-                Nova Review
-              </Link>
-            )}
-          </div>
-          <p className="mb-4 text-primary-100">
-            Compartilhe suas experiências e ajude outros inquilinos a encontrar o lugar ideal.
-          </p>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+              Nova Review
+            </Link>
+          )}
         </div>
 
-        {/* Filtros */}
         <ReviewFilters onFilterChange={handleFilterChange} />
-
-        {/* Reviews List */}
+        
         <ReviewsList
           reviews={reviews}
           userMap={userMap}

@@ -3,6 +3,7 @@
 import { createClient } from '@/utils/supabase-client'
 import BuildingsList from './BuildingsList'
 import { useEffect, useState } from 'react'
+import StarRating from '@/components/StarRating'
 
 interface BuildingSummary {
   building_name: string
@@ -20,44 +21,36 @@ export default function BuildingsPage() {
   useEffect(() => {
     const loadBuildings = async () => {
       const supabase = createClient()
-      const { data, error } = await supabase
-        .from('reviews')
-        .select(`
-          apartments!inner (
-            building_name,
-            address,
-            neighborhood,
-            city
-          )
-        `)
+      
+      try {
+        const { data: buildings } = await supabase
+          .from('apartments')
+          .select(`
+            *,
+            reviews (
+              rating
+            )
+          `)
+          .eq('property_type', 'apartment')
+          .order('building_name')
 
-      if (error) {
-        console.error('Erro ao carregar prédios:', error.message)
-        return
-      }
+        if (buildings) {
+          // Filtrar apenas prédios com reviews e calcular média
+          const buildingsWithReviews = buildings
+            .filter(building => building.reviews && building.reviews.length > 0)
+            .map(building => ({
+              ...building,
+              avgRating: building.reviews.reduce((acc, review) => acc + review.rating, 0) / building.reviews.length,
+              reviewsCount: building.reviews.length
+            }))
 
-      const buildingsMap = data.reduce<Record<string, BuildingSummary>>((acc, review: any) => {
-        const building = review.apartments
-        if (!building?.building_name) return acc
-
-        if (!acc[building.building_name]) {
-          acc[building.building_name] = {
-            building_name: building.building_name,
-            address: building.address,
-            neighborhood: building.neighborhood,
-            city: building.city,
-            reviews_count: 1,
-            average_rating: 0
-          }
-        } else {
-          acc[building.building_name].reviews_count++
+          setBuildings(buildingsWithReviews)
         }
-
-        return acc
-      }, {})
-
-      setBuildings(Object.values(buildingsMap))
-      setLoading(false)
+      } catch (error) {
+        console.error('Erro ao carregar prédios:', error)
+      } finally {
+        setLoading(false)
+      }
     }
 
     loadBuildings()

@@ -5,29 +5,29 @@ import { useState } from 'react'
 import { StarRating } from '@/components/ui/star-rating'
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline'
 
-interface BuildingsSummary {
+interface Building {
+  id: string
   building_name: string
   address: string
   neighborhood: string
   city: string
-  reviews_count: number
-  average_rating: number
+  avgRating: number
+  reviewsCount: number
+  reviews?: { rating: number }[]
 }
 
-interface BuildingsListProps {
-  buildings: BuildingsSummary[]
-}
-
-export default function BuildingsList({ buildings }: BuildingsListProps) {
+export default function BuildingsList({ buildings }: { buildings: Building[] }) {
   const [searchTerm, setSearchTerm] = useState('')
 
   const filteredBuildings = buildings.filter(building => {
+    if (!searchTerm.trim()) return true
+
     const searchLower = searchTerm.toLowerCase()
     return (
-      building.building_name.toLowerCase().includes(searchLower) ||
-      building.address.toLowerCase().includes(searchLower) ||
-      building.neighborhood.toLowerCase().includes(searchLower) ||
-      building.city.toLowerCase().includes(searchLower)
+      (building.building_name || '').toLowerCase().includes(searchLower) ||
+      (building.address || '').toLowerCase().includes(searchLower) ||
+      (building.neighborhood || '').toLowerCase().includes(searchLower) ||
+      (building.city || '').toLowerCase().includes(searchLower)
     )
   })
 
@@ -68,7 +68,7 @@ export default function BuildingsList({ buildings }: BuildingsListProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredBuildings.map((building) => (
               <Link
-                key={building.building_name}
+                key={building.id}
                 href={`/buildings/${encodeURIComponent(building.building_name)}`}
                 className="block"
               >
@@ -82,9 +82,9 @@ export default function BuildingsList({ buildings }: BuildingsListProps) {
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <StarRating rating={building.average_rating} size="sm" />
+                      <StarRating rating={building.avgRating} size="sm" />
                       <span className="text-sm text-gray-600">
-                        ({building.reviews_count} {building.reviews_count === 1 ? 'review' : 'reviews'})
+                        ({building.reviewsCount} {building.reviewsCount === 1 ? 'review' : 'reviews'})
                       </span>
                     </div>
                   </div>

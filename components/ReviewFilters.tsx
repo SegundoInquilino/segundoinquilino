@@ -20,6 +20,7 @@ export default function ReviewFilters({ onFilterChange }: ReviewFiltersProps) {
   const [rating, setRating] = useState('all')
   const [orderBy, setOrderBy] = useState('recent')
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([])
+  const [showAmenities, setShowAmenities] = useState(false)
 
   const handleChange = (
     type: 'search' | 'city' | 'rating' | 'orderBy' | 'amenities',
@@ -109,12 +110,35 @@ export default function ReviewFilters({ onFilterChange }: ReviewFiltersProps) {
         </div>
       </div>
 
-      {/* Amenidades com melhor espaçamento */}
+      {/* Botão para expandir/colapsar amenidades */}
       <div className="mt-6">
-        <AmenitiesSelector
-          selectedAmenities={selectedAmenities}
-          onChange={(amenities) => handleChange('amenities', amenities)}
-        />
+        <button
+          onClick={() => setShowAmenities(!showAmenities)}
+          className="flex items-center justify-between w-full px-4 py-2 text-sm font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
+        >
+          <span>Expandir para filtro de comodidades</span>
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
+            />
+          </svg>
+        </button>
+
+        {/* Amenidades com animação de fade */}
+        <div className={`mt-4 transition-all duration-200 ${showAmenities ? 'opacity-100' : 'opacity-0 h-0 overflow-hidden'}`}>
+          <AmenitiesSelector
+            selectedAmenities={selectedAmenities}
+            onChange={(amenities) => handleChange('amenities', amenities)}
+          />
+        </div>
       </div>
     </div>
   )
