@@ -12,16 +12,11 @@ export default function OAuthCallback() {
       const supabase = createClient()
       
       try {
-        // Processa o callback do OAuth
         const { data: { user }, error } = await supabase.auth.getUser()
-
         if (error) throw error
-
         if (user) {
-          // Redireciona para a página inicial após login bem sucedido
           router.push('/home')
         } else {
-          // Se algo der errado, volta para a página de login
           router.push('/auth')
         }
       } catch (error) {
