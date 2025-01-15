@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { StarRating } from '@/components/ui/star-rating'
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline'
+import { useRouter } from 'next/navigation'
 
 interface Building {
   id: string
@@ -18,6 +19,15 @@ interface Building {
 
 export default function BuildingsList({ buildings }: { buildings: Building[] }) {
   const [searchTerm, setSearchTerm] = useState('')
+  const router = useRouter()
+
+  const handleBuildingClick = (e: React.MouseEvent, buildingName: string) => {
+    // Se não estiver logado, previne a navegação e redireciona para login
+    if (!localStorage.getItem('supabase.auth.token')) {
+      e.preventDefault()
+      router.push('/auth')
+    }
+  }
 
   const filteredBuildings = buildings.filter(building => {
     if (!searchTerm.trim()) return true
@@ -70,6 +80,7 @@ export default function BuildingsList({ buildings }: { buildings: Building[] }) 
               <Link
                 key={building.id}
                 href={`/buildings/${encodeURIComponent(building.building_name)}`}
+                onClick={(e) => handleBuildingClick(e, building.building_name)}
                 className="block"
               >
                 <div className="bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow p-6">

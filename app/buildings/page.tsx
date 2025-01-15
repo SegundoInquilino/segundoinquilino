@@ -40,7 +40,7 @@ export default function BuildingsPage() {
             .filter(building => building.reviews && building.reviews.length > 0)
             .map(building => ({
               ...building,
-              avgRating: building.reviews.reduce((acc, review) => acc + review.rating, 0) / building.reviews.length,
+              avgRating: building.reviews.reduce((acc: number, review) => acc + review.rating, 0) / building.reviews.length,
               reviewsCount: building.reviews.length
             }))
 
