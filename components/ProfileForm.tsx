@@ -43,14 +43,19 @@ export default function ProfileForm({
 
       <div className="space-y-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Nome Completo
+          <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">
+            Nome completo
           </label>
           <input
             type="text"
-            value={fullName}
-            className="w-full p-2 border rounded-md"
+            id="fullName"
+            name="fullName"
+            defaultValue={fullName}
+            className="mt-1 w-full p-2 border rounded-md"
           />
+          <p className="mt-2 text-sm text-gray-600 italic">
+            Adicione aqui como será visto o seu nome nos comentários e reviews
+          </p>
         </div>
 
         <div>
