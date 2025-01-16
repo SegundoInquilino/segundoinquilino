@@ -8,7 +8,9 @@ import { createClient } from '@/utils/supabase-client'
 import { 
   MagnifyingGlassIcon, 
   BuildingOfficeIcon, 
-  PlusCircleIcon 
+  PlusCircleIcon, 
+  PencilIcon,
+  DocumentTextIcon 
 } from '@heroicons/react/24/outline'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { getInitials } from '@/utils/string'
@@ -96,6 +98,13 @@ export default function DashboardPage() {
       icon: <PlusCircleIcon className="w-8 h-8" />,
       href: '/new-review',
       color: 'bg-green-100 text-green-600'
+    },
+    {
+      title: 'Termos e Condições',
+      description: 'Leia nossos termos de uso',
+      icon: <DocumentTextIcon className="w-8 h-8" />,
+      href: '/terms',
+      color: 'bg-gray-100 text-gray-600'
     }
   ]
 
@@ -103,18 +112,29 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
-          <div className="flex items-center gap-4">
-            <Avatar className="w-16 h-16">
-              <AvatarImage src={userProfile?.avatar_url || ''} />
-              <AvatarFallback className="bg-black text-white text-xl font-bold">
-                {getInitials(userProfile?.full_name || userProfile?.username || 'Usuário')}
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900">
-                {userProfile?.full_name || userProfile?.username || 'Bem-vindo'}
-              </h2>
-              <p className="text-gray-500">{userProfile?.email}</p>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Avatar className="w-16 h-16">
+                <AvatarImage src={userProfile?.avatar_url || ''} />
+                <AvatarFallback className="bg-black text-white text-xl font-bold">
+                  {getInitials(userProfile?.full_name || userProfile?.username || 'Usuário')}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-2xl font-bold text-gray-900">
+                    {userProfile?.full_name || userProfile?.username || 'Bem-vindo'}
+                  </h2>
+                  <Link 
+                    href="/profile" 
+                    className="p-1 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors"
+                    title="Editar perfil"
+                  >
+                    <PencilIcon className="w-4 h-4" />
+                  </Link>
+                </div>
+                <p className="text-gray-500">{userProfile?.email}</p>
+              </div>
             </div>
           </div>
         </div>
