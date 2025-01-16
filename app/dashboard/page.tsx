@@ -10,7 +10,8 @@ import {
   BuildingOfficeIcon, 
   PlusCircleIcon, 
   PencilIcon,
-  DocumentTextIcon 
+  DocumentTextIcon,
+  InformationCircleIcon 
 } from '@heroicons/react/24/outline'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { getInitials } from '@/utils/string'
@@ -105,6 +106,13 @@ export default function DashboardPage() {
       icon: <DocumentTextIcon className="w-8 h-8" />,
       href: '/terms',
       color: 'bg-gray-100 text-gray-600'
+    },
+    {
+      title: 'Sobre',
+      description: 'Conheça mais sobre o Segundo Inquilino',
+      icon: <InformationCircleIcon className="w-8 h-8" />,
+      href: '/about',
+      color: 'bg-yellow-100 text-yellow-600'
     }
   ]
 
