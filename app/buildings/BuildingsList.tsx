@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { StarRating } from '@/components/ui/star-rating'
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline'
 import { useRouter } from 'next/navigation'
+import { useAuth } from '@/contexts/AuthContext'
 
 interface Building {
   id: string
@@ -20,10 +21,10 @@ interface Building {
 export default function BuildingsList({ buildings }: { buildings: Building[] }) {
   const [searchTerm, setSearchTerm] = useState('')
   const router = useRouter()
+  const { currentUserId } = useAuth()
 
   const handleBuildingClick = (e: React.MouseEvent, buildingName: string) => {
-    // Se não estiver logado, previne a navegação e redireciona para login
-    if (!localStorage.getItem('supabase.auth.token')) {
+    if (!currentUserId) {
       e.preventDefault()
       router.push('/auth')
     }

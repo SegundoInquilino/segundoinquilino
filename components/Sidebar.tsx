@@ -79,7 +79,7 @@ export default function Sidebar({ isOpen, onClose, currentUserId }: SidebarProps
 
   return (
     <>
-      {/* Overlay */}
+      {/* Overlay clicável */}
       <div
         className={`fixed inset-0 bg-black/50 transition-opacity z-40 ${
           isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
@@ -94,7 +94,6 @@ export default function Sidebar({ isOpen, onClose, currentUserId }: SidebarProps
         }`}
       >
         <div className="h-full flex flex-col">
-          {/* Botão fechar */}
           <button
             onClick={onClose}
             className="absolute top-4 right-4 text-white/70 hover:text-white"
@@ -128,6 +127,19 @@ export default function Sidebar({ isOpen, onClose, currentUserId }: SidebarProps
             <nav className="space-y-2">
               {currentUserId && (
                 <>
+                  <Link 
+                    href="/dashboard"
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded-lg transition-all duration-200 ${
+                      isCurrentPath('/dashboard')
+                        ? 'bg-white text-black font-medium shadow-sm'
+                        : 'text-gray-300 hover:bg-white/10 hover:text-white'
+                    }`}
+                    onClick={onClose}
+                  >
+                    <HomeIcon className="w-5 h-5" />
+                    <span>Dashboard</span>
+                  </Link>
+
                   <Link 
                     href="/home"
                     className={`flex items-center gap-2 px-4 py-2.5 rounded-lg transition-all duration-200 ${

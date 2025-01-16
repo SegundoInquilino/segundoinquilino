@@ -47,16 +47,18 @@ export default function Header({ username, currentUserId, profile }: HeaderProps
             </svg>
           </button>
 
-          {/* Logo/Brand */}
+          {/* Logo/Brand com link para dashboard quando logado */}
           <div className="flex items-center">
-            <Image
-              src="/images/Logo_SI_icon.png"
-              alt="Segundo Inquilino"
-              width={32}
-              height={32}
-              className="h-auto w-auto"
-              priority
-            />
+            <Link href={currentUserId ? '/dashboard' : '/'}>
+              <Image
+                src="/images/Logo_SI_icon.png"
+                alt="Segundo Inquilino"
+                width={32}
+                height={32}
+                className="h-auto w-auto"
+                priority
+              />
+            </Link>
           </div>
 
           {/* Right Section */}
