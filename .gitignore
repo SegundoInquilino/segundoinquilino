@@ -36,3 +36,7 @@ next-env.d.ts
 .netlify
 .env.godaddy
 .next
+
+# Next.js build output
+.next
+
