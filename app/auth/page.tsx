@@ -51,6 +51,13 @@ export default function AuthPage() {
                 >
                   Termos e Condições
                 </Link>
+                <span className="mx-1">•</span>
+                <Link 
+                  href="/about" 
+                  className="text-purple-600 hover:text-purple-500 hover:underline"
+                >
+                  Sobre
+                </Link>
               </div>
             </div>
           </div>
