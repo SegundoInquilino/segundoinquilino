@@ -2,6 +2,7 @@ export interface Apartment {
   id: string
   building_name: string
   address: string
+  postal_code: string
   neighborhood: string
   city: string
   state: string

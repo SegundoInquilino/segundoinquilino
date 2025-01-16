@@ -7,6 +7,7 @@ import ReviewCardWrapper from '@/components/ReviewCardWrapper'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import type { Review } from '@/types/review'
+import { MapPinIcon } from '@heroicons/react/24/outline'
 
 const jsonLd = {
   '@context': 'https://schema.org',

@@ -162,7 +162,7 @@ export default function ReviewCard({
             <div className="mb-3 text-sm text-gray-600">
               <a 
                 href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                  `${review.apartments.building_name} ${review.apartments.address}, ${review.apartments.neighborhood}, ${review.apartments.city}, ${review.apartments.state}`
+                  `${review.apartments.address}, ${review.apartments.neighborhood}, ${review.apartments.city} - ${review.apartments.state}`
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
