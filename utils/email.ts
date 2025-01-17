@@ -1,25 +1,20 @@
-import { Resend } from 'resend'
+import sgMail from '@sendgrid/mail'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+sgMail.setApiKey(process.env.SENDGRID_API_KEY!)
 
 export async function sendEmail(to: string, subject: string, html: string) {
   try {
-    const { data, error } = await resend.emails.send({
+    await sgMail.send({
       from: 'Segundo Inquilino <contato@segundoinquilino.com.br>',
       to,
       subject,
       html,
       // Configurações adicionais para melhorar entregabilidade
-      reply_to: 'contato@segundoinquilino.com.br',
+      replyTo: 'contato@segundoinquilino.com.br',
       text: html.replace(/<[^>]*>/g, ''), // versão texto do email
     })
 
-    if (error) {
-      console.error('Erro ao enviar email:', error)
-      return { success: false, error }
-    }
-
-    return { success: true, data }
+    return { success: true }
   } catch (error) {
     console.error('Erro no serviço de email:', error)
     return { success: false, error }

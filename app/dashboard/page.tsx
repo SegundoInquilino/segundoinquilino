@@ -7,11 +7,11 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/utils/supabase-client'
 import { 
   MagnifyingGlassIcon, 
-  BuildingOfficeIcon, 
   PlusCircleIcon, 
   PencilIcon,
   DocumentTextIcon,
-  InformationCircleIcon 
+  InformationCircleIcon,
+  BellIcon
 } from '@heroicons/react/24/outline'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { getInitials } from '@/utils/string'
@@ -87,18 +87,18 @@ export default function DashboardPage() {
       color: 'bg-purple-100 text-purple-600'
     },
     {
-      title: 'Explorar Prédios',
-      description: 'Veja todos os prédios avaliados',
-      icon: <BuildingOfficeIcon className="w-8 h-8" />,
-      href: '/buildings',
-      color: 'bg-blue-100 text-blue-600'
-    },
-    {
       title: 'Nova Review',
       description: 'Compartilhe sua experiência',
       icon: <PlusCircleIcon className="w-8 h-8" />,
       href: '/new-review',
       color: 'bg-green-100 text-green-600'
+    },
+    {
+      title: 'Solicitar Review',
+      description: 'Peça uma avaliação para um imóvel',
+      icon: <BellIcon className="w-8 h-8" />,
+      href: '/review-requests',
+      color: 'bg-blue-100 text-blue-600'
     },
     {
       title: 'Termos e Condições',

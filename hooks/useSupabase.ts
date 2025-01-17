@@ -1,21 +1,29 @@
-import { createClient } from '@/utils/supabase-client'
-import { useEffect, useState } from 'react'
+'use client'
 
-let supabaseInstance: ReturnType<typeof createClient> | null = null
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { useEffect, useState } from 'react'
+import type { User } from '@supabase/auth-helpers-nextjs'
+import type { Database } from '@/types/supabase'
 
 export function useSupabase() {
-  const [client] = useState(() => {
-    if (!supabaseInstance) {
-      supabaseInstance = createClient()
-    }
-    return supabaseInstance
-  })
+  const [user, setUser] = useState<User | null>(null)
+  const supabase = createClientComponentClient<Database>()
 
   useEffect(() => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session) {
+        setUser(session.user)
+      } else {
+        setUser(null)
+      }
+    })
+
     return () => {
-      // Cleanup se necessário
+      subscription.unsubscribe()
     }
   }, [])
 
-  return client
+  return { supabase, user }
 } 

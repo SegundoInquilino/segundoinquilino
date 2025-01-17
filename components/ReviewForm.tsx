@@ -7,20 +7,32 @@ import { createClient } from '@/utils/supabase-client'
 import { useAuth } from '@/contexts/AuthContext'
 import { StarRating } from '@/components/ui/star-rating'
 
-const ReviewForm = () => {
+interface ReviewFormProps {
+  initialData?: {
+    building_name: string
+    address: string
+    zip_code?: string
+    neighborhood?: string
+    city?: string
+    state?: string
+  }
+  onSubmit?: (data: any) => Promise<void>
+}
+
+const ReviewForm = ({ initialData, onSubmit }: ReviewFormProps) => {
   const router = useRouter()
   const supabase = createClient()
   const { currentUserId } = useAuth()
 
   const [formData, setFormData] = useState({
-    title: '',
     content: '',
     rating: 0,
-    building_name: '',
-    address: '',
-    neighborhood: '',
-    city: '',
-    state: '',
+    building_name: initialData?.building_name || '',
+    address: initialData?.address || '',
+    zip_code: initialData?.zip_code || '',
+    neighborhood: initialData?.neighborhood || '',
+    city: initialData?.city || '',
+    state: initialData?.state || '',
     property_type: 'apartment' as const
   })
 
@@ -33,30 +45,46 @@ const ReviewForm = () => {
     }
 
     try {
-      const { data, error } = await supabase
-        .from('reviews')
-        .insert([
-          {
-            title: formData.title,
-            content: formData.content,
-            rating: formData.rating,
-            user_id: currentUserId,
-            apartments: {
-              building_name: formData.building_name.trim(),
-              address: formData.address.trim(),
-              neighborhood: formData.neighborhood.trim(),
-              city: formData.city.trim(),
-              state: formData.state.trim(),
-              property_type: formData.property_type
+      const reviewData = {
+        content: formData.content,
+        rating: formData.rating,
+        apartments: {
+          building_name: formData.building_name.trim(),
+          address: formData.address.trim(),
+          neighborhood: formData.neighborhood.trim(),
+          city: formData.city.trim(),
+          state: formData.state.trim(),
+          property_type: formData.property_type
+        }
+      }
+
+      console.log('Enviando dados:', reviewData)
+
+      if (onSubmit) {
+        await onSubmit(reviewData)
+      } else {
+        // Comportamento padrão
+        const { data, error } = await supabase
+          .from('reviews')
+          .insert([
+            {
+              ...reviewData,
+              user_id: currentUserId
             }
-          }
-        ])
+          ])
 
-      if (error) throw error
+        if (error) throw error
 
-      router.push(`/buildings/${encodeURIComponent(formData.building_name.trim())}`)
-    } catch (error) {
-      console.error('Erro ao criar review:', error)
+        router.push(`/buildings/${encodeURIComponent(formData.building_name.trim())}`)
+      }
+    } catch (error: any) {
+      console.error('Erro ao criar review:', {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code
+      })
+      // Você pode adicionar um estado de erro no formulário se quiser mostrar para o usuário
     }
   }
 
@@ -72,12 +100,9 @@ const ReviewForm = () => {
           <input
             type="text"
             value={formData.building_name}
-            onChange={(e) => setFormData(prev => ({
-              ...prev,
-              building_name: e.target.value
-            }))}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+            className="mt-1 block w-full rounded-md border-gray-300 bg-gray-50 shadow-sm"
             required
+            readOnly
           />
         </div>
 
@@ -88,12 +113,9 @@ const ReviewForm = () => {
           <input
             type="text"
             value={formData.address}
-            onChange={(e) => setFormData(prev => ({
-              ...prev,
-              address: e.target.value
-            }))}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+            className="mt-1 block w-full rounded-md border-gray-300 bg-gray-50 shadow-sm"
             required
+            readOnly
           />
         </div>
 
@@ -105,12 +127,9 @@ const ReviewForm = () => {
             <input
               type="text"
               value={formData.neighborhood}
-              onChange={(e) => setFormData(prev => ({
-                ...prev,
-                neighborhood: e.target.value
-              }))}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+              className="mt-1 block w-full rounded-md border-gray-300 bg-gray-50 shadow-sm"
               required
+              readOnly
             />
           </div>
 
@@ -121,12 +140,9 @@ const ReviewForm = () => {
             <input
               type="text"
               value={formData.city}
-              onChange={(e) => setFormData(prev => ({
-                ...prev,
-                city: e.target.value
-              }))}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+              className="mt-1 block w-full rounded-md border-gray-300 bg-gray-50 shadow-sm"
               required
+              readOnly
             />
           </div>
 
@@ -137,14 +153,25 @@ const ReviewForm = () => {
             <input
               type="text"
               value={formData.state}
-              onChange={(e) => setFormData(prev => ({
-                ...prev,
-                state: e.target.value
-              }))}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+              className="mt-1 block w-full rounded-md border-gray-300 bg-gray-50 shadow-sm"
               required
+              readOnly
             />
           </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            CEP
+          </label>
+          <input
+            type="text"
+            value={formData.zip_code}
+            className="mt-1 block w-full rounded-md border-gray-300 bg-gray-50 shadow-sm"
+            required
+            readOnly
+            placeholder="00000-000"
+          />
         </div>
 
         <div>
@@ -160,22 +187,6 @@ const ReviewForm = () => {
 
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Título da Review
-          </label>
-          <input
-            type="text"
-            value={formData.title}
-            onChange={(e) => setFormData(prev => ({
-              ...prev,
-              title: e.target.value
-            }))}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
             Sua Experiência
           </label>
           <textarea
@@ -185,7 +196,7 @@ const ReviewForm = () => {
               content: e.target.value
             }))}
             rows={4}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
             required
           />
         </div>

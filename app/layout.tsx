@@ -9,6 +9,7 @@ import { siteMetadata } from '@/lib/metadata'
 import SessionAlert from '@/components/SessionAlert'
 import GoogleAnalytics from '@/components/GoogleAnalytics'
 import LoginBanner from '@/components/LoginBanner'
+import { Toaster } from 'react-hot-toast'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -122,6 +123,7 @@ export default async function RootLayout({
             </div>
           </footer>
         </AuthProvider>
+        <Toaster />
       </body>
     </html>
   )

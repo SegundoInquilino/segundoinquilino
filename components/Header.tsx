@@ -89,6 +89,12 @@ export default function Header({ username, currentUserId, profile }: HeaderProps
                   </div>
                   <span className="hover:underline">{username}</span>
                 </Link>
+                <Link 
+                  href="/my-reviews" 
+                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                >
+                  Minhas Reviews
+                </Link>
               </>
             ) : (
               <Link

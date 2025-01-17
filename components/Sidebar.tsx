@@ -9,9 +9,9 @@ import {
   HomeIcon, 
   PlusCircleIcon, 
   UserCircleIcon, 
-  BuildingOfficeIcon,
   ArrowRightOnRectangleIcon,
-  XMarkIcon
+  XMarkIcon,
+  BellIcon
 } from '@heroicons/react/24/outline'
 
 interface SidebarProps {
@@ -76,6 +76,19 @@ export default function Sidebar({ isOpen, onClose, currentUserId }: SidebarProps
   const isCurrentPath = (path: string) => {
     return pathname === path
   }
+
+  const menuItems = [
+    {
+      name: 'Home',
+      href: '/home',
+      icon: HomeIcon
+    },
+    {
+      name: 'Solicitar Reviews',
+      href: '/review-requests',
+      icon: BellIcon
+    }
+  ]
 
   return (
     <>
@@ -177,15 +190,16 @@ export default function Sidebar({ isOpen, onClose, currentUserId }: SidebarProps
                   </Link>
 
                   <Link 
-                    href="/buildings"
+                    href="/review-requests"
                     className={`flex items-center gap-2 px-4 py-2.5 rounded-lg transition-all duration-200 ${
-                      isCurrentPath('/buildings')
+                      isCurrentPath('/review-requests')
                         ? 'bg-white text-black font-medium shadow-sm'
                         : 'text-gray-300 hover:bg-white/10 hover:text-white'
                     }`}
+                    onClick={onClose}
                   >
-                    <BuildingOfficeIcon className="w-5 h-5" />
-                    <span>Prédios</span>
+                    <BellIcon className="w-5 h-5" />
+                    <span>Solicitar Reviews</span>
                   </Link>
 
                   <button

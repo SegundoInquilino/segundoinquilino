@@ -21,6 +21,7 @@ export default async function HomePage() {
       apartments (*),
       likes_count:review_likes(count)
     `)
+    .is('requester_email', null)
     .order('created_at', { ascending: false })
     .limit(6)
 
@@ -32,6 +33,7 @@ export default async function HomePage() {
       apartments (*),
       likes_count:review_likes(count)
     `)
+    .is('requester_email', null)
     .order('rating', { ascending: false })
     .limit(3)
 

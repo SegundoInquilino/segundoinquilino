@@ -62,23 +62,25 @@ export default function ReviewsPage() {
           apartments (*),
           likes_count:review_likes(count)
         `)
+        .is('request_id', null)
         .order('created_at', { ascending: false })
 
       if (reviewsData) {
-        setReviews(reviewsData as Review[])
-
-        // Carregar userMap
+        // Buscar usuários para os nomes (mesma lógica da home)
         const userIds = Array.from(new Set(reviewsData.map(r => r.user_id)))
         const { data: profiles } = await supabase
           .from('profiles')
           .select('id, username')
           .in('id', userIds)
 
+        // Criar mapa de usuários
         const newUserMap: Record<string, string> = {}
         profiles?.forEach(profile => {
           newUserMap[profile.id] = profile.username || 'Usuário'
         })
+
         setUserMap(newUserMap)
+        setReviews(reviewsData as Review[])
       }
     } catch (error) {
       console.error('Erro ao carregar reviews:', error)

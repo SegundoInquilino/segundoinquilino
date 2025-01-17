@@ -15,34 +15,29 @@ export default function ImageUpload({ onUploadComplete, maxImages = 5 }: ImageUp
   const [uploadedUrls, setUploadedUrls] = useState<string[]>([])
   const [error, setError] = useState<string>('')
 
-  const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files) return
+
     try {
-      const files = event.target.files
-      if (!files || files.length === 0) return
-
-      const totalImages = previewUrls.length + files.length
-      if (totalImages > maxImages) {
-        setError(`Você pode enviar no máximo ${maxImages} imagens`)
-        return
-      }
-
-      setUploading(true)
       setError('')
+      setUploading(true)
 
       const supabase = createClient()
       const newUploadedUrls: string[] = [...uploadedUrls]
+      const filesArray = Array.from(files)
 
-      for (const file of files) {
+      for (const file of filesArray) {
         // Validar tamanho (max 5MB)
         if (file.size > 5 * 1024 * 1024) {
           setError('Cada imagem deve ter no máximo 5MB')
-          continue
+          return
         }
 
         // Validar tipo
         if (!file.type.startsWith('image/')) {
           setError('Apenas imagens são permitidas')
-          continue
+          return
         }
 
         const fileExt = file.name.split('.').pop()
@@ -79,8 +74,8 @@ export default function ImageUpload({ onUploadComplete, maxImages = 5 }: ImageUp
       console.log('Todas URLs:', newUploadedUrls)
       onUploadComplete(newUploadedUrls)
     } catch (error) {
-      console.error('Erro:', error)
-      setError('Erro ao fazer upload das imagens')
+      console.error('Erro ao fazer upload:', error)
+      setError('Erro ao fazer upload da imagem')
     } finally {
       setUploading(false)
     }
@@ -112,7 +107,7 @@ export default function ImageUpload({ onUploadComplete, maxImages = 5 }: ImageUp
             className="hidden"
             multiple
             accept="image/*"
-            onChange={handleUpload}
+            onChange={handleFileChange}
             disabled={uploading}
           />
         </label>

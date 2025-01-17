@@ -33,7 +33,7 @@ export default function BuildingPageClient({ buildingName }: BuildingPageClientP
 
       if (!apartment) return
 
-      // Buscar reviews que são públicas OU que pertencem ao usuário atual
+      // Buscar reviews
       const { data: reviewsData } = await supabase
         .from('reviews')
         .select(`
@@ -42,11 +42,10 @@ export default function BuildingPageClient({ buildingName }: BuildingPageClientP
             username,
             full_name
           ),
-          likes_count:review_likes(count),
-          review_requests!left(email)
+          likes_count:review_likes(count)
         `)
         .eq('apartment_id', apartment.id)
-        .or(`request_id.is.null,review_requests.email.eq.${currentUserId}`)
+        .is('request_id', null) // Apenas reviews públicas
         .order('created_at', { ascending: false })
 
       if (reviewsData) {

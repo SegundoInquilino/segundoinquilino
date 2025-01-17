@@ -6,6 +6,15 @@ import { useAuth } from '@/contexts/AuthContext'
 import ReviewCardWrapper from '@/components/ReviewCardWrapper'
 import type { Review } from '@/types/review'
 
+interface ReviewCardWrapperProps {
+  review: Review
+  currentUserId: string | null
+  userMap: Record<string, string>
+  onDeleteReview?: (reviewId: string) => void
+  username: string
+  layout?: 'square' | 'list'
+}
+
 export default function FavoritesPage() {
   const [reviews, setReviews] = useState<Review[]>([])
   const [loading, setLoading] = useState(true)
@@ -89,10 +98,6 @@ export default function FavoritesPage() {
     loadFavorites()
   }, [currentUserId])
 
-  const handleReviewDeleted = (reviewId: string) => {
-    setReviews(prevReviews => prevReviews.filter(review => review.id !== reviewId))
-  }
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50 py-12">
@@ -127,7 +132,6 @@ export default function FavoritesPage() {
                 review={review}
                 currentUserId={currentUserId}
                 userMap={userMap}
-                onDeleteReview={handleReviewDeleted}
                 username={userMap[review.user_id] || 'Usuário'}
                 layout="square"
               />
