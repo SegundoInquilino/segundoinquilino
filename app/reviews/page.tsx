@@ -202,7 +202,7 @@ export default function ReviewsPage() {
     }
   }
 
-  const handleDeleteReview = (reviewId: string) => {
+  const handleReviewDeleted = (reviewId: string) => {
     setReviews(prevReviews => prevReviews.filter(review => review.id !== reviewId))
     // Fechar o modal se estiver aberto
     setShowModal(false)
@@ -253,7 +253,8 @@ export default function ReviewsPage() {
           reviews={reviews}
           userMap={userMap}
           currentUserId={currentUserId}
-          onDeleteReview={handleDeleteReview}
+          onReviewDeleted={handleReviewDeleted}
+          layout="square"
         />
       </div>
 

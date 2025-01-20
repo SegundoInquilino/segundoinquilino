@@ -8,10 +8,10 @@ import { useAuth } from '@/contexts/AuthContext'
 interface ReviewCardWrapperProps {
   review: Review
   username: string
-  currentUserId?: string | null
-  layout?: 'grid' | 'square'
+  currentUserId: string | null
+  onReviewDeleted?: (reviewId: string) => void
+  layout?: 'square' | 'list'
   userMap: Record<string, string>
-  onDeleteReview?: (reviewId: string) => void
 }
 
 export default function ReviewCardWrapper({
@@ -20,7 +20,7 @@ export default function ReviewCardWrapper({
   currentUserId,
   layout,
   userMap,
-  onDeleteReview
+  onReviewDeleted
 }: ReviewCardWrapperProps) {
   const [showModal, setShowModal] = useState(false)
 
@@ -33,7 +33,7 @@ export default function ReviewCardWrapper({
           currentUserId={currentUserId}
           layout={layout}
           userMap={userMap}
-          onDelete={onDeleteReview}
+          onDelete={onReviewDeleted}
           isModal={false}
         />
       </div>
@@ -56,7 +56,7 @@ export default function ReviewCardWrapper({
               currentUserId={currentUserId}
               username={username}
               userMap={userMap}
-              onDelete={onDeleteReview}
+              onDelete={onReviewDeleted}
             />
           </div>
         </div>

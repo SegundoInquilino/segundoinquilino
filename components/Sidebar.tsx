@@ -11,7 +11,8 @@ import {
   UserCircleIcon, 
   ArrowRightOnRectangleIcon,
   XMarkIcon,
-  BellIcon
+  BellIcon,
+  Squares2X2Icon
 } from '@heroicons/react/24/outline'
 
 interface SidebarProps {
@@ -79,14 +80,33 @@ export default function Sidebar({ isOpen, onClose, currentUserId }: SidebarProps
 
   const menuItems = [
     {
+      name: 'Dashboard',
+      href: '/dashboard',
+      icon: Squares2X2Icon,
+      requiresAuth: true
+    },
+    {
       name: 'Home',
       href: '/home',
       icon: HomeIcon
     },
     {
+      name: 'Nova Review',
+      href: '/new-review',
+      icon: PlusCircleIcon,
+      requiresAuth: true
+    },
+    {
+      name: 'Perfil',
+      href: '/profile',
+      icon: UserCircleIcon,
+      requiresAuth: true
+    },
+    {
       name: 'Solicitar Reviews',
       href: '/review-requests',
-      icon: BellIcon
+      icon: BellIcon,
+      requiresAuth: true
     }
   ]
 
@@ -138,92 +158,32 @@ export default function Sidebar({ isOpen, onClose, currentUserId }: SidebarProps
           {/* Menu de navegação */}
           <div className="flex-1 p-6">
             <nav className="space-y-2">
+              {menuItems.map((item) => (
+                (!item.requiresAuth || currentUserId) && (
+                  <Link 
+                    key={item.href}
+                    href={item.href}
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded-lg transition-all duration-200 ${
+                      isCurrentPath(item.href)
+                        ? 'bg-white text-black font-medium shadow-sm'
+                        : 'text-gray-300 hover:bg-white/10 hover:text-white'
+                    }`}
+                    onClick={onClose}
+                  >
+                    <item.icon className="w-5 h-5" />
+                    <span>{item.name}</span>
+                  </Link>
+                )
+              ))}
+              
               {currentUserId && (
-                <>
-                  <Link 
-                    href="/dashboard"
-                    className={`flex items-center gap-2 px-4 py-2.5 rounded-lg transition-all duration-200 ${
-                      isCurrentPath('/dashboard')
-                        ? 'bg-white text-black font-medium shadow-sm'
-                        : 'text-gray-300 hover:bg-white/10 hover:text-white'
-                    }`}
-                    onClick={onClose}
-                  >
-                    <HomeIcon className="w-5 h-5" />
-                    <span>Dashboard</span>
-                  </Link>
-
-                  <Link 
-                    href="/home"
-                    className={`flex items-center gap-2 px-4 py-2.5 rounded-lg transition-all duration-200 ${
-                      isCurrentPath('/home')
-                        ? 'bg-white text-black font-medium shadow-sm'
-                        : 'text-gray-300 hover:bg-white/10 hover:text-white'
-                    }`}
-                  >
-                    <HomeIcon className="w-5 h-5" />
-                    <span>Home</span>
-                  </Link>
-
-                  <Link 
-                    href="/new-review"
-                    className={`flex items-center gap-2 px-4 py-2.5 rounded-lg transition-all duration-200 ${
-                      isCurrentPath('/new-review')
-                        ? 'bg-white text-black font-medium shadow-sm'
-                        : 'text-gray-300 hover:bg-white/10 hover:text-white'
-                    }`}
-                  >
-                    <PlusCircleIcon className="w-5 h-5" />
-                    <span>Nova Review</span>
-                  </Link>
-
-                  <Link 
-                    href="/profile"
-                    className={`flex items-center gap-2 px-4 py-2.5 rounded-lg transition-all duration-200 ${
-                      isCurrentPath('/profile')
-                        ? 'bg-white text-black font-medium shadow-sm'
-                        : 'text-gray-300 hover:bg-white/10 hover:text-white'
-                    }`}
-                  >
-                    <UserCircleIcon className="w-5 h-5" />
-                    <span>Perfil</span>
-                  </Link>
-
-                  <Link 
-                    href="/review-requests"
-                    className={`flex items-center gap-2 px-4 py-2.5 rounded-lg transition-all duration-200 ${
-                      isCurrentPath('/review-requests')
-                        ? 'bg-white text-black font-medium shadow-sm'
-                        : 'text-gray-300 hover:bg-white/10 hover:text-white'
-                    }`}
-                    onClick={onClose}
-                  >
-                    <BellIcon className="w-5 h-5" />
-                    <span>Solicitar Reviews</span>
-                  </Link>
-
-                  <button
-                    onClick={handleSignOut}
-                    className="w-full flex items-center gap-2 px-4 py-2.5 text-gray-300 hover:bg-red-600 hover:text-white rounded-lg transition-all duration-200"
-                  >
-                    <ArrowRightOnRectangleIcon className="w-5 h-5" />
-                    <span>Log out</span>
-                  </button>
-                </>
-              )}
-
-              {!currentUserId && (
-                <Link 
-                  href="/auth"
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-lg transition-all duration-200 ${
-                    isCurrentPath('/auth')
-                      ? 'bg-white text-black font-medium shadow-sm'
-                      : 'text-gray-300 hover:bg-white/10 hover:text-white'
-                  }`}
+                <button
+                  onClick={handleSignOut}
+                  className="w-full flex items-center gap-2 px-4 py-2.5 text-gray-300 hover:bg-red-600 hover:text-white rounded-lg transition-all duration-200"
                 >
                   <ArrowRightOnRectangleIcon className="w-5 h-5" />
-                  <span>Entrar</span>
-                </Link>
+                  <span>Log out</span>
+                </button>
               )}
             </nav>
           </div>

@@ -9,6 +9,7 @@ import Image from 'next/image'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { getInitials } from '@/utils/string'
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline'
+import { FaRegEnvelope } from 'react-icons/fa'
 
 interface HeaderProps {
   currentUserId?: string
@@ -75,6 +76,13 @@ export default function Header({ username, currentUserId, profile }: HeaderProps
               <>
                 <NotificationBell userId={currentUserId} />
                 <Link
+                  href="/my-reviews"
+                  className="text-gray-600 hover:text-gray-900"
+                  title="Minhas Reviews"
+                >
+                  <FaRegEnvelope className="h-5 w-5" />
+                </Link>
+                <Link
                   href="/profile"
                   className="text-gray-700 hover:text-primary-600 transition-colors font-medium flex items-center gap-2 group"
                 >
@@ -88,12 +96,6 @@ export default function Header({ username, currentUserId, profile }: HeaderProps
                     <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
                   </div>
                   <span className="hover:underline">{username}</span>
-                </Link>
-                <Link 
-                  href="/my-reviews" 
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                >
-                  Minhas Reviews
                 </Link>
               </>
             ) : (

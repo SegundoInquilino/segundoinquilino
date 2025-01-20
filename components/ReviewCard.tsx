@@ -43,24 +43,24 @@ const formatDate = (date: string) => {
 
 interface ReviewCardProps {
   review: Review
-  currentUserId?: string | null
-  layout?: 'grid' | 'square'
-  isModal?: boolean
-  onOpenModal?: () => void
-  username?: string
-  userMap?: Record<string, string>
+  username: string
+  currentUserId: string | null
   onDelete?: (reviewId: string) => void
+  layout?: 'square' | 'list'
+  userMap: Record<string, string>
+  isModal: boolean
+  onOpenModal?: () => void
 }
 
 export default function ReviewCard({
   review,
-  currentUserId,
-  layout,
-  isModal = false,
-  onOpenModal,
   username,
-  userMap = {},
-  onDelete
+  currentUserId,
+  onDelete,
+  layout,
+  userMap,
+  isModal = false,
+  onOpenModal
 }: ReviewCardProps) {
   const [showModal, setShowModal] = useState(false)
   const [showAuthModal, setShowAuthModal] = useState(false)

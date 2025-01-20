@@ -6,17 +6,17 @@ import type { Review } from '@/types/review'
 interface ReviewsListProps {
   reviews: Review[]
   userMap: Record<string, string>
-  currentUserId?: string | null
-  onDeleteReview?: (reviewId: string) => void
-  layout?: 'grid' | 'square'
+  currentUserId: string | null
+  onReviewDeleted?: (reviewId: string) => void
+  layout?: 'square' | 'list'
 }
 
 export default function ReviewsList({ 
   reviews, 
   userMap, 
   currentUserId,
-  onDeleteReview,
-  layout = 'grid'
+  onReviewDeleted,
+  layout = 'square'
 }: ReviewsListProps) {
   return (
     <div className={`grid gap-6 ${
@@ -30,7 +30,7 @@ export default function ReviewsList({
           review={review}
           username={userMap[review.user_id]}
           currentUserId={currentUserId}
-          onDeleteReview={onDeleteReview}
+          onReviewDeleted={onReviewDeleted}
           layout={layout}
           userMap={userMap}
         />

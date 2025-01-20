@@ -91,7 +91,7 @@ export default function BuildingPageClient({ buildingName }: BuildingPageClientP
           reviews={reviews}
           userMap={userMap}
           currentUserId={currentUserId}
-          onDeleteReview={() => loadBuildingReviews()}
+          onReviewDeleted={() => loadBuildingReviews()}
         />
       </div>
     </div>

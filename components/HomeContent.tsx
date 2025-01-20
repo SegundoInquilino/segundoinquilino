@@ -5,6 +5,7 @@ import ReviewsList from './ReviewsList'
 import Link from 'next/link'
 import { Review } from '@/types/review'
 import { useRouter } from 'next/navigation'
+import { useAuth } from '@/contexts/AuthContext'
 
 interface HomeContentProps {
   initialReviews: Review[]
@@ -22,7 +23,8 @@ export default function HomeContent({
   children 
 }: HomeContentProps) {
   const router = useRouter()
-  const [reviews, setReviews] = useState(initialReviews)
+  const { currentUserId: authUserId } = useAuth()
+  const [reviews, setReviews] = useState<Review[]>(initialReviews)
   const [topRatedReviews, setTopRatedReviews] = useState(topReviews)
 
   const handleReviewDeleted = (deletedReviewId: string) => {
@@ -70,8 +72,8 @@ export default function HomeContent({
           <ReviewsList
             reviews={reviews}
             userMap={userMap}
-            currentUserId={currentUserId}
-            onDeleteReview={handleReviewDeleted}
+            currentUserId={authUserId}
+            onReviewDeleted={handleReviewDeleted}
           />
         </section>
 
@@ -80,8 +82,8 @@ export default function HomeContent({
           <ReviewsList
             reviews={topRatedReviews}
             userMap={userMap}
-            currentUserId={currentUserId}
-            onDeleteReview={handleReviewDeleted}
+            currentUserId={authUserId}
+            onReviewDeleted={handleReviewDeleted}
           />
         </section>
       </main>

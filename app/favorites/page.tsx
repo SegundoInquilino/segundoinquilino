@@ -15,6 +15,14 @@ interface ReviewCardWrapperProps {
   layout?: 'square' | 'list'
 }
 
+interface ReviewsListProps {
+  reviews: Review[]
+  userMap: Record<string, string>
+  currentUserId: string | null
+  onReviewDeleted?: (reviewId: string) => void
+  layout?: 'square' | 'list'
+}
+
 export default function FavoritesPage() {
   const [reviews, setReviews] = useState<Review[]>([])
   const [loading, setLoading] = useState(true)
