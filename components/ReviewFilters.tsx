@@ -1,20 +1,26 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import AmenitiesSelector from '@/components/AmenitiesSelector'
 import Link from 'next/link'
+import { createClient } from '@/utils/supabase-client'
+
+interface Filters {
+  search?: string
+  city?: string
+  rating?: number
+  amenities?: string[]
+  orderBy?: 'recent' | 'rating' | 'likes'
+  rental_source?: string
+}
 
 interface ReviewFiltersProps {
-  onFilterChange: (filters: {
-    search?: string
-    city?: string
-    rating?: number | undefined
-    orderBy?: 'recent' | 'rating' | 'likes'
-    amenities?: string[]
-  }) => void
+  onFilterChange: (filters: Filters) => void
 }
 
 export default function ReviewFilters({ onFilterChange }: ReviewFiltersProps) {
+  const [filters, setFilters] = useState<Filters>({})
+  const [rentalSources, setRentalSources] = useState<string[]>([])
   const [search, setSearch] = useState('')
   const [city, setCity] = useState('all')
   const [rating, setRating] = useState('all')
@@ -22,22 +28,50 @@ export default function ReviewFilters({ onFilterChange }: ReviewFiltersProps) {
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([])
   const [showAmenities, setShowAmenities] = useState(false)
 
+  // Carregar as fontes únicas de aluguel
+  useEffect(() => {
+    const loadRentalSources = async () => {
+      const supabase = createClient()
+      const { data } = await supabase
+        .from('reviews')
+        .select('rental_source')
+        .not('rental_source', 'is', null)
+        .order('rental_source')
+
+      if (data) {
+        const uniqueSources = Array.from(new Set(data.map(r => r.rental_source)))
+          .filter(Boolean) as string[]
+        setRentalSources(uniqueSources)
+      }
+    }
+
+    loadRentalSources()
+  }, [])
+
   const handleChange = (
-    type: 'search' | 'city' | 'rating' | 'orderBy' | 'amenities',
+    type: 'search' | 'city' | 'rating' | 'orderBy' | 'amenities' | 'rental_source',
     value: any
   ) => {
     if (type === 'search') setSearch(value)
     if (type === 'city') setCity(value)
     if (type === 'rating') setRating(value)
-    if (type === 'orderBy') setOrderBy(value)
+    if (type === 'orderBy') setOrderBy(value as 'recent' | 'rating' | 'likes')
     if (type === 'amenities') setSelectedAmenities(value)
+    if (type === 'rental_source') {
+      const newFilters = {
+        ...filters,
+        rental_source: value || undefined
+      }
+      setFilters(newFilters)
+    }
 
     onFilterChange({
       search: type === 'search' ? value : search,
       city: type === 'city' ? (value === 'all' ? undefined : value) : (city === 'all' ? undefined : city),
       rating: type === 'rating' ? (value === 'all' ? undefined : Number(value)) : (rating === 'all' ? undefined : Number(rating)),
       orderBy: type === 'orderBy' ? value as 'recent' | 'rating' | 'likes' : orderBy as 'recent' | 'rating' | 'likes',
-      amenities: type === 'amenities' ? value : selectedAmenities
+      amenities: type === 'amenities' ? value : selectedAmenities,
+      rental_source: type === 'rental_source' ? value : filters.rental_source
     })
   }
 
@@ -108,6 +142,25 @@ export default function ReviewFilters({ onFilterChange }: ReviewFiltersProps) {
             <option value="likes">Mais curtidas</option>
           </select>
         </div>
+      </div>
+
+      {/* Fonte de Aluguel - Adicionado aqui */}
+      <div className="mt-6">
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Fonte do Aluguel
+        </label>
+        <select
+          value={filters.rental_source || ''}
+          onChange={(e) => handleChange('rental_source', e.target.value)}
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+        >
+          <option value="">Todas as fontes de aluguel</option>
+          {rentalSources.map((source) => (
+            <option key={source} value={source}>
+              {source}
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* Botão para expandir/colapsar amenidades */}

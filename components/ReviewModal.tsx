@@ -135,6 +135,13 @@ export default function ReviewModal({
           </a>
           <p className="text-gray-500 mt-1">{getReviewLocation(review)}</p>
         </div>
+
+        {review.rental_source && (
+          <div className="flex items-center gap-2 text-gray-600">
+            <span className="text-gray-400">•</span>
+            <span><span className="font-medium">Alugado via:</span> {review.rental_source}</span>
+          </div>
+        )}
       </div>
 
       {review.comment && (

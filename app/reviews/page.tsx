@@ -16,6 +16,7 @@ interface Filters {
   rating?: number | undefined
   orderBy?: 'recent' | 'rating' | 'likes'
   amenities?: string[]
+  rental_source?: string
 }
 
 export default function ReviewsPage() {
@@ -174,6 +175,13 @@ export default function ReviewsPage() {
             filters.amenities!.every(amenity => 
               review.amenities?.includes(amenity)
             )
+          )
+        }
+
+        // Adicionar o filtro de fonte de aluguel
+        if (filters.rental_source) {
+          filtered = filtered.filter(review => 
+            review.rental_source === filters.rental_source
           )
         }
 

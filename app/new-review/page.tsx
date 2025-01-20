@@ -37,9 +37,22 @@ const ESTADOS_BRASILEIROS = [
   { sigla: 'TO', nome: 'Tocantins' }
 ]
 
+interface FormData {
+  address: string
+  buildingName: string
+  neighborhood: string
+  city: string
+  state: string
+  zipCode: string
+  rating: number
+  comment: string
+  propertyType: string
+  rental_source: string
+}
+
 export default function NewReview() {
   const router = useRouter()
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     address: '',
     buildingName: '',
     neighborhood: '',
@@ -48,7 +61,8 @@ export default function NewReview() {
     zipCode: '',
     rating: 5,
     comment: '',
-    propertyType: 'apartment'
+    propertyType: 'apartment',
+    rental_source: ''
   })
   const [imageUrls, setImageUrls] = useState<string[]>([])
   const [submitting, setSubmitting] = useState(false)
@@ -101,7 +115,8 @@ export default function NewReview() {
           rating: formData.rating,
           comment: formData.comment,
           images: imageUrls,
-          amenities: amenities
+          amenities: amenities,
+          rental_source: formData.rental_source.trim() || null
         })
 
       if (reviewError) {
@@ -300,6 +315,24 @@ export default function NewReview() {
             rows={4}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             placeholder="Compartilhe sua experiência com este apartamento..."
+          />
+        </div>
+
+        <div className="mb-6">
+          <label 
+            htmlFor="rental_source" 
+            className="block text-sm font-medium text-gray-700 mb-2"
+          >
+            De onde alugou o imóvel?
+          </label>
+          <input
+            type="text"
+            id="rental_source"
+            name="rental_source"
+            value={formData.rental_source}
+            onChange={handleChange}
+            placeholder="Ex: QuintoAndar, Imobiliária XYZ, Direto com proprietário..."
+            className="w-full p-2 border rounded focus:ring-2 focus:ring-primary-500"
           />
         </div>
 

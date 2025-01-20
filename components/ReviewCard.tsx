@@ -192,6 +192,12 @@ export default function ReviewCard({
                 <span className="line-clamp-1">{getReviewAddress(review)}</span>
               </a>
               <p className="text-gray-500">{getReviewLocation(review)}</p>
+              {review.rental_source && (
+                <p className="text-gray-500 mt-1 flex items-center gap-1">
+                  <span className="text-gray-400">•</span>
+                  <span className="font-medium">Alugado via:</span> {review.rental_source}
+                </p>
+              )}
             </div>
 
             <p className="text-sm text-gray-600 line-clamp-2 mb-3">

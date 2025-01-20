@@ -33,4 +33,5 @@ export interface Review {
     full_name?: string
   }
   apartments: Apartment
+  rental_source?: string
 } 
