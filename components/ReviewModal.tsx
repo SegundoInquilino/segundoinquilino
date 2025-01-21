@@ -82,7 +82,7 @@ export default function ReviewModal({
   return (
     <div className="p-6">
       <div className="flex justify-between items-start mb-6">
-        <div className="flex items-center gap-3 mb-6">
+        <div className="flex items-center gap-3">
           <Avatar className="w-10 h-10">
             <AvatarImage src={review.profiles?.avatar_url || ''} />
             <AvatarFallback className="bg-black text-white font-bold">
@@ -94,15 +94,9 @@ export default function ReviewModal({
             <h3 className="font-medium text-gray-900">
               {username || 'Usuário'}
             </h3>
-            <div className="flex items-center text-sm text-gray-500 gap-1">
-              <span>{formatDate(review.created_at)}</span>
-              {formatPeriod() && (
-                <>
-                  <span>•</span>
-                  <span>{formatPeriod()}</span>
-                </>
-              )}
-            </div>
+            <p className="text-sm text-gray-500">
+              {formatDate(review.created_at)}
+            </p>
           </div>
         </div>
 

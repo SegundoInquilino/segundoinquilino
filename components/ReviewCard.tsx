@@ -150,15 +150,9 @@ export default function ReviewCard({
                   <h3 className="font-semibold text-sm">
                     {getReviewAuthor(review, userMap)}
                   </h3>
-                  <div className="flex items-center text-xs text-gray-500 gap-1">
-                    <span>{formatDate(review.created_at)}</span>
-                    {formatPeriod() && (
-                      <>
-                        <span>•</span>
-                        <span>{formatPeriod()}</span>
-                      </>
-                    )}
-                  </div>
+                  <p className="text-xs text-gray-500">
+                    {formatDate(review.created_at)}
+                  </p>
                 </div>
               </div>
 
