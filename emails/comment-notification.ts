@@ -62,11 +62,11 @@ export const commentNotificationTemplate = (data: {
           Segundo Inquilino
         </a>
         <span style="color: #9CA3AF; margin: 0 10px;">|</span>
-        <a href="https://segundoinquilino.com.br/termos" style="color: #8B5CF6; text-decoration: none; font-size: 12px;">
+        <a href="https://segundoinquilino.com.br/terms" style="color: #8B5CF6; text-decoration: none; font-size: 12px;">
           Termos
         </a>
         <span style="color: #9CA3AF; margin: 0 10px;">|</span>
-        <a href="https://segundoinquilino.com.br/sobre" style="color: #8B5CF6; text-decoration: none; font-size: 12px;">
+        <a href="https://segundoinquilino.com.br/about" style="color: #8B5CF6; text-decoration: none; font-size: 12px;">
           Sobre
         </a>
       </div>
