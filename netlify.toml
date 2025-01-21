@@ -13,4 +13,10 @@
   package = "@netlify/plugin-nextjs"
 
 [functions]
-  directory = "netlify/functions" 
+  directory = "netlify/functions"
+
+[[functions]]
+  path = "netlify/functions/weekly-digest"
+  schedule = "@weekly"
+  # Roda toda segunda-feira às 10h
+  schedule = "0 10 * * 1" 

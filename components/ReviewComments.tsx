@@ -100,8 +100,74 @@ export default function ReviewComments({
 
       if (error) throw error
 
+      // Após adicionar o comentário com sucesso
+      const { data: reviewData } = await supabase
+        .from('reviews')
+        .select('id, user_id, apartment_id')
+        .eq('id', reviewId)
+        .single()
+
+      if (reviewData) {
+        // Buscar dados do autor
+        const { data: authorData } = await supabase
+          .from('profiles')
+          .select('email, full_name')
+          .eq('id', reviewData.user_id)
+          .single()
+
+        // Buscar dados do apartamento
+        const { data: apartmentData } = await supabase
+          .from('apartments')
+          .select('building_name')
+          .eq('id', reviewData.apartment_id)
+          .single()
+
+        console.log('Dados do review:', {
+          reviewData,
+          currentUserId,
+          email: authorData?.email,
+          authorName: authorData?.full_name,
+          buildingName: apartmentData?.building_name
+        })
+
+        // Só envia email se o comentário for de outro usuário e tiver email
+        if (reviewData.user_id !== currentUserId && authorData?.email) {
+          try {
+            const { data: commenterData } = await supabase
+              .from('profiles')
+              .select('full_name')
+              .eq('id', currentUserId)
+              .single()
+
+            console.log('Dados do comentarista:', commenterData)
+
+            const response = await fetch('/api/send-email', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                to: authorData.email,
+                reviewAuthor: authorData.full_name || 'Usuário',
+                commenterName: commenterData?.full_name || 'Usuário',
+                reviewTitle: apartmentData?.building_name || 'Imóvel',
+                commentText: newComment
+              })
+            })
+
+            const responseData = await response.json()
+            if (!response.ok) {
+              throw new Error(`Erro ao enviar email: ${responseData.error}`)
+            }
+            console.log('Email enviado com sucesso')
+          } catch (error) {
+            console.error('Erro ao enviar notificação:', error)
+          }
+        }
+      }
+
       setNewComment('')
-      loadComments() // Recarregar comentários
+      loadComments()
     } catch (error) {
       console.error('Erro ao comentar:', error)
     } finally {
@@ -139,11 +205,6 @@ export default function ReviewComments({
   }
 
   const canDeleteComment = (commentUserId: string) => {
-    console.log('Verificando permissão:', {
-      currentUserId,
-      commentUserId,
-      isOwner: currentUserId === commentUserId
-    })
     return currentUserId === commentUserId
   }
 
