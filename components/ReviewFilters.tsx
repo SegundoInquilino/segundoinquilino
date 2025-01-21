@@ -23,7 +23,7 @@ export default function ReviewFilters({ onFilterChange }: ReviewFiltersProps) {
   const [rentalSources, setRentalSources] = useState<string[]>([])
   const [search, setSearch] = useState('')
   const [city, setCity] = useState('all')
-  const [rating, setRating] = useState('all')
+  const [rating, setRating] = useState<string>('all')
   const [orderBy, setOrderBy] = useState('recent')
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([])
   const [showAmenities, setShowAmenities] = useState(false)
@@ -52,6 +52,11 @@ export default function ReviewFilters({ onFilterChange }: ReviewFiltersProps) {
     type: 'search' | 'city' | 'rating' | 'orderBy' | 'amenities' | 'rental_source',
     value: any
   ) => {
+    // Processar o valor do rating fora do if
+    const ratingValue = type === 'rating' 
+      ? (value === 'all' ? undefined : Number(value))
+      : (rating === 'all' ? undefined : Number(rating))
+
     if (type === 'search') setSearch(value)
     if (type === 'city') setCity(value)
     if (type === 'rating') setRating(value)
@@ -68,7 +73,7 @@ export default function ReviewFilters({ onFilterChange }: ReviewFiltersProps) {
     onFilterChange({
       search: type === 'search' ? value : search,
       city: type === 'city' ? (value === 'all' ? undefined : value) : (city === 'all' ? undefined : city),
-      rating: type === 'rating' ? (value === 'all' ? undefined : Number(value)) : (rating === 'all' ? undefined : Number(rating)),
+      rating: ratingValue,
       orderBy: type === 'orderBy' ? value as 'recent' | 'rating' | 'likes' : orderBy as 'recent' | 'rating' | 'likes',
       amenities: type === 'amenities' ? value : selectedAmenities,
       rental_source: type === 'rental_source' ? value : filters.rental_source

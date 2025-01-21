@@ -11,7 +11,9 @@ import {
   PencilIcon,
   DocumentTextIcon,
   InformationCircleIcon,
-  BellIcon
+  BellIcon,
+  EnvelopeIcon,
+  QuestionMarkCircleIcon
 } from '@heroicons/react/24/outline'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { getInitials } from '@/utils/string'
@@ -81,38 +83,45 @@ export default function DashboardPage() {
   const shortcuts = [
     {
       title: 'Buscar Reviews',
-      description: 'Encontre avaliações de apartamentos e casas',
-      icon: <MagnifyingGlassIcon className="w-8 h-8" />,
+      description: 'Encontre avaliações de imóveis',
       href: '/reviews',
-      color: 'bg-purple-100 text-purple-600'
+      icon: <MagnifyingGlassIcon className="h-6 w-6" />,
+      color: 'bg-blue-100 text-blue-600'
     },
     {
       title: 'Nova Review',
       description: 'Compartilhe sua experiência',
-      icon: <PlusCircleIcon className="w-8 h-8" />,
       href: '/new-review',
+      icon: <PlusCircleIcon className="h-6 w-6" />,
       color: 'bg-green-100 text-green-600'
     },
     {
       title: 'Solicitar Review',
-      description: 'Peça uma avaliação para um imóvel',
-      icon: <BellIcon className="w-8 h-8" />,
+      description: 'Peça uma avaliação',
       href: '/review-requests',
-      color: 'bg-blue-100 text-blue-600'
+      icon: <PencilIcon className="h-6 w-6" />,
+      color: 'bg-purple-100 text-purple-600'
     },
     {
-      title: 'Termos e Condições',
-      description: 'Leia nossos termos de uso',
-      icon: <DocumentTextIcon className="w-8 h-8" />,
-      href: '/terms',
-      color: 'bg-gray-100 text-gray-600'
+      title: 'Minhas Reviews',
+      description: 'Veja suas reviews solicitadas',
+      href: '/my-reviews',
+      icon: <EnvelopeIcon className="h-6 w-6" />,
+      color: 'bg-indigo-100 text-indigo-600'
     },
     {
       title: 'Sobre',
-      description: 'Conheça mais sobre o Segundo Inquilino',
-      icon: <InformationCircleIcon className="w-8 h-8" />,
+      description: 'Conheça o Segundo Inquilino',
       href: '/about',
-      color: 'bg-yellow-100 text-yellow-600'
+      icon: <QuestionMarkCircleIcon className="h-6 w-6" />,
+      color: 'bg-orange-100 text-orange-600'
+    },
+    {
+      title: 'Termos e Condições',
+      description: 'Leia nossos termos',
+      href: '/terms',
+      icon: <DocumentTextIcon className="h-6 w-6" />,
+      color: 'bg-gray-100 text-gray-600'
     }
   ]
 
