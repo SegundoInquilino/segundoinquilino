@@ -5,6 +5,7 @@ import { createClient } from '@/utils/supabase-client'
 import ImageUpload from '@/components/ImageUpload'
 import { useRouter } from 'next/navigation'
 import AmenitiesSelector from '@/components/AmenitiesSelector'
+import { DatePicker } from '@/components/ui/date-picker'
 
 // Lista completa de estados brasileiros
 const ESTADOS_BRASILEIROS = [
@@ -68,6 +69,9 @@ export default function NewReview() {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [amenities, setAmenities] = useState<string[]>([])
+  const [livedFrom, setLivedFrom] = useState<Date | null>(null)
+  const [livedUntil, setLivedUntil] = useState<Date | null>(null)
+  const [currentlyLiving, setCurrentlyLiving] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -116,7 +120,10 @@ export default function NewReview() {
           comment: formData.comment,
           images: imageUrls,
           amenities: amenities,
-          rental_source: formData.rental_source.trim() || null
+          rental_source: formData.rental_source.trim() || null,
+          lived_from: livedFrom,
+          lived_until: livedUntil,
+          currently_living: currentlyLiving
         })
 
       if (reviewError) {
@@ -354,6 +361,56 @@ export default function NewReview() {
             selectedAmenities={amenities}
             onChange={setAmenities}
           />
+        </div>
+
+        <div className="mb-6 space-y-4">
+          <h3 className="text-lg font-medium text-gray-900">Período de Moradia</h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Data Inicial
+              </label>
+              <DatePicker
+                selected={livedFrom}
+                onChange={setLivedFrom}
+                placeholderText="Quando você começou a morar"
+                className="w-full"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Data Final
+              </label>
+              <DatePicker
+                selected={livedUntil}
+                onChange={setLivedUntil}
+                placeholderText="Quando você saiu"
+                className="w-full"
+                disabled={currentlyLiving}
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              id="currentlyLiving"
+              checked={currentlyLiving}
+              onChange={(e) => {
+                setCurrentlyLiving(e.target.checked)
+                if (e.target.checked) {
+                  setLivedUntil(null)
+                }
+              }}
+              className="h-4 w-4 text-blue-600 rounded border-gray-300"
+            />
+            <label htmlFor="currentlyLiving" className="ml-2 text-sm text-gray-700">
+              Ainda moro neste imóvel
+            </label>
+          </div>
         </div>
 
         {error && (
