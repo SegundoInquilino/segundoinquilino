@@ -4,12 +4,10 @@ import { useState } from 'react'
 import Link from 'next/link'
 import NotificationBell from './NotificationBell'
 import Sidebar from './Sidebar'
-import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { getInitials } from '@/utils/string'
-import { MagnifyingGlassIcon } from '@heroicons/react/24/outline'
-import { FaRegEnvelope } from 'react-icons/fa'
+import { MagnifyingGlassIcon, Bars3Icon } from '@heroicons/react/24/outline'
 
 interface HeaderProps {
   currentUserId?: string
@@ -21,87 +19,76 @@ interface HeaderProps {
 }
 
 export default function Header({ username, currentUserId, profile }: HeaderProps) {
-  const router = useRouter()
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
   return (
-    <header className="fixed top-0 left-0 right-0 bg-white shadow-sm z-40">
+    <header className="fixed top-0 left-0 right-0 bg-white border-b border-gray-100 z-40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Menu Button */}
-          <button
-            onClick={() => setIsSidebarOpen(true)}
-            className="p-2 text-white bg-black hover:bg-gray-800 rounded-full transition-colors focus:outline-none"
-          >
-            <svg
-              className="h-5 w-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+          {/* Menu e Logo */}
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setIsSidebarOpen(true)}
+              className="p-2 text-gray-600 hover:text-gray-900 rounded-lg transition-colors"
+              aria-label="Menu"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-            </svg>
-          </button>
+              <Bars3Icon className="h-6 w-6" />
+            </button>
 
-          {/* Logo/Brand com link para dashboard quando logado */}
-          <div className="flex items-center">
-            <Link href={currentUserId ? '/dashboard' : '/'}>
+            <Link 
+              href={currentUserId ? '/dashboard' : '/'} 
+              className="flex items-center gap-2"
+            >
               <Image
                 src="/images/Logo_SI_icon.png"
                 alt="Segundo Inquilino"
                 width={32}
                 height={32}
-                className="h-auto w-auto"
+                className="h-8 w-auto"
                 priority
               />
+              <span className="hidden md:block font-semibold text-gray-900">
+                SegundoInquilino
+              </span>
             </Link>
           </div>
 
-          {/* Right Section */}
-          <div className="flex items-center space-x-4">
+          {/* Busca e Ações */}
+          <div className="flex items-center gap-4">
             <Link 
               href="/reviews"
-              className="p-2 text-gray-600 hover:text-gray-900 rounded-full transition-colors"
+              className="p-2 text-gray-600 hover:text-gray-900 rounded-lg transition-colors"
               title="Buscar reviews"
             >
-              <MagnifyingGlassIcon className="w-5 h-5" />
+              <MagnifyingGlassIcon className="h-5 w-5" />
             </Link>
 
             {currentUserId ? (
-              <>
+              <div className="flex items-center gap-4">
                 <NotificationBell userId={currentUserId} />
-                <Link
-                  href="/my-reviews"
-                  className="text-gray-600 hover:text-gray-900"
-                  title="Minhas Reviews"
-                >
-                  <FaRegEnvelope className="h-5 w-5" />
-                </Link>
+                
                 <Link
                   href="/profile"
-                  className="text-gray-700 hover:text-primary-600 transition-colors font-medium flex items-center gap-2 group"
+                  className="flex items-center gap-2 py-2 px-3 rounded-lg hover:bg-gray-50 transition-colors"
                 >
                   <div className="relative">
-                    <Avatar className="w-8 h-8">
+                    <Avatar className="h-8 w-8 ring-2 ring-white">
                       <AvatarImage src={profile?.avatar_url || ''} />
-                      <AvatarFallback className="bg-black text-white font-bold">
+                      <AvatarFallback className="bg-gradient-to-br from-purple-600 to-blue-600 text-white font-medium">
                         {getInitials(profile?.full_name || username || 'Usuário')}
                       </AvatarFallback>
                     </Avatar>
-                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
+                    <span className="absolute -top-1 -right-1 h-3 w-3 bg-green-400 rounded-full border-2 border-white" />
                   </div>
-                  <span className="hover:underline">{username}</span>
+                  <span className="hidden sm:block text-sm font-medium text-gray-700">
+                    {username}
+                  </span>
                 </Link>
-              </>
+              </div>
             ) : (
               <Link
                 href="/auth"
-                className="text-gray-700 hover:text-primary-600 transition-colors"
+                className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 transition-all shadow-sm hover:shadow"
               >
                 Entrar
               </Link>
