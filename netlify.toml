@@ -14,9 +14,6 @@
 
 [functions]
   directory = "netlify/functions"
-
-[[functions]]
-  path = "netlify/functions/weekly-digest"
-  schedule = "@weekly"
   # Roda toda segunda-feira às 10h
-  schedule = "0 10 * * 1" 
+  [functions.weekly-digest]
+    schedule = "0 10 * * 1" 
