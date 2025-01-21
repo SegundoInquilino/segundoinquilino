@@ -2,11 +2,16 @@
 const nextConfig = {
   experimental: {
   },
-  transpilePackages: ['@headlessui/react', '@heroicons/react'],
+  transpilePackages: [
+    '@radix-ui/react-alert-dialog',
+    '@radix-ui/react-dialog',
+    '@radix-ui/react-primitive',
+    '@heroicons/react'
+  ],
   webpack: (config) => {
     config.resolve.alias = {
       ...config.resolve.alias,
-      '@headlessui/react': require.resolve('@headlessui/react')
+      '@radix-ui/react-alert-dialog': require.resolve('@radix-ui/react-alert-dialog')
     }
     return config
   }
