@@ -22,7 +22,7 @@
     "@radix-ui/react-slot": "^1.1.1",
     "@react-email/components": "^0.0.32",
     "@react-google-maps/api": "^2.20.5",
-    "@sendgrid/mail": "^8.1.4",
+    "@sendgrid/mail": "^7.7.0",
     "@supabase/auth-helpers-nextjs": "^0.8.7",
     "@supabase/auth-helpers-react": "^0.5.0",
     "@supabase/ssr": "0.0.10",
@@ -48,7 +48,8 @@
     "tailwindcss-animate": "^1.0.7",
     "typescript": "5.7.2",
     "utf-8-validate": "^6.0.5",
-    "uuid": "^9.0.1"
+    "uuid": "^9.0.1",
+    "@netlify/functions": "^2.6.0"
   },
   "devDependencies": {
     "@netlify/plugin-nextjs": "^5.9.2",
