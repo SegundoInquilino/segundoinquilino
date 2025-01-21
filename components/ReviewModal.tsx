@@ -4,13 +4,13 @@ import { useState } from 'react'
 import { createClient } from '@/utils/supabase-client'
 import ReviewComments from './ReviewComments'
 import type { Review } from '@/types/review'
-import { formatDistanceToNow } from 'date-fns'
+import { formatDistanceToNow, format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { AMENITIES } from '@/types/amenities'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { StarRating } from '@/components/ui/star-rating'
 import ImageModal from './ImageModal'
-import { HomeIcon, BuildingOfficeIcon } from '@heroicons/react/24/outline'
+import { HomeIcon, BuildingOfficeIcon, CalendarIcon } from '@heroicons/react/24/outline'
 import { 
   getReviewTitle, 
   getReviewLocation, 
@@ -62,6 +62,23 @@ export default function ReviewModal({
 }: ReviewModalProps) {
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
 
+  const formatPeriod = () => {
+    if (!review.lived_from) return null
+
+    const fromDate = format(new Date(review.lived_from), 'MMMM yyyy', { locale: ptBR })
+    
+    if (review.currently_living) {
+      return `Mora neste imóvel desde ${fromDate}`
+    }
+
+    if (review.lived_until) {
+      const untilDate = format(new Date(review.lived_until), 'MMMM yyyy', { locale: ptBR })
+      return `Morou neste imóvel de ${fromDate} até ${untilDate}`
+    }
+
+    return `Morou neste imóvel desde ${fromDate}`
+  }
+
   return (
     <div className="p-6">
       <div className="flex justify-between items-start mb-6">
@@ -77,12 +94,15 @@ export default function ReviewModal({
             <h3 className="font-medium text-gray-900">
               {username || 'Usuário'}
             </h3>
-            <p className="text-sm text-gray-500">
-              {formatDistanceToNow(new Date(review.created_at), {
-                addSuffix: true,
-                locale: ptBR
-              })}
-            </p>
+            <div className="flex items-center text-sm text-gray-500 gap-1">
+              <span>{formatDate(review.created_at)}</span>
+              {formatPeriod() && (
+                <>
+                  <span>•</span>
+                  <span>{formatPeriod()}</span>
+                </>
+              )}
+            </div>
           </div>
         </div>
 
@@ -100,6 +120,13 @@ export default function ReviewModal({
             {review.apartments.building_name}
           </h3>
         </div>
+
+        {formatPeriod() && (
+          <p className="text-sm text-gray-500 mb-3 flex items-center gap-1">
+            <CalendarIcon className="w-4 h-4" />
+            <span>{formatPeriod()}</span>
+          </p>
+        )}
 
         <div className="text-gray-600">
           <a 
@@ -142,46 +169,43 @@ export default function ReviewModal({
             <span><span className="font-medium">Alugado via:</span> {review.rental_source}</span>
           </div>
         )}
-      </div>
 
-      {review.comment && (
-        <div className="mt-8 space-y-4">
-          <div className="inline-block">
-            <h4 className="font-medium px-3 py-1 bg-black text-white rounded-lg text-sm">
-              Comentário
-            </h4>
-          </div>
-          <p className="text-gray-600 whitespace-pre-wrap leading-relaxed">
+        {review.comment && (
+          <p className="text-gray-700 whitespace-pre-wrap mb-8">
             {review.comment}
           </p>
-        </div>
-      )}
+        )}
 
-      {review.amenities && review.amenities.length > 0 && (
-        <div className="mb-6">
-          <h4 className="font-medium mb-2">Amenidades</h4>
-          <div className="flex flex-wrap gap-2">
-            {review.amenities.map((amenityId: string) => {
-              const amenity = AMENITIES.find(a => a.id === amenityId)
-              if (!amenity) return null
-              
-              return (
-                <span 
-                  key={amenityId}
-                  className="inline-flex items-center px-2.5 py-1.5 rounded-full text-sm font-medium bg-gray-100 text-gray-700"
-                >
-                  <span className="mr-1">{amenity.icon}</span>
-                  {amenity.label}
-                </span>
-              )
-            })}
-          </div>
-        </div>
-      )}
+        {review.amenities && review.amenities.length > 0 && (
+          <>
+            <div className="inline-block bg-black text-white text-sm font-medium px-3 py-1 rounded-md mb-3">
+              Amenidades
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              {review.amenities.map((amenityId: string) => {
+                const amenity = AMENITIES.find(a => a.id === amenityId)
+                if (!amenity) return null
+                
+                return (
+                  <span 
+                    key={amenityId}
+                    className="inline-flex items-center px-2.5 py-1.5 rounded-full text-sm font-medium bg-gray-100 text-gray-700"
+                  >
+                    <span className="mr-1">{amenity.icon}</span>
+                    {amenity.label}
+                  </span>
+                )
+              })}
+            </div>
+          </>
+        )}
+      </div>
 
       {review.images && review.images.length > 0 && (
         <div className="mb-6">
-          <h4 className="font-medium mb-2">Fotos</h4>
+          <div className="inline-block bg-black text-white text-sm font-medium px-3 py-1 rounded-md mt-8 mb-3">
+            Fotos
+          </div>
           <div className="grid grid-cols-2 gap-2">
             {review.images.map((image, index) => (
               <div 

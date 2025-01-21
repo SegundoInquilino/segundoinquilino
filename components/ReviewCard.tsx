@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { formatDistanceToNow } from 'date-fns'
+import { formatDistanceToNow, format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import ReviewModal from './ReviewModal'
 import type { Review } from '@/types/review'
@@ -19,9 +19,19 @@ import {
   getReviewAuthor,
   getReviewSummary 
 } from '@/utils/review'
-import { TrashIcon, HomeIcon, BuildingOfficeIcon } from '@heroicons/react/24/outline'
+import { TrashIcon, HomeIcon, BuildingOfficeIcon, CalendarIcon } from '@heroicons/react/24/outline'
 import { createClient } from '@/utils/supabase-client'
 import Link from 'next/link'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 
 // Funções auxiliares
 const getInitials = (name?: string) => {
@@ -67,6 +77,7 @@ export default function ReviewCard({
   const { currentUserId: authUserId } = useAuth()
   const router = useRouter()
   const [isDeleting, setIsDeleting] = useState(false)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
 
   const handleCardClick = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -78,8 +89,6 @@ export default function ReviewCard({
   }
 
   const handleDeleteReview = async () => {
-    if (!confirm('Tem certeza que deseja deletar esta review?')) return
-
     setIsDeleting(true)
     const supabase = createClient()
 
@@ -98,8 +107,6 @@ export default function ReviewCard({
 
       onDelete?.(review.id)
       setShowModal(false)
-      
-      // Revalida os dados sem recarregar a página inteira
       router.refresh()
     } catch (error) {
       console.error('Erro ao deletar review:', error)
@@ -107,6 +114,23 @@ export default function ReviewCard({
     } finally {
       setIsDeleting(false)
     }
+  }
+
+  const formatPeriod = () => {
+    if (!review.lived_from) return null
+
+    const fromDate = format(new Date(review.lived_from), 'MMM yyyy', { locale: ptBR })
+    
+    if (review.currently_living) {
+      return `Mora desde ${fromDate}`
+    }
+
+    if (review.lived_until) {
+      const untilDate = format(new Date(review.lived_until), 'MMM yyyy', { locale: ptBR })
+      return `Morou de ${fromDate} até ${untilDate}`
+    }
+
+    return `Morou desde ${fromDate}`
   }
 
   return (
@@ -125,8 +149,16 @@ export default function ReviewCard({
                 <div>
                   <h3 className="font-semibold text-sm">
                     {getReviewAuthor(review, userMap)}
-                </h3>
-                  <p className="text-xs text-gray-500">{formatDate(review.created_at)}</p>
+                  </h3>
+                  <div className="flex items-center text-xs text-gray-500 gap-1">
+                    <span>{formatDate(review.created_at)}</span>
+                    {formatPeriod() && (
+                      <>
+                        <span>•</span>
+                        <span>{formatPeriod()}</span>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -136,7 +168,7 @@ export default function ReviewCard({
                   <button
                     onClick={(e) => {
                       e.stopPropagation()
-                      handleDeleteReview()
+                      setShowDeleteDialog(true)
                     }}
                     disabled={isDeleting}
                     className="text-gray-400 hover:text-red-500 transition-colors p-2 rounded-full hover:bg-red-50"
@@ -158,6 +190,13 @@ export default function ReviewCard({
                 {review.apartments.building_name}
               </h3>
             </div>
+
+            {formatPeriod() && (
+              <p className="text-sm text-gray-500 mb-3 flex items-center gap-1">
+                <CalendarIcon className="w-4 h-4" />
+                <span>{formatPeriod()}</span>
+              </p>
+            )}
 
             <div className="mb-3 text-sm text-gray-600">
               <a 
@@ -256,6 +295,34 @@ export default function ReviewCard({
         isOpen={showAuthModal} 
         onClose={() => setShowAuthModal(false)} 
       />
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent className="sm:max-w-[425px]">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-xl font-semibold text-gray-900">
+              Deletar Review
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-gray-500">
+              Tem certeza que deseja deletar esta review? Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="gap-3">
+            <AlertDialogCancel
+              className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+              disabled={isDeleting}
+            >
+              Cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50"
+              onClick={handleDeleteReview}
+              disabled={isDeleting}
+            >
+              {isDeleting ? 'Deletando...' : 'Deletar Review'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   )
 } 
