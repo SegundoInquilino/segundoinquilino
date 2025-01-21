@@ -8,6 +8,7 @@
   NEXT_TELEMETRY_DISABLED = "1"
   SKIP_TYPE_CHECK = "true"
   NEXT_PUBLIC_GA_ID = "AW-11553438817"
+  SECRETS_SCAN_OMIT_PATHS = ".next/**/*,.netlify/**/*"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
