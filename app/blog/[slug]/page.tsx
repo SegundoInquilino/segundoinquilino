@@ -328,42 +328,49 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
     notFound()
   }
 
+  // Criar o objeto JSON-LD fora do JSX
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": post.title,
+    "datePublished": post.date,
+    "author": {
+      "@type": "Organization",
+      "name": "Segundo Inquilino"
+    }
+  }
+
   return (
-    <main className="container mx-auto px-4 py-8">
-      <Link 
-        href="/blog"
-        className="text-purple-800 hover:text-purple-900 mb-8 inline-flex items-center"
-      >
-        ← Voltar para o Blog
-      </Link>
-      
-      <article className="max-w-3xl mx-auto">
-        <h1 className="text-4xl font-bold mb-4">{post.title}</h1>
-        <div className="text-gray-500 mb-8">{post.date}</div>
-        <div 
-          className="prose lg:prose-xl"
-          dangerouslySetInnerHTML={{ __html: post.content }}
+    <>
+      <head>
+        <link 
+          rel="canonical" 
+          href={`https://segundoinquilino.com.br/blog/${params.slug}`} 
         />
-      </article>
+        <script 
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
 
-      <script type="application/ld+json">
-        {
-          "@context": "https://schema.org",
-          "@type": "BlogPosting",
-          "headline": "${post.title}",
-          "datePublished": "${post.date}",
-          "author": {
-            "@type": "Organization",
-            "name": "Segundo Inquilino"
-          }
-        }
-      </script>
-
-      <link 
-        rel="canonical" 
-        href={`https://segundoinquilino.com.br/blog/${params.slug}`} 
-      />
-    </main>
+      <main className="container mx-auto px-4 py-8">
+        <Link 
+          href="/blog"
+          className="text-purple-800 hover:text-purple-900 mb-8 inline-flex items-center"
+        >
+          ← Voltar para o Blog
+        </Link>
+        
+        <article className="max-w-3xl mx-auto">
+          <h1 className="text-4xl font-bold mb-4">{post.title}</h1>
+          <div className="text-gray-500 mb-8">{post.date}</div>
+          <div 
+            className="prose lg:prose-xl"
+            dangerouslySetInnerHTML={{ __html: post.content }}
+          />
+        </article>
+      </main>
+    </>
   )
 }
 
