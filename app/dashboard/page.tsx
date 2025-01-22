@@ -13,7 +13,9 @@ import {
   InformationCircleIcon,
   BellIcon,
   EnvelopeIcon,
-  QuestionMarkCircleIcon
+  QuestionMarkCircleIcon,
+  HomeIcon,
+  UserCircleIcon
 } from '@heroicons/react/24/outline'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { getInitials } from '@/utils/string'
@@ -82,18 +84,32 @@ export default function DashboardPage() {
 
   const shortcuts = [
     {
-      title: 'Buscar Reviews',
-      description: 'Encontre avaliações de imóveis',
-      href: '/reviews',
-      icon: <MagnifyingGlassIcon className="h-6 w-6" />,
+      title: 'Home',
+      description: 'Voltar para a página inicial',
+      href: '/home',
+      icon: <HomeIcon className="h-6 w-6" />,
       color: 'bg-blue-100 text-blue-600'
     },
     {
       title: 'Nova Review',
-      description: 'Compartilhe sua experiência',
+      description: 'Criar uma nova avaliação',
       href: '/new-review',
       icon: <PlusCircleIcon className="h-6 w-6" />,
       color: 'bg-green-100 text-green-600'
+    },
+    {
+      title: 'Blog',
+      description: 'Acesse nosso blog com dicas e informações',
+      href: '/blog',
+      icon: <DocumentTextIcon className="h-6 w-6" />,
+      color: 'bg-purple-100 text-purple-600'
+    },
+    {
+      title: 'Perfil',
+      description: 'Gerenciar seu perfil',
+      href: '/profile',
+      icon: <UserCircleIcon className="h-6 w-6" />,
+      color: 'bg-indigo-100 text-indigo-600'
     },
     {
       title: 'Solicitar Review',

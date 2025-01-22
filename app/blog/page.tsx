@@ -1,6 +1,7 @@
 import { Metadata } from 'next'
 import BlogCard from '@/components/BlogCard'
 import Link from 'next/link'
+import { createClient } from '@/utils/supabase-server'
 
 export const metadata: Metadata = {
   title: 'Blog do Segundo Inquilino - Dicas e Informações sobre Aluguel',
@@ -79,30 +80,38 @@ const categories = [
   }
 ]
 
-export default function BlogPage() {
+export default async function BlogPage() {
+  // Verificar se o usuário está logado
+  const supabase = createClient()
+  const { data: { session } } = await supabase.auth.getSession()
+  const isLoggedIn = !!session?.user
+
   return (
     <main className="container mx-auto px-4 py-8">
       <div className="max-w-5xl mx-auto">
-        <div className="mb-8">
-          <Link 
-            href="/"
-            className="text-purple-800 hover:text-purple-900 inline-flex items-center"
-          >
-            <svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              className="h-5 w-5 mr-2" 
-              viewBox="0 0 20 20" 
-              fill="currentColor"
+        {/* Mostrar o link apenas se não estiver logado */}
+        {!isLoggedIn && (
+          <div className="mb-8">
+            <Link 
+              href="/"
+              className="text-purple-800 hover:text-purple-900 inline-flex items-center"
             >
-              <path 
-                fillRule="evenodd" 
-                d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" 
-                clipRule="evenodd" 
-              />
-            </svg>
-            Voltar para Home
-          </Link>
-        </div>
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                className="h-5 w-5 mr-2" 
+                viewBox="0 0 20 20" 
+                fill="currentColor"
+              >
+                <path 
+                  fillRule="evenodd" 
+                  d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" 
+                  clipRule="evenodd" 
+                />
+              </svg>
+              Voltar para Home
+            </Link>
+          </div>
+        )}
 
         <h1 className="text-4xl font-bold mb-4">Blog do Segundo Inquilino</h1>
         <p className="text-xl text-gray-600 mb-12">

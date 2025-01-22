@@ -12,7 +12,8 @@ import {
   ArrowRightOnRectangleIcon,
   XMarkIcon,
   BellIcon,
-  Squares2X2Icon
+  Squares2X2Icon,
+  DocumentTextIcon
 } from '@heroicons/react/24/outline'
 
 interface SidebarProps {
@@ -107,6 +108,12 @@ export default function Sidebar({ isOpen, onClose, currentUserId }: SidebarProps
       href: '/review-requests',
       icon: BellIcon,
       requiresAuth: true
+    },
+    {
+      name: 'Blog',
+      href: '/blog',
+      icon: DocumentTextIcon,
+      requiresAuth: false
     }
   ]
 
