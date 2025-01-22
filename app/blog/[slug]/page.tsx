@@ -345,6 +345,24 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
           dangerouslySetInnerHTML={{ __html: post.content }}
         />
       </article>
+
+      <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "BlogPosting",
+          "headline": "${post.title}",
+          "datePublished": "${post.date}",
+          "author": {
+            "@type": "Organization",
+            "name": "Segundo Inquilino"
+          }
+        }
+      </script>
+
+      <link 
+        rel="canonical" 
+        href={`https://segundoinquilino.com.br/blog/${params.slug}`} 
+      />
     </main>
   )
 }

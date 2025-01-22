@@ -10,6 +10,7 @@ import SessionAlert from '@/components/SessionAlert'
 import GoogleAnalytics from '@/components/GoogleAnalytics'
 import LoginBanner from '@/components/LoginBanner'
 import { Toaster } from 'react-hot-toast'
+import Script from 'next/script'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -92,6 +93,10 @@ export default async function RootLayout({
     <html lang="pt-BR">
       <head>
         <GoogleAnalytics />
+        <Script
+          strategy="afterInteractive"
+          src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
+        />
       </head>
       <body className={inter.className}>
         <AuthProvider>
