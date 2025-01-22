@@ -20,7 +20,17 @@ const nextConfig = {
   eslint: {
     // Ignora erros de ESLint durante o build em produção
     ignoreDuringBuilds: true
-  }
+  },
+  async redirects() {
+    return [
+      // Remova ou comente o redirecionamento do blog
+      // {
+      //   source: '/blog',
+      //   destination: '/blog',
+      //   permanent: true,
+      // },
+    ]
+  },
 }
 
 module.exports = nextConfig 
