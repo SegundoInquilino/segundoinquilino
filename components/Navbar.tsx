@@ -43,6 +43,13 @@ export default function Navbar() {
     }
   }
 
+  const navigation = [
+    { name: 'Home', href: '/' },
+    { name: 'Como Funciona', href: '/#como-funciona' },
+    { name: 'Blog', href: '/blog' },
+    { name: 'Contato', href: '/#contato' },
+  ]
+
   return (
     <nav className="fixed top-0 left-0 right-0 bg-white shadow-sm z-50">
       <div className="max-w-7xl mx-auto px-4">

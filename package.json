@@ -14,6 +14,7 @@
     "@babel/runtime": "^7.22.5",
     "@headlessui/react": "^1.7.17",
     "@heroicons/react": "^2.2.0",
+    "@netlify/functions": "^2.6.0",
     "@radix-ui/react-alert-dialog": "^1.1.4",
     "@radix-ui/react-avatar": "^1.1.2",
     "@radix-ui/react-dialog": "^1.1.4",
@@ -48,13 +49,13 @@
     "tailwindcss-animate": "^1.0.7",
     "typescript": "5.7.2",
     "utf-8-validate": "^6.0.5",
-    "uuid": "^9.0.1",
-    "@netlify/functions": "^2.6.0"
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@netlify/plugin-nextjs": "^5.9.2",
     "@shadcn/ui": "^0.0.4",
     "@tailwindcss/forms": "^0.5.7",
+    "@tailwindcss/typography": "^0.5.16",
     "@types/cookie": "^0.5.4",
     "@types/json5": "^0.0.30",
     "@types/node": "^22.10.5",

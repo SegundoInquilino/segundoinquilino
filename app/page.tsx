@@ -359,6 +359,49 @@ export default function HomePage() {
           
           <ExampleReviewCarousel />
         </div>
+
+        <section className="py-12 bg-gray-50" id="blog">
+          <div className="container mx-auto px-4">
+            <div className="text-center">
+              <h2 className="text-3xl font-bold mb-4">Blog do Segundo Inquilino</h2>
+              <p className="text-gray-600 mb-8">
+                Encontre dicas valiosas e informações essenciais sobre aluguel de imóveis
+              </p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto mb-8">
+                <div className="bg-white p-6 rounded-lg shadow-sm">
+                  <h3 className="text-xl font-semibold mb-3">Guia do Inquilino</h3>
+                  <p className="text-gray-600 mb-4">Dicas essenciais para antes, durante e depois do aluguel</p>
+                </div>
+                
+                <div className="bg-white p-6 rounded-lg shadow-sm">
+                  <h3 className="text-xl font-semibold mb-3">Direitos e Deveres</h3>
+                  <p className="text-gray-600 mb-4">O que você precisa saber sobre legislação de aluguel</p>
+                </div>
+                
+                <div className="bg-white p-6 rounded-lg shadow-sm">
+                  <h3 className="text-xl font-semibold mb-3">Dicas de Vistoria</h3>
+                  <p className="text-gray-600 mb-4">Como fazer uma vistoria detalhada do imóvel</p>
+                </div>
+              </div>
+
+              <a 
+                href="/blog" 
+                className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-purple-800 hover:bg-purple-900"
+              >
+                Acessar o Blog
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  className="h-5 w-5 ml-2" 
+                  viewBox="0 0 20 20" 
+                  fill="currentColor"
+                >
+                  <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
+              </a>
+            </div>
+          </div>
+        </section>
       </div>
     </>
   )
