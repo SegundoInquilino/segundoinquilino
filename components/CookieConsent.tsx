@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
+import Link from 'next/link'
 
 export default function CookieConsent() {
   const [showConsent, setShowConsent] = useState(false)
@@ -28,9 +29,13 @@ export default function CookieConsent() {
           <div className="flex-1 pr-4">
             <p className="text-sm text-gray-700">
               Utilizamos cookies para melhorar sua experiência no site. Ao continuar navegando, você concorda com a nossa{' '}
-              <a href="/privacy" className="text-purple-600 hover:text-purple-800 underline">
+              <Link 
+                href="/privacy" 
+                className="text-purple-600 hover:text-purple-800 underline"
+              >
                 Política de Privacidade
-              </a>.
+              </Link>
+              .
             </p>
           </div>
           <div className="flex items-center gap-4">

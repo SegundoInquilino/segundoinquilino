@@ -8,6 +8,18 @@ import ReviewsList from '@/components/ReviewsList'
 import ReviewModal from '@/components/ReviewModal'
 import type { Review, Apartment } from '@/types/review'
 import { useAuth } from '@/contexts/AuthContext'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import { toast } from 'react-hot-toast'
 
 interface Profile {
   id: string
@@ -36,6 +48,7 @@ export default function ProfilePage() {
   const [selectedReview, setSelectedReview] = useState<Review | null>(null)
   const [showModal, setShowModal] = useState(false)
   const [fullName, setFullName] = useState('')
+  const [isDeleting, setIsDeleting] = useState(false)
 
   useEffect(() => {
     loadProfile()
@@ -155,6 +168,42 @@ export default function ProfilePage() {
       window.location.href = '/auth'
     } catch (error) {
       console.error('Erro ao fazer logout:', error)
+    }
+  }
+
+  const handleDeleteAccount = async () => {
+    setIsDeleting(true)
+    const supabase = createClient()
+
+    try {
+      // 1. Deletar reviews do usuário
+      await supabase
+        .from('reviews')
+        .delete()
+        .eq('user_id', supabase.auth.user()?.id)
+
+      // 2. Deletar perfil do usuário
+      await supabase
+        .from('profiles')
+        .delete()
+        .eq('id', supabase.auth.user()?.id)
+
+      // 3. Deletar conta do usuário
+      const { error } = await supabase.auth.api.deleteUser(
+        supabase.auth.user()?.id as string
+      )
+
+      if (error) throw error
+
+      // 4. Fazer logout e redirecionar
+      await supabase.auth.signOut()
+      router.push('/')
+      toast.success('Sua conta foi deletada com sucesso')
+    } catch (error) {
+      console.error('Erro ao deletar conta:', error)
+      toast.error('Erro ao deletar conta. Tente novamente.')
+    } finally {
+      setIsDeleting(false)
     }
   }
 
@@ -406,6 +455,109 @@ export default function ProfilePage() {
           <p className="mt-2 text-gray-600">
             Veja todas as reviews que foram respondidas para suas solicitações.
           </p>
+        </div>
+
+        <div className="mt-12 border-t pt-8">
+          <h2 className="text-2xl font-bold text-red-600 mb-4">Zona de Perigo</h2>
+          <p className="text-gray-600 mb-4">
+            Ao deletar sua conta, todos os seus dados serão permanentemente removidos.
+            Esta ação não pode ser desfeita.
+          </p>
+
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <button
+                className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-colors flex items-center space-x-2"
+                disabled={isDeleting}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                <span>{isDeleting ? 'Deletando...' : 'Deletar Conta'}</span>
+              </button>
+            </AlertDialogTrigger>
+            <AlertDialogContent className="bg-white rounded-2xl shadow-xl p-6 max-w-md mx-auto">
+              <AlertDialogHeader>
+                <AlertDialogTitle className="flex items-center space-x-2 text-2xl font-bold text-gray-900">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-8 w-8 text-red-600"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                    />
+                  </svg>
+                  <span>Confirmar exclusão</span>
+                </AlertDialogTitle>
+                <AlertDialogDescription className="mt-4 text-gray-600 space-y-3">
+                  <p>
+                    Você está prestes a deletar sua conta permanentemente. Esta ação não pode ser desfeita.
+                  </p>
+                  <div className="bg-red-50 p-4 rounded-lg">
+                    <h4 className="font-semibold text-red-800 mb-2">O que será deletado:</h4>
+                    <ul className="text-red-700 space-y-1">
+                      <li className="flex items-center">
+                        <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                        </svg>
+                        Seu perfil e informações pessoais
+                      </li>
+                      <li className="flex items-center">
+                        <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                        </svg>
+                        Todas as suas reviews
+                      </li>
+                      <li className="flex items-center">
+                        <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                        </svg>
+                        Histórico de interações
+                      </li>
+                    </ul>
+                  </div>
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter className="mt-6 flex space-x-4">
+                <AlertDialogCancel className="flex-1 px-4 py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
+                  Cancelar
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={handleDeleteAccount}
+                  className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center space-x-2"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  <span>Sim, deletar minha conta</span>
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </div>
 
