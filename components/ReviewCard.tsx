@@ -32,6 +32,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import ImageCarousel from './ImageCarousel'
 
 // Funções auxiliares
 const getInitials = (name?: string) => {
@@ -138,6 +139,14 @@ export default function ReviewCard({
       <div className={`w-full ${isModal ? 'p-6' : 'p-4'} bg-white rounded-lg shadow-md`}>
         {!isModal ? (
           <>
+            {/* Adiciona o carrossel se houver imagens */}
+            {review.images && review.images.length > 0 && (
+              <ImageCarousel 
+                images={review.images} 
+                alt={`Review de ${review.apartments?.name || 'apartamento'}`}
+              />
+            )}
+
             <div className="flex justify-between items-start mb-4">
               <div className="flex items-center gap-2">
                 <Avatar className="w-8 h-8">

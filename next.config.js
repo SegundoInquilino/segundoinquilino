@@ -21,6 +21,13 @@ const nextConfig = {
     // Ignora erros de ESLint durante o build em produção
     ignoreDuringBuilds: true
   },
+  images: {
+    domains: [
+      'ejoivntarqlinulkiure.supabase.co', // Domínio do Supabase Storage
+      'lh3.googleusercontent.com', // Para avatares do Google
+      'avatars.githubusercontent.com' // Para avatares do GitHub
+    ]
+  },
   async redirects() {
     return [
       // Remova ou comente o redirecionamento do blog
