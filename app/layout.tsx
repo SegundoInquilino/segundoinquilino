@@ -11,6 +11,7 @@ import GoogleAnalytics from '@/components/GoogleAnalytics'
 import LoginBanner from '@/components/LoginBanner'
 import { Toaster } from 'react-hot-toast'
 import Script from 'next/script'
+import CookieConsent from '@/components/CookieConsent'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -97,6 +98,12 @@ export default async function RootLayout({
           strategy="afterInteractive"
           src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
         />
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#7C3AED" />
+        <link rel="apple-touch-icon" href="/images/Logo_SI_icon.png" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Segundo Inquilino" />
       </head>
       <body className={inter.className}>
         <AuthProvider>
@@ -127,6 +134,9 @@ export default async function RootLayout({
               </div>
             </div>
           </footer>
+          
+          {/* Adicionar o banner de cookies */}
+          <CookieConsent />
         </AuthProvider>
         <Toaster />
       </body>
