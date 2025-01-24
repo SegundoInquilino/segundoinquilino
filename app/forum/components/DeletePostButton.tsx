@@ -8,7 +8,7 @@ import { TrashIcon } from '@heroicons/react/24/outline'
 interface DeletePostButtonProps {
   postId: string
   postAuthorId: string
-  currentUserId?: string
+  currentUserId?: string | null
 }
 
 export default function DeletePostButton({ 

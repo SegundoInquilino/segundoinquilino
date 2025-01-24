@@ -26,18 +26,21 @@ export default function NewCommentForm({ postId, onCommentAdded }: NewCommentFor
 
     try {
       setIsSubmitting(true)
+      console.log('Enviando comentário para o post:', postId) // Debug
 
       const { error } = await supabase
         .from('forum_comments')
-        .insert([
-          {
-            content,
-            post_id: postId,
-            user_id: currentUserId
-          }
-        ])
+        .insert({
+          content,
+          post_id: postId,
+          user_id: currentUserId
+          // Remover created_at, deixar o banco definir automaticamente
+        })
 
-      if (error) throw error
+      if (error) {
+        console.error('Erro do Supabase:', error)
+        throw new Error(error.message || 'Erro ao adicionar comentário')
+      }
 
       toast.success('Comentário adicionado com sucesso!')
       setContent('')
@@ -47,7 +50,8 @@ export default function NewCommentForm({ postId, onCommentAdded }: NewCommentFor
       }
     } catch (error) {
       console.error('Erro ao adicionar comentário:', error)
-      toast.error('Erro ao adicionar comentário. Tente novamente.')
+      const message = error instanceof Error ? error.message : 'Erro ao adicionar comentário. Tente novamente.'
+      toast.error(message)
     } finally {
       setIsSubmitting(false)
     }
