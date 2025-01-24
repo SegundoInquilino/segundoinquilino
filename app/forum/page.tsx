@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { toast } from 'react-hot-toast'
 import NewPostButton from './components/NewPostButton'
-import DeletePostButton from './components/DeletePostButton'
+import DeletePostButton from '@/components/DeletePostButton'
 import Link from 'next/link'
 import { categories } from './constants'
 
@@ -142,6 +142,7 @@ export default function ForumPage() {
                     postId={post.id}
                     postAuthorId={post.user_id}
                     currentUserId={currentUserId}
+                    onPostDeleted={loadPosts}
                   />
                 </div>
                 <p className="text-gray-600 mt-3 mb-4 line-clamp-2">{post.content}</p>

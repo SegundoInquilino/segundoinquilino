@@ -126,82 +126,68 @@ export default function Sidebar({ isOpen, onClose, currentUserId }: SidebarProps
 
   return (
     <>
-      {/* Overlay clicável */}
-      <div
-        className={`fixed inset-0 bg-black/50 transition-opacity z-40 ${
-          isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
-        }`}
+      {/* Overlay - ajuste apenas na opacidade */}
+      <div 
+        className={`fixed inset-0 bg-black/30 backdrop-blur-sm z-40 transition-opacity duration-300 ease-in-out
+          ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
         onClick={onClose}
       />
 
-      {/* Sidebar */}
+      {/* Sidebar - mudando apenas o posicionamento para esquerda */}
       <div
-        className={`fixed inset-y-0 left-0 w-64 bg-black transform transition-transform z-50 ${
-          isOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
+        className={`fixed top-0 left-0 h-full w-64 bg-white shadow-lg z-50 transform transition-transform duration-300 ease-in-out
+          ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
       >
-        <div className="h-full flex flex-col">
+        {/* Cabeçalho - ajuste nas cores */}
+        <div className="flex justify-between items-center p-4 border-b border-gray-100">
+          <h2 className="text-lg font-semibold text-primary-600">Menu</h2>
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 text-white/70 hover:text-white"
+            className="p-2 rounded-full hover:bg-gray-100 text-gray-500 hover:text-gray-700 transition-colors"
           >
-            <XMarkIcon className="w-6 h-6" />
+            <XMarkIcon className="h-6 w-6" />
           </button>
+        </div>
 
-          {/* Perfil do usuário */}
-          {currentUserId && userProfile && (
-            <div className="p-6 border-b border-gray-200">
-              <div className="flex items-center space-x-3 mb-3">
-                <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
-                  <span className="text-xl text-gray-700 font-medium">
-                    {userProfile.username.charAt(0).toUpperCase()}
-                  </span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-gray-700 font-medium truncate">
-                    {userProfile.username}
-                  </h3>
-                  <p className="text-gray-500 text-sm truncate">
-                    {userProfile.email}
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
+        {/* Links - modernização do estilo mantendo a estrutura */}
+        <nav className="p-4 space-y-2">
+          {menuItems.map((item) => (
+            (!item.requiresAuth || currentUserId) && (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="flex items-center space-x-2 px-4 py-2.5 rounded-lg text-gray-600 hover:text-primary-600 hover:bg-primary-50 transition-all duration-200"
+                onClick={onClose}
+              >
+                <item.icon className="h-5 w-5" />
+                <span>{item.name}</span>
+              </Link>
+            )
+          ))}
+        </nav>
 
-          {/* Menu de navegação */}
-          <div className="flex-1 p-6">
-            <nav className="space-y-2">
-              {menuItems.map((item) => (
-                (!item.requiresAuth || currentUserId) && (
-                  <Link 
-                    key={item.href}
-                    href={item.href}
-                    className={`flex items-center gap-2 px-4 py-2.5 rounded-lg transition-all duration-200 ${
-                      isCurrentPath(item.href)
-                        ? 'bg-white text-black font-medium shadow-sm'
-                        : 'text-gray-300 hover:bg-white/10 hover:text-white'
-                    }`}
-                    onClick={onClose}
-                  >
-                    <item.icon className="w-5 h-5" />
-                    <span>{item.name}</span>
-                  </Link>
-                )
-              ))}
-
-              {/* Remover o link duplicado do Fórum */}
-              
-              {currentUserId && (
+        {/* Botões de ação - modernização mantendo a estrutura */}
+        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-100">
+          <div className="space-y-3">
+            {currentUserId && (
+              <>
+                <Link
+                  href="/profile"
+                  className="flex items-center justify-center w-full px-4 py-2 text-primary-600 bg-primary-50 hover:bg-primary-100 rounded-lg transition-colors"
+                  onClick={onClose}
+                >
+                  <UserCircleIcon className="h-5 w-5 mr-2" />
+                  Perfil
+                </Link>
                 <button
                   onClick={handleSignOut}
-                  className="w-full flex items-center gap-2 px-4 py-2.5 text-gray-300 hover:bg-red-600 hover:text-white rounded-lg transition-all duration-200"
+                  className="flex items-center justify-center w-full px-4 py-2 text-gray-600 hover:text-gray-800 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
                 >
-                  <ArrowRightOnRectangleIcon className="w-5 h-5" />
-                  <span>Log out</span>
+                  <ArrowRightOnRectangleIcon className="h-5 w-5 mr-2" />
+                  Sair
                 </button>
-              )}
-            </nav>
+              </>
+            )}
           </div>
         </div>
       </div>

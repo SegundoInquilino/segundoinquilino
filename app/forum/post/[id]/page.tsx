@@ -5,10 +5,10 @@ import { useAuth } from '@/contexts/AuthContext'
 import { toast } from 'react-hot-toast'
 import Link from 'next/link'
 import { ArrowLeftIcon } from '@heroicons/react/24/outline'
-import DeletePostButton from '../../components/DeletePostButton'
 import NewCommentForm from './components/NewCommentForm'
 import CommentsList from './components/CommentsList'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
+import DeletePostButton from '@/components/DeletePostButton'
 
 interface ForumPost {
   id: string
@@ -29,6 +29,7 @@ export default function PostPage() {
   const [loading, setLoading] = useState(true)
   const [commentsKey, setCommentsKey] = useState(0)
   const params = useParams()
+  const router = useRouter()
   const postId = params?.id as string
 
   useEffect(() => {
@@ -69,6 +70,10 @@ export default function PostPage() {
 
   const handleCommentAdded = () => {
     setCommentsKey(prev => prev + 1)
+  }
+
+  const handlePostDeleted = () => {
+    router.push('/forum')
   }
 
   if (loading) {
@@ -123,6 +128,7 @@ export default function PostPage() {
               postId={post.id}
               postAuthorId={post.user_id}
               currentUserId={currentUserId}
+              onPostDeleted={handlePostDeleted}
             />
           </div>
           

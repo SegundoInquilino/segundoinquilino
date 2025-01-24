@@ -33,8 +33,12 @@ export const handler: Handler = async (event) => {
       .gte('created_at', oneWeekAgo.toISOString())
       .order('rating', { ascending: false })
 
+    // Verificação de nulo com valores padrão
+    const usersData = users ?? []
+    const newReviewsData = newReviews ?? []
+
     // Envia email para cada usuário
-    for (const user of users) {
+    for (const user of usersData) {
       const msg = {
         to: user.email,
         from: {
@@ -44,8 +48,8 @@ export const handler: Handler = async (event) => {
         subject: 'Resumo Semanal - Segundo Inquilino',
         html: weeklyDigestTemplate({
           userName: user.full_name || 'Usuário',
-          newReviewsCount: newReviews.length,
-          topReviews: newReviews.slice(0, 3).map(review => ({
+          newReviewsCount: newReviewsData.length,
+          topReviews: newReviewsData.slice(0, 3).map(review => ({
             title: review.apartments.building_name,
             rating: review.rating
           }))

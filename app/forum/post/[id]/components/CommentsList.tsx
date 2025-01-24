@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/utils/supabase-client'
 import { useAuth } from '@/contexts/AuthContext'
 import { toast } from 'react-hot-toast'
-import DeleteCommentButton from './DeleteCommentButton'
+import DeleteCommentButton from '@/components/DeleteCommentButton'
 
 interface Comment {
   id: string
@@ -125,6 +125,7 @@ export default function CommentsList({ postId }: CommentsListProps) {
                 commentId={comment.id}
                 commentAuthorId={comment.user_id}
                 currentUserId={currentUserId}
+                onCommentDeleted={loadComments}
               />
             </div>
           </div>
