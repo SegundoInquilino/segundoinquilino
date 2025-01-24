@@ -24,9 +24,14 @@ export default function NewCommentForm({ postId, onCommentAdded }: NewCommentFor
       return
     }
 
+    if (!postId) {
+      toast.error('ID do post inválido')
+      return
+    }
+
     try {
       setIsSubmitting(true)
-      console.log('Enviando comentário para o post:', postId) // Debug
+      console.log('Debug - postId:', postId, 'currentUserId:', currentUserId)
 
       const { error } = await supabase
         .from('forum_comments')
@@ -34,8 +39,8 @@ export default function NewCommentForm({ postId, onCommentAdded }: NewCommentFor
           content,
           post_id: postId,
           user_id: currentUserId
-          // Remover created_at, deixar o banco definir automaticamente
         })
+        .select()
 
       if (error) {
         console.error('Erro do Supabase:', error)

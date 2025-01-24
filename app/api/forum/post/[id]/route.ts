@@ -7,24 +7,10 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    // Garantir que cookies() seja await
     const cookieStore = await cookies()
     const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
 
-    // Primeiro verificar se o post existe
-    const { data: postExists } = await supabase
-      .from('forum_posts')
-      .select('id')
-      .eq('id', params.id)
-      .limit(1)
-
-    if (!postExists?.length) {
-      return NextResponse.json({
-        error: 'Post não encontrado'
-      }, { status: 404 })
-    }
-
-    // Buscar post com todos os detalhes
+    // Buscar o post
     const { data: post, error: postError } = await supabase
       .from('forum_posts')
       .select(`
@@ -32,41 +18,55 @@ export async function GET(
         title,
         content,
         created_at,
-        user_id
+        user_id,
+        category,
+        user:profiles(username, avatar_url)
       `)
       .eq('id', params.id)
-      .limit(1)
       .single()
 
     if (postError) {
       console.error('Erro ao buscar post:', postError)
       return NextResponse.json({
-        error: 'Erro ao buscar post',
-        details: postError.message
+        error: postError.message || 'Erro ao buscar post'
       }, { status: 500 })
     }
 
-    // Buscar informações do usuário separadamente
-    const { data: userData, error: userError } = await supabase
-      .from('profiles')
-      .select('username, avatar_url')
-      .eq('id', post.user_id)
-      .limit(1)
-      .single()
-
-    if (userError) {
-      console.error('Erro ao buscar usuário:', userError)
+    if (!post) {
+      return NextResponse.json({
+        error: 'Post não encontrado'
+      }, { status: 404 })
     }
 
-    // Combinar os dados
-    const postWithUser = {
-      ...post,
-      user: userData || null
+    // Buscar comentários do post
+    const { data: comments, error: commentsError } = await supabase
+      .from('forum_comments')
+      .select(`
+        id,
+        content,
+        created_at,
+        user_id,
+        user:profiles(username, avatar_url)
+      `)
+      .eq('post_id', params.id)
+      .order('created_at', { ascending: true })
+
+    if (commentsError) {
+      console.error('Erro ao buscar comentários:', commentsError)
+      // Não falhar completamente se os comentários derem erro
+      return NextResponse.json({
+        post,
+        comments: [],
+        error: 'Erro ao carregar comentários'
+      })
     }
 
-    return NextResponse.json({ post: postWithUser })
+    return NextResponse.json({
+      post,
+      comments: comments || []
+    })
   } catch (error) {
-    console.error('Erro inesperado:', error)
+    console.error('Erro na API:', error)
     return NextResponse.json({
       error: 'Erro interno do servidor',
       details: error instanceof Error ? error.message : 'Erro desconhecido'

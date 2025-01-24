@@ -16,6 +16,7 @@ interface ForumPost {
   content: string
   user_id: string
   created_at: string
+  category: string
   user?: {
     username: string
     avatar_url?: string
@@ -44,17 +45,23 @@ export default function PostPage() {
       const data = await response.json()
       
       if (!response.ok) {
-        throw new Error(data.details || data.error || 'Erro ao carregar post')
+        console.error('Erro na resposta:', data)
+        throw new Error(data.error || 'Erro ao carregar post')
       }
       
       if (!data.post) {
         throw new Error('Post não encontrado')
       }
-      
+
       setPost(data.post)
+
     } catch (error) {
       console.error('Erro ao carregar post:', error)
-      toast.error('Não foi possível carregar o post')
+      toast.error(
+        error instanceof Error 
+          ? error.message 
+          : 'Não foi possível carregar o post'
+      )
     } finally {
       setLoading(false)
     }
@@ -140,7 +147,7 @@ export default function PostPage() {
             {currentUserId && (
               <div className="mb-6">
                 <NewCommentForm 
-                  postId={post.id} 
+                  postId={post?.id || ''}
                   onCommentAdded={handleCommentAdded}
                 />
               </div>

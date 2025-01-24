@@ -11,10 +11,8 @@ interface Comment {
   content: string
   created_at: string
   user_id: string
-  user?: {
-    username: string
-    avatar_url?: string
-  } | null
+  username: string
+  avatar_url?: string
 }
 
 interface CommentsListProps {
@@ -28,31 +26,40 @@ export default function CommentsList({ postId }: CommentsListProps) {
   const supabase = createClient()
 
   useEffect(() => {
-    loadComments()
+    if (postId) {
+      loadComments()
+    }
   }, [postId])
 
   const loadComments = async () => {
     try {
       setLoading(true)
+      console.log('Carregando comentários para o post:', postId)
       
       const { data, error } = await supabase
-        .from('forum_comments')
+        .from('forum_comments_with_users')
         .select(`
           id,
           content,
           created_at,
           user_id,
-          user:profiles(username, avatar_url)
+          username,
+          avatar_url
         `)
         .eq('post_id', postId)
         .order('created_at', { ascending: true })
 
-      if (error) throw error
+      if (error) {
+        console.error('Erro do Supabase:', error)
+        throw new Error(error.message || 'Erro ao carregar comentários')
+      }
 
+      console.log('Comentários carregados:', data)
       setComments(data || [])
     } catch (error) {
       console.error('Erro ao carregar comentários:', error)
-      toast.error('Erro ao carregar comentários')
+      const message = error instanceof Error ? error.message : 'Erro ao carregar comentários'
+      toast.error(message)
     } finally {
       setLoading(false)
     }
@@ -97,7 +104,7 @@ export default function CommentsList({ postId }: CommentsListProps) {
               <div className="flex-1">
                 <div className="flex items-center space-x-2 mb-2">
                   <span className="font-medium text-gray-900">
-                    {comment.user?.username}
+                    {comment.username}
                   </span>
                   <span className="text-gray-400">•</span>
                   <span className="text-gray-500 text-sm">
