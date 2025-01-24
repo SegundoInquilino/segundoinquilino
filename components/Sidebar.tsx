@@ -13,7 +13,8 @@ import {
   XMarkIcon,
   BellIcon,
   Squares2X2Icon,
-  DocumentTextIcon
+  DocumentTextIcon,
+  ChatBubbleLeftRightIcon
 } from '@heroicons/react/24/outline'
 
 interface SidebarProps {
@@ -114,6 +115,12 @@ export default function Sidebar({ isOpen, onClose, currentUserId }: SidebarProps
       href: '/blog',
       icon: DocumentTextIcon,
       requiresAuth: false
+    },
+    {
+      name: 'Fórum',
+      href: '/forum',
+      icon: ChatBubbleLeftRightIcon,
+      requiresAuth: false
     }
   ]
 
@@ -143,18 +150,18 @@ export default function Sidebar({ isOpen, onClose, currentUserId }: SidebarProps
 
           {/* Perfil do usuário */}
           {currentUserId && userProfile && (
-            <div className="p-6 border-b border-white/10">
+            <div className="p-6 border-b border-gray-200">
               <div className="flex items-center space-x-3 mb-3">
-                <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
-                  <span className="text-xl text-white font-medium">
+                <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
+                  <span className="text-xl text-gray-700 font-medium">
                     {userProfile.username.charAt(0).toUpperCase()}
                   </span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-white font-medium truncate">
+                  <h3 className="text-gray-700 font-medium truncate">
                     {userProfile.username}
                   </h3>
-                  <p className="text-gray-300 text-sm truncate">
+                  <p className="text-gray-500 text-sm truncate">
                     {userProfile.email}
                   </p>
                 </div>
@@ -182,6 +189,8 @@ export default function Sidebar({ isOpen, onClose, currentUserId }: SidebarProps
                   </Link>
                 )
               ))}
+
+              {/* Remover o link duplicado do Fórum */}
               
               {currentUserId && (
                 <button

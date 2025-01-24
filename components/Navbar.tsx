@@ -107,6 +107,27 @@ export default function Navbar() {
                 Entrar
               </Link>
             )}
+            
+            <Link
+              href="/forum"
+              className="ml-8 inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-700 hover:text-primary-600"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 mr-1.5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a2 2 0 01-2-2v-6a2 2 0 012-2h8a2 2 0 002-2V6a2 2 0 00-2-2H9a2 2 0 00-2 2v2"
+                />
+              </svg>
+              Fórum
+            </Link>
           </div>
         </div>
       </div>
