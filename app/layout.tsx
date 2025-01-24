@@ -12,7 +12,7 @@ import LoginBanner from '@/components/LoginBanner'
 import { Toaster } from 'react-hot-toast'
 import Script from 'next/script'
 import CookieConsent from '@/components/CookieConsent'
-import { useEffect } from 'react'
+import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -65,21 +65,6 @@ export const metadata: Metadata = {
   manifest: '/site.webmanifest',
 }
 
-const registerServiceWorker = () => {
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js').then(
-        (registration) => {
-          console.log('ServiceWorker registration successful')
-        },
-        (err) => {
-          console.log('ServiceWorker registration failed: ', err)
-        }
-      )
-    })
-  }
-}
-
 export default async function RootLayout({
   children,
 }: {
@@ -106,10 +91,6 @@ export default async function RootLayout({
     }
   }
 
-  useEffect(() => {
-    registerServiceWorker()
-  }, [])
-
   return (
     <html lang="pt-BR">
       <head>
@@ -134,6 +115,7 @@ export default async function RootLayout({
         <link rel="apple-touch-icon" type="image/png" sizes="512x512" href="/images/Logo_SI_icon_512x512.png" />
       </head>
       <body className={inter.className}>
+        <ServiceWorkerRegistration />
         <AuthProvider>
           <SessionAlert />
           <LoginBanner show={!session?.user} />
