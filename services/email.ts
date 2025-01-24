@@ -41,8 +41,10 @@ export const sendCommentNotification = async ({
 
   try {
     await sgMail.send(msg)
+    console.log('Email enviado com sucesso para:', to)
   } catch (error) {
     console.error('Erro ao enviar email:', error)
+    throw error // Propagar o erro para tratamento adequado
   }
 }
 

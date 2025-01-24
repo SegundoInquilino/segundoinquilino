@@ -1,10 +1,10 @@
 {
   "name": "Segundo Inquilino",
-  "short_name": "Segundo Inquilino",
-  "description": "Avaliações e dicas sobre aluguel de imóveis",
+  "short_name": "SegundoInquilino",
+  "description": "Avaliações e reviews de apartamentos para aluguel",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#FFFFFF",
+  "background_color": "#ffffff",
   "theme_color": "#7C3AED",
   "icons": [
     {
@@ -16,7 +16,8 @@
     {
       "src": "/images/Logo_SI_icon_512x512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 } 

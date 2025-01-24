@@ -20,12 +20,16 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { toast } from 'react-hot-toast'
+import { User } from '@supabase/supabase-js'
+import ProfileForm from '@/components/ProfileForm'
 
 interface Profile {
   id: string
   username: string
-  full_name: string
-  avatar_url: string
+  avatar_url?: string
+  full_name?: string
+  website?: string
+  updated_at?: string
 }
 
 interface UserMap {
@@ -49,34 +53,38 @@ export default function ProfilePage() {
   const [showModal, setShowModal] = useState(false)
   const [fullName, setFullName] = useState('')
   const [isDeleting, setIsDeleting] = useState(false)
+  const [user, setUser] = useState<User | null>(null)
+  const [profile, setProfile] = useState<Profile | null>(null)
+  const supabase = createClient()
 
   useEffect(() => {
-    loadProfile()
+    loadProfileData()
   }, [])
 
-  const loadProfile = async () => {
+  const loadProfileData = async () => {
     try {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
+      setLoading(true)
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession()
       
-      if (!user) {
+      if (sessionError) throw sessionError
+      
+      if (!session?.user) {
         router.push('/auth')
         return
       }
 
-      setCurrentUserId(user.id)
+      setUser(session.user)
+      setCurrentUserId(session.user.id)
 
-      const { data: profile } = await supabase
+      const { data: profileData, error: profileError } = await supabase
         .from('profiles')
-        .select('username, email, full_name, avatar_url')
-        .eq('id', user.id)
+        .select('*')
+        .eq('id', session.user.id)
         .single()
 
-      if (profile) {
-        setUsername(profile.username || '')
-        setEmail(profile.email || '')
-        setFullName(profile.full_name || '')
-      }
+      if (profileError) throw profileError
+
+      setProfile(profileData)
 
       // Usar a mesma query das outras páginas
       const { data: reviewsData } = await supabase
@@ -86,7 +94,7 @@ export default function ProfilePage() {
           apartments (*),
           likes_count:review_likes(count)
         `)
-        .eq('user_id', user.id)
+        .eq('user_id', session.user.id)
         .order('created_at', { ascending: false })
 
       if (reviewsData) {
@@ -94,7 +102,7 @@ export default function ProfilePage() {
 
         // Criar userMap
         const newUserMap: Record<string, string> = {}
-        newUserMap[user.id] = profile?.username || 'Usuário'
+        newUserMap[session.user.id] = profileData?.username || 'Usuário'
         setUserMap(newUserMap)
       }
 
@@ -102,19 +110,19 @@ export default function ProfilePage() {
       const { count: comments } = await supabase
         .from('review_comments')
         .select('id', { count: 'exact' })
-        .eq('user_id', user.id)
+        .eq('user_id', session.user.id)
 
       const { count: likes } = await supabase
         .from('review_likes')
         .select('id', { count: 'exact' })
-        .eq('user_id', user.id)
+        .eq('user_id', session.user.id)
 
       setCommentsCount(comments || 0)
       setLikesCount(likes || 0)
 
     } catch (error) {
-      console.error('Erro ao carregar perfil:', error)
-      router.push('/auth')
+      console.error('Error loading profile:', error)
+      toast.error('Erro ao carregar perfil')
     } finally {
       setLoading(false)
     }
@@ -125,18 +133,13 @@ export default function ProfilePage() {
     setSaving(true)
     setMessage(null)
 
-    const supabase = createClient()
-
     try {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) throw new Error('Usuário não autenticado')
-
       const { error } = await supabase
         .from('profiles')
         .update({
           full_name: fullName
         })
-        .eq('id', user.id)
+        .eq('id', user?.id)
 
       if (error) throw error
 
@@ -162,7 +165,6 @@ export default function ProfilePage() {
 
   const handleLogout = async () => {
     try {
-      const supabase = createClient()
       await supabase.auth.signOut()
       setCurrentUserId(null)
       window.location.href = '/auth'
@@ -173,27 +175,25 @@ export default function ProfilePage() {
 
   const handleDeleteAccount = async () => {
     setIsDeleting(true)
-    const supabase = createClient()
 
     try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.user) throw new Error('Usuário não encontrado')
+
       // 1. Deletar reviews do usuário
       await supabase
         .from('reviews')
         .delete()
-        .eq('user_id', supabase.auth.user()?.id)
+        .eq('user_id', session.user.id)
 
       // 2. Deletar perfil do usuário
       await supabase
         .from('profiles')
         .delete()
-        .eq('id', supabase.auth.user()?.id)
+        .eq('id', session.user.id)
 
       // 3. Deletar conta do usuário
-      const { error } = await supabase.auth.api.deleteUser(
-        supabase.auth.user()?.id as string
-      )
-
-      if (error) throw error
+      await supabase.auth.admin.deleteUser(session.user.id)
 
       // 4. Fazer logout e redirecionar
       await supabase.auth.signOut()
@@ -396,7 +396,7 @@ export default function ProfilePage() {
                 userMap={userMap}
                 currentUserId={currentUserId}
                 onReviewDeleted={() => {
-                  loadProfile()
+                  loadProfileData()
                 }}
                 layout="square"
               />
@@ -586,7 +586,7 @@ export default function ProfilePage() {
                 isDeleting={false}
                 onDelete={async () => {
                   setShowModal(false)
-                  await loadProfile()
+                  await loadProfileData()
                 }}
               />
             </div>
