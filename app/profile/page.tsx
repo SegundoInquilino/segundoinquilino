@@ -28,6 +28,7 @@ interface Profile {
   username: string
   avatar_url?: string
   full_name?: string
+  email?: string
   website?: string
   updated_at?: string
 }
@@ -84,9 +85,19 @@ export default function ProfilePage() {
 
       if (profileError) throw profileError
 
-      setProfile(profileData)
+      const completeProfile = {
+        ...profileData,
+        id: session.user.id,
+        email: session.user.email || '',
+        username: profileData.username || '',
+        full_name: profileData.full_name || ''
+      }
 
-      // Usar a mesma query das outras páginas
+      setProfile(completeProfile)
+      setUsername(completeProfile.username)
+      setEmail(session.user.email || '')
+      setFullName(completeProfile.full_name)
+
       const { data: reviewsData } = await supabase
         .from('reviews')
         .select(`
@@ -100,13 +111,11 @@ export default function ProfilePage() {
       if (reviewsData) {
         setReviews(reviewsData as Review[])
 
-        // Criar userMap
         const newUserMap: Record<string, string> = {}
         newUserMap[session.user.id] = profileData?.username || 'Usuário'
         setUserMap(newUserMap)
       }
 
-      // Buscar contagens
       const { count: comments } = await supabase
         .from('review_comments')
         .select('id', { count: 'exact' })
@@ -180,22 +189,18 @@ export default function ProfilePage() {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session?.user) throw new Error('Usuário não encontrado')
 
-      // 1. Deletar reviews do usuário
       await supabase
         .from('reviews')
         .delete()
         .eq('user_id', session.user.id)
 
-      // 2. Deletar perfil do usuário
       await supabase
         .from('profiles')
         .delete()
         .eq('id', session.user.id)
 
-      // 3. Deletar conta do usuário
       await supabase.auth.admin.deleteUser(session.user.id)
 
-      // 4. Fazer logout e redirecionar
       await supabase.auth.signOut()
       router.push('/')
       toast.success('Sua conta foi deletada com sucesso')
@@ -424,7 +429,7 @@ export default function ProfilePage() {
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
               </svg>
-              <span>Sair da conta</span>
+              <span>Log Out</span>
             </button>
           </div>
         </div>

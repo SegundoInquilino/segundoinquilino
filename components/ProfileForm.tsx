@@ -10,6 +10,7 @@ interface ProfileFormProps {
   profile: {
     id: string
     username?: string
+    email?: string
     full_name?: string
     avatar_url?: string
   }
@@ -42,12 +43,12 @@ export default function ProfileForm({ profile, onSubmit, loading }: ProfileFormP
         {profile.avatar_url ? (
           <Avatar className="w-20 h-20">
             <AvatarImage src={profile.avatar_url} />
-            <AvatarFallback className="bg-gradient-to-br from-primary-500 to-secondary-500 text-white text-2xl font-bold shadow-lg transform hover:scale-105 transition-all duration-200">
+            <AvatarFallback className="bg-gradient-to-br from-primary-500 to-secondary-500 text-white text-2xl font-bold">
               {getInitials(profile.full_name || '')}
             </AvatarFallback>
           </Avatar>
         ) : (
-          <div className="w-20 h-20 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-lg transform hover:scale-105 transition-all duration-200">
+          <div className="w-20 h-20 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-full flex items-center justify-center text-white text-2xl font-bold">
             {getInitials(profile.full_name || '')}
           </div>
         )}
@@ -84,6 +85,21 @@ export default function ProfileForm({ profile, onSubmit, loading }: ProfileFormP
           />
           <p className="mt-1 text-sm text-gray-500">
             O nome de usuário não pode ser alterado
+          </p>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Email
+          </label>
+          <input
+            type="email"
+            value={profile.email}
+            disabled
+            className="w-full p-2 border rounded-md bg-gray-50"
+          />
+          <p className="mt-1 text-sm text-gray-500">
+            O email não pode ser alterado por questões de segurança
           </p>
         </div>
 
