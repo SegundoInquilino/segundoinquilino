@@ -22,6 +22,7 @@ import {
 import { toast } from 'react-hot-toast'
 import { User } from '@supabase/supabase-js'
 import ProfileForm from '@/components/ProfileForm'
+import { ArrowRightOnRectangleIcon } from '@heroicons/react/24/outline'
 
 interface Profile {
   id: string
@@ -353,21 +354,18 @@ export default function ProfilePage() {
               </form>
             </div>
 
-            <div className="bg-white rounded-xl shadow-lg p-6 space-y-4">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">Reviews</h3>
-                <p className="text-3xl font-bold text-primary-600">{reviewsCount}</p>
-                <p className="text-sm text-gray-600">Reviews publicadas</p>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">Comentários</h3>
-                <p className="text-3xl font-bold text-primary-600">{commentsCount}</p>
-                <p className="text-sm text-gray-600">Comentários feitos</p>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">Curtidas</h3>
-                <p className="text-3xl font-bold text-primary-600">{likesCount}</p>
-                <p className="text-sm text-gray-600">Curtidas recebidas</p>
+            <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-6 mb-6">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                Ações da Conta
+              </h2>
+              <div className="space-y-4">
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center px-4 py-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+                >
+                  <ArrowRightOnRectangleIcon className="w-5 h-5 mr-2" />
+                  Log Out
+                </button>
               </div>
             </div>
           </div>
@@ -406,31 +404,6 @@ export default function ProfilePage() {
                 layout="square"
               />
             )}
-          </div>
-        </div>
-
-        <div className="mt-8 bg-white rounded-xl shadow-lg p-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Ações da conta</h3>
-          <div className="space-y-4">
-            <button
-              onClick={() => router.push('/reviews')}
-              className="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-50 flex items-center space-x-3"
-            >
-              <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-              </svg>
-              <span>Minhas Reviews</span>
-            </button>
-
-            <button
-              onClick={handleLogout}
-              className="w-full text-left px-4 py-3 rounded-lg hover:bg-red-50 flex items-center space-x-3 text-red-600"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-              </svg>
-              <span>Log Out</span>
-            </button>
           </div>
         </div>
 

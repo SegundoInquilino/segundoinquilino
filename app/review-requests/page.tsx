@@ -2,6 +2,7 @@ import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import ReviewRequestsClient from './client'
+import DeleteReviewRequestButton from '@/components/DeleteReviewRequestButton'
 
 export default async function ReviewRequestsPage() {
   const cookieStore = cookies()
@@ -17,7 +18,7 @@ export default async function ReviewRequestsPage() {
 
   const { data: requests } = await supabase
     .from('review_requests')
-    .select('*')
+    .select('*, user_email')
     .order('created_at', { ascending: false })
 
   return <ReviewRequestsClient initialRequests={requests || []} user={session.user} />

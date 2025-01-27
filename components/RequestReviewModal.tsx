@@ -34,6 +34,9 @@ export default function RequestReviewModal({ isOpen, onClose }: RequestReviewMod
     setError('')
 
     try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) throw new Error('Não autorizado')
+
       const expiresAt = new Date()
       expiresAt.setDate(expiresAt.getDate() + 7) // 7 dias a partir de hoje
 
@@ -44,7 +47,8 @@ export default function RequestReviewModal({ isOpen, onClose }: RequestReviewMod
         city: formData.city.trim(),
         state: formData.state.trim(),
         zip_code: formData.zip_code.trim(),
-        email: formData.email.trim(),
+        user_id: session.user.id,
+        user_email: session.user.email,
         notes: formData.notes.trim() || null,
         status: 'pending',
         expires_at: expiresAt.toISOString()

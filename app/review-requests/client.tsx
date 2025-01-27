@@ -1,7 +1,7 @@
 'use client'
 
 import { User } from '@supabase/auth-helpers-nextjs'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import RequestReviewModal from '@/components/RequestReviewModal'
 import { Database } from '@/types/supabase'
@@ -9,6 +9,7 @@ import { formatDistanceToNow } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { createClient } from '@/utils/supabase-client'
 import { toast } from 'react-hot-toast'
+import DeleteReviewRequestButton from '@/components/DeleteReviewRequestButton'
 
 type ReviewRequest = Database['public']['Tables']['review_requests']['Row'] & {
   id: string
@@ -18,6 +19,7 @@ type ReviewRequest = Database['public']['Tables']['review_requests']['Row'] & {
   created_at: string
   expires_at?: string
   user_id: string
+  user_email: string
 }
 
 interface ReviewRequestsClientProps {
@@ -29,28 +31,9 @@ export default function ReviewRequestsClient({ initialRequests, user }: ReviewRe
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [requests, setRequests] = useState(initialRequests)
 
-  const handleDelete = async (requestId: string) => {
-    if (!confirm('Tem certeza que deseja deletar esta solicitação?')) {
-      return
-    }
-
-    try {
-      const supabase = createClient()
-      const { error } = await supabase
-        .from('review_requests')
-        .delete()
-        .eq('id', requestId)
-        .eq('user_id', user.id) // Garante que só o criador pode deletar
-
-      if (error) throw error
-
-      // Atualiza a lista local
-      setRequests(prev => prev.filter(req => req.id !== requestId))
-      toast.success('Solicitação deletada com sucesso')
-    } catch (error) {
-      console.error('Erro ao deletar:', error)
-      toast.error('Erro ao deletar solicitação')
-    }
+  const handleRequestDeleted = async (deletedRequestId: string) => {
+    // Atualizar a lista removendo o request deletado
+    setRequests(prev => prev.filter(req => req.id !== deletedRequestId))
   }
 
   return (
@@ -174,16 +157,13 @@ export default function ReviewRequestsClient({ initialRequests, user }: ReviewRe
                           Ver detalhes →
                         </Link>
                         
-                        {request.user_id === user.id && (
-                          <button
-                            onClick={() => handleDelete(request.id)}
-                            className="text-sm text-red-600 hover:text-red-800"
-                            title="Deletar solicitação"
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                              <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
-                            </svg>
-                          </button>
+                        {request.user_email === user.email && (
+                          <DeleteReviewRequestButton
+                            requestId={request.id}
+                            requestAuthorEmail={request.user_email}
+                            currentUserEmail={user.email}
+                            onRequestDeleted={() => handleRequestDeleted(request.id)}
+                          />
                         )}
                       </div>
                     </div>

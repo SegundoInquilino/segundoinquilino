@@ -146,7 +146,7 @@ export default function ForumPage() {
                   />
                 </div>
                 <p className="text-gray-600 mt-3 mb-4 line-clamp-2">{post.content}</p>
-                <div className="flex items-center justify-between text-sm">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between text-sm gap-3 sm:gap-4">
                   <div className="flex items-center space-x-4 text-gray-500">
                     <span className="font-medium text-gray-900">
                       {post.user?.username}
@@ -156,11 +156,19 @@ export default function ForumPage() {
                   </div>
                   <Link 
                     href={`/forum/post/${post.id}`}
-                    className="inline-flex items-center text-primary-600 hover:text-primary-700 font-medium transition-colors"
+                    className="inline-flex items-center text-primary-600 hover:text-primary-700 font-medium transition-colors whitespace-nowrap"
                   >
                     Ver discussão
-                    <svg className="w-4 h-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                    <svg 
+                      className="w-4 h-4 ml-1 flex-shrink-0" 
+                      viewBox="0 0 20 20" 
+                      fill="currentColor"
+                    >
+                      <path 
+                        fillRule="evenodd" 
+                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" 
+                        clipRule="evenodd" 
+                      />
                     </svg>
                   </Link>
                 </div>
