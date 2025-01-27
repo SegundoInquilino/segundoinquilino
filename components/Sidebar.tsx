@@ -105,12 +105,6 @@ export default function Sidebar({ isOpen, onClose, currentUserId }: SidebarProps
       requiresAuth: true
     },
     {
-      name: 'Solicitar Reviews',
-      href: '/review-requests',
-      icon: BellIcon,
-      requiresAuth: true
-    },
-    {
       name: 'Blog',
       href: '/blog',
       icon: DocumentTextIcon,

@@ -15,7 +15,8 @@ import {
   EnvelopeIcon,
   QuestionMarkCircleIcon,
   HomeIcon,
-  UserCircleIcon
+  UserCircleIcon,
+  ChatBubbleLeftRightIcon
 } from '@heroicons/react/24/outline'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { getInitials } from '@/utils/string'
@@ -112,18 +113,11 @@ export default function DashboardPage() {
       color: 'bg-indigo-100 text-indigo-600'
     },
     {
-      title: 'Solicitar Review',
-      description: 'Peça uma avaliação',
-      href: '/review-requests',
-      icon: <PencilIcon className="h-6 w-6" />,
+      title: 'Fórum',
+      description: 'Participe das discussões da comunidade',
+      href: '/forum',
+      icon: <ChatBubbleLeftRightIcon className="h-6 w-6" />,
       color: 'bg-purple-100 text-purple-600'
-    },
-    {
-      title: 'Minhas Reviews',
-      description: 'Veja suas reviews solicitadas',
-      href: '/my-reviews',
-      icon: <EnvelopeIcon className="h-6 w-6" />,
-      color: 'bg-indigo-100 text-indigo-600'
     },
     {
       title: 'Sobre',
