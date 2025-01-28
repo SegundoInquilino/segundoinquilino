@@ -7,10 +7,12 @@ import { toast } from 'react-hot-toast'
 
 interface NewCommentFormProps {
   postId: string
-  onCommentAdded?: () => void
+  parentId?: string | null
+  onCommentAdded: () => void
+  onCancelReply?: () => void
 }
 
-export default function NewCommentForm({ postId, onCommentAdded }: NewCommentFormProps) {
+export default function NewCommentForm({ postId, parentId, onCommentAdded, onCancelReply }: NewCommentFormProps) {
   const [content, setContent] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { currentUserId } = useAuth()
@@ -31,14 +33,14 @@ export default function NewCommentForm({ postId, onCommentAdded }: NewCommentFor
 
     try {
       setIsSubmitting(true)
-      console.log('Debug - postId:', postId, 'currentUserId:', currentUserId)
 
       const { error } = await supabase
         .from('forum_comments')
         .insert({
           content,
           post_id: postId,
-          user_id: currentUserId
+          user_id: currentUserId,
+          parent_id: parentId || null
         })
         .select()
 
@@ -49,10 +51,7 @@ export default function NewCommentForm({ postId, onCommentAdded }: NewCommentFor
 
       toast.success('Comentário adicionado com sucesso!')
       setContent('')
-      
-      if (onCommentAdded) {
-        onCommentAdded()
-      }
+      onCommentAdded()
     } catch (error) {
       console.error('Erro ao adicionar comentário:', error)
       const message = error instanceof Error ? error.message : 'Erro ao adicionar comentário. Tente novamente.'
@@ -69,7 +68,7 @@ export default function NewCommentForm({ postId, onCommentAdded }: NewCommentFor
           htmlFor="comment" 
           className="block text-sm font-medium text-gray-700 mb-2"
         >
-          Deixe seu comentário
+          {parentId ? 'Responder ao comentário' : 'Deixe seu comentário'}
         </label>
         <textarea
           id="comment"
@@ -80,10 +79,19 @@ export default function NewCommentForm({ postId, onCommentAdded }: NewCommentFor
           required
           minLength={3}
           maxLength={1000}
-          placeholder="O que você pensa sobre isso?"
+          placeholder={parentId ? 'Escreva sua resposta...' : 'O que você pensa sobre isso?'}
         />
       </div>
-      <div className="flex justify-end">
+      <div className="flex justify-end space-x-3">
+        {onCancelReply && (
+          <button
+            type="button"
+            onClick={onCancelReply}
+            className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+          >
+            Cancelar
+          </button>
+        )}
         <button
           type="submit"
           disabled={isSubmitting}
@@ -98,7 +106,7 @@ export default function NewCommentForm({ postId, onCommentAdded }: NewCommentFor
               Enviando...
             </>
           ) : (
-            'Enviar comentário'
+            parentId ? 'Enviar resposta' : 'Enviar comentário'
           )}
         </button>
       </div>

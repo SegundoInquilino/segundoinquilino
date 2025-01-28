@@ -5,6 +5,7 @@ import { createClient } from '@/utils/supabase-client'
 import { useAuth } from '@/contexts/AuthContext'
 import { toast } from 'react-hot-toast'
 import DeleteCommentButton from '@/components/DeleteCommentButton'
+import NewCommentForm from '../components/NewCommentForm'
 
 interface Comment {
   id: string
@@ -13,10 +14,122 @@ interface Comment {
   user_id: string
   username: string
   avatar_url?: string
+  parent_id?: string | null
+  replies?: Comment[]
+  post_id: string
 }
 
 interface CommentsListProps {
   postId: string
+}
+
+function organizeComments(comments: Comment[]): Comment[] {
+  const commentMap = new Map<string, Comment>()
+  const roots: Comment[] = []
+
+  comments.forEach(comment => {
+    commentMap.set(comment.id, { ...comment, replies: [] })
+  })
+
+  commentMap.forEach(comment => {
+    if (comment.parent_id && commentMap.has(comment.parent_id)) {
+      const parent = commentMap.get(comment.parent_id)!
+      parent.replies?.push(comment)
+    } else {
+      roots.push(comment)
+    }
+  })
+
+  return roots
+}
+
+function CommentItem({ 
+  comment, 
+  level = 0,
+  currentUserId,
+  onReply,
+  onCommentDeleted
+}: { 
+  comment: Comment
+  level?: number
+  currentUserId: string | null
+  onReply: (parentId: string) => void
+  onCommentDeleted: () => void
+}) {
+  const [isReplying, setIsReplying] = useState(false)
+
+  return (
+    <div className={`${level > 0 ? 'ml-8' : ''}`}>
+      <div className="relative pl-4 border-l-2 border-gray-200">
+        <div className="bg-white rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex justify-between items-start">
+            <div className="flex-1">
+              <div className="flex items-center space-x-2 mb-2">
+                <span className="font-medium text-gray-900">
+                  {comment.username}
+                </span>
+                <span className="text-gray-400">•</span>
+                <span className="text-gray-500 text-sm">
+                  {new Date(comment.created_at).toLocaleDateString('pt-BR', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })}
+                </span>
+              </div>
+              <p className="text-gray-700 whitespace-pre-line">
+                {comment.content}
+              </p>
+              {currentUserId && (
+                <button
+                  onClick={() => setIsReplying(true)}
+                  className="mt-2 text-sm text-primary-600 hover:text-primary-700"
+                >
+                  Responder
+                </button>
+              )}
+            </div>
+            <DeleteCommentButton
+              commentId={comment.id}
+              commentAuthorId={comment.user_id}
+              currentUserId={currentUserId}
+              onCommentDeleted={onCommentDeleted}
+            />
+          </div>
+        </div>
+      </div>
+      {comment.replies && comment.replies.length > 0 && (
+        <div className="mt-2">
+          {comment.replies.map(reply => (
+            <CommentItem
+              key={reply.id}
+              comment={reply}
+              level={level + 1}
+              currentUserId={currentUserId}
+              onReply={onReply}
+              onCommentDeleted={onCommentDeleted}
+            />
+          ))}
+        </div>
+      )}
+
+      {isReplying && (
+        <div className="mt-4">
+          <NewCommentForm
+            postId={comment.post_id}
+            parentId={comment.id}
+            onCommentAdded={() => {
+              setIsReplying(false)
+              onCommentDeleted()
+            }}
+            onCancelReply={() => setIsReplying(false)}
+          />
+        </div>
+      )}
+    </div>
+  )
 }
 
 export default function CommentsList({ postId }: CommentsListProps) {
@@ -24,6 +137,7 @@ export default function CommentsList({ postId }: CommentsListProps) {
   const [loading, setLoading] = useState(true)
   const { currentUserId } = useAuth()
   const supabase = createClient()
+  const [replyingTo, setReplyingTo] = useState<string | null>(null)
 
   useEffect(() => {
     if (postId) {
@@ -44,7 +158,9 @@ export default function CommentsList({ postId }: CommentsListProps) {
           created_at,
           user_id,
           username,
-          avatar_url
+          avatar_url,
+          parent_id,
+          post_id
         `)
         .eq('post_id', postId)
         .order('created_at', { ascending: true })
@@ -64,6 +180,8 @@ export default function CommentsList({ postId }: CommentsListProps) {
       setLoading(false)
     }
   }
+
+  const organizedComments = organizeComments(comments)
 
   if (loading) {
     return (
@@ -94,42 +212,14 @@ export default function CommentsList({ postId }: CommentsListProps) {
 
   return (
     <div className="space-y-4">
-      {comments.map((comment) => (
-        <div 
-          key={comment.id} 
-          className="relative pl-4 border-l-2 border-gray-200"
-        >
-          <div className="bg-white rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex justify-between items-start">
-              <div className="flex-1">
-                <div className="flex items-center space-x-2 mb-2">
-                  <span className="font-medium text-gray-900">
-                    {comment.username}
-                  </span>
-                  <span className="text-gray-400">•</span>
-                  <span className="text-gray-500 text-sm">
-                    {new Date(comment.created_at).toLocaleDateString('pt-BR', {
-                      day: '2-digit',
-                      month: 'short',
-                      year: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })}
-                  </span>
-                </div>
-                <p className="text-gray-700 whitespace-pre-line">
-                  {comment.content}
-                </p>
-              </div>
-              <DeleteCommentButton
-                commentId={comment.id}
-                commentAuthorId={comment.user_id}
-                currentUserId={currentUserId}
-                onCommentDeleted={loadComments}
-              />
-            </div>
-          </div>
-        </div>
+      {organizedComments.map((comment) => (
+        <CommentItem
+          key={comment.id}
+          comment={comment}
+          currentUserId={currentUserId}
+          onReply={setReplyingTo}
+          onCommentDeleted={loadComments}
+        />
       ))}
     </div>
   )
