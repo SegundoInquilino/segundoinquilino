@@ -21,19 +21,20 @@ export default function ReviewsList({
   return (
     <div className={`grid gap-6 ${
       layout === 'square' 
-        ? 'grid-cols-1 md:grid-cols-2' 
-        : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+        ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 w-full' 
+        : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
     }`}>
       {reviews?.map((review) => (
-        <ReviewCardWrapper
-          key={review.id}
-          review={review}
-          username={userMap[review.user_id]}
-          currentUserId={currentUserId}
-          onReviewDeleted={onReviewDeleted}
-          layout={layout}
-          userMap={userMap}
-        />
+        <div className="h-full" key={review.id}>
+          <ReviewCardWrapper
+            review={review}
+            username={userMap[review.user_id]}
+            currentUserId={currentUserId}
+            onReviewDeleted={onReviewDeleted}
+            layout={layout}
+            userMap={userMap}
+          />
+        </div>
       ))}
     </div>
   )

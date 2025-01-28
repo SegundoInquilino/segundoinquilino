@@ -146,8 +146,33 @@ export default function ReviewsPage() {
 
       if (data) {
         let filtered = data
-        
-        // Filtro de busca (nome do prédio, endereço, bairro)
+
+        // Primeiro aplicar o filtro de rating
+        if (typeof filters.rating === 'number') {
+          filtered = filtered.filter(review => review.rating >= filters.rating!)
+          // Ordenar por rating de forma crescente quando filtrado por rating
+          filtered = [...filtered].sort((a, b) => a.rating - b.rating)
+        } else {
+          // Aplicar ordenação padrão quando não há filtro de rating
+          if (filters.orderBy) {
+            filtered = [...filtered].sort((a, b) => {
+              switch (filters.orderBy) {
+                case 'recent':
+                  return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+                case 'rating':
+                  return b.rating - a.rating
+                case 'likes':
+                  const likesA = typeof a.likes_count === 'number' ? a.likes_count : a.likes_count.count
+                  const likesB = typeof b.likes_count === 'number' ? b.likes_count : b.likes_count.count
+                  return likesB - likesA
+                default:
+                  return 0
+              }
+            })
+          }
+        }
+
+        // Depois aplicar os outros filtros
         if (filters.search?.trim()) {
           const searchTerm = filters.search.trim().toLowerCase()
           filtered = filtered.filter(review => 
@@ -157,19 +182,12 @@ export default function ReviewsPage() {
           )
         }
 
-        // Filtro de cidade
         if (filters.city && filters.city !== 'all') {
           filtered = filtered.filter(review =>
             review.apartments.city.toLowerCase().includes(filters.city!.toLowerCase())
           )
         }
 
-        // Filtro de avaliação
-        if (typeof filters.rating === 'number') {
-          filtered = filtered.filter(review => review.rating >= filters.rating!)
-        }
-
-        // Filtro de amenidades
         if (filters.amenities?.length) {
           filtered = filtered.filter(review =>
             filters.amenities!.every(amenity => 
@@ -178,29 +196,10 @@ export default function ReviewsPage() {
           )
         }
 
-        // Adicionar o filtro de fonte de aluguel
         if (filters.rental_source) {
           filtered = filtered.filter(review => 
             review.rental_source === filters.rental_source
           )
-        }
-
-        // Ordenação
-        if (filters.orderBy) {
-          filtered = [...filtered].sort((a, b) => {
-            switch (filters.orderBy) {
-              case 'recent':
-                return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-              case 'rating':
-                return b.rating - a.rating
-              case 'likes':
-                const likesA = typeof a.likes_count === 'number' ? a.likes_count : a.likes_count.count
-                const likesB = typeof b.likes_count === 'number' ? b.likes_count : b.likes_count.count
-                return likesB - likesA
-              default:
-                return 0
-            }
-          })
         }
 
         setReviews(filtered as Review[])
