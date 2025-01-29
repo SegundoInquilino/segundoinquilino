@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
 
+# Sitemap
 Sitemap: https://segundoinquilino.com.br/sitemap.xml 

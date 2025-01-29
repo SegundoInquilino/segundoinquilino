@@ -17,7 +17,7 @@ import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  metadataBase: new URL(siteMetadata.siteUrl),
+  metadataBase: new URL('https://segundoinquilino.com.br'),
   title: {
     default: siteMetadata.title,
     template: `%s | ${siteMetadata.title}`
