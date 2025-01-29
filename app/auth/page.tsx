@@ -16,10 +16,10 @@ export default function AuthPage() {
       <div className="max-w-md w-full space-y-8">
         <div className="flex justify-center mb-8">
           <Image
-            src="/images/Logo_SI.png"
+            src="/images/Logo_SI.png?v=2"
             alt="Segundo Inquilino Logo"
-            width={150}
-            height={150}
+            width={400}
+            height={400}
             className="h-auto w-auto"
             priority
           />

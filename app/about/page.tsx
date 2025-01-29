@@ -11,8 +11,8 @@ export default function AboutPage() {
             <Image
               src="/images/Logo_SI.png"
               alt="Segundo Inquilino Logo"
-              width={150}
-              height={150}
+              width={300}
+              height={300}
               className="mx-auto mb-8"
               priority
             />

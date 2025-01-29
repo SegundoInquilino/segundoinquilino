@@ -9,8 +9,8 @@ export default function TermsPage() {
           <Image
             src="/images/Logo_SI.png"
             alt="Segundo Inquilino Logo"
-            width={120}
-            height={120}
+            width={300}
+            height={300}
             className="h-auto w-auto mx-auto mb-6"
             priority
           />
@@ -123,8 +123,8 @@ export default function TermsPage() {
               <Image
                 src="/images/Logo_SI.png"
                 alt="Segundo Inquilino Logo"
-                width={80}
-                height={80}
+                width={150}
+                height={150}
                 className="h-auto w-auto opacity-75"
               />
               <p className="text-gray-500 text-center text-sm">
