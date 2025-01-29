@@ -57,7 +57,7 @@ interface ReviewCardProps {
   username: string
   currentUserId: string | null
   onDelete?: (reviewId: string) => void
-  layout?: 'square' | 'list'
+  layout?: 'square' | 'list' | 'profile'
   userMap: Record<string, string>
   isModal: boolean
   onOpenModal?: () => void
@@ -136,37 +136,49 @@ export default function ReviewCard({
 
   return (
     <>
-      <div className={`w-full ${isModal ? 'p-6' : 'p-4'} bg-white rounded-lg shadow-md`}>
+      <div className={`
+        w-full bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200
+        ${isModal ? 'p-6' : 'p-5'}
+        ${layout === 'profile' ? 'max-w-2xl mx-auto' : ''}
+      `}>
         {!isModal ? (
           <>
-            {/* Adiciona o carrossel se houver imagens */}
+            {/* Carrossel de imagens */}
             {review.images && review.images.length > 0 && (
-              <ImageCarousel 
-                images={review.images} 
-                alt={`Review de ${review.apartments?.name || 'apartamento'}`}
-              />
+              <div className={`
+                -mx-5 -mt-5 mb-6
+                ${layout === 'profile' ? 'aspect-video' : ''}
+              `}>
+                <ImageCarousel 
+                  images={review.images} 
+                  alt={`Review de ${review.apartments?.building_name || 'apartamento'}`}
+                />
+              </div>
             )}
 
-            <div className="flex justify-between items-start mb-4">
-              <div className="flex items-center gap-2">
-                <Avatar className="w-8 h-8">
+            {/* Cabeçalho com informações do autor */}
+            <div className="flex justify-between items-start mb-5">
+              <div className="flex items-center gap-3">
+                <Avatar className="w-10 h-10">
                   <AvatarImage src={review.profiles?.avatar_url || ''} />
                   <AvatarFallback className="bg-black text-white font-bold">
                     {getInitials(getReviewAuthor(review, userMap))}
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <h3 className="font-semibold text-sm">
+                  <h3 className="font-semibold text-gray-900">
                     {getReviewAuthor(review, userMap)}
                   </h3>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-sm text-gray-500">
                     {formatDate(review.created_at)}
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
-                <StarRating rating={review.rating} size="sm" />
+              <div className="flex items-center gap-3">
+                <div className="bg-gray-50 px-3 py-1 rounded-full">
+                  <StarRating rating={review.rating} size="sm" />
+                </div>
                 {currentUserId === review.user_id && (
                   <button
                     onClick={(e) => {
@@ -183,71 +195,77 @@ export default function ReviewCard({
               </div>
             </div>
 
-            <div className="flex items-center gap-2 mb-2">
-              {(review.apartments.property_type || 'apartment') === 'house' ? (
-                <HomeIcon className="w-5 h-5 text-gray-500" />
-              ) : (
-                <BuildingOfficeIcon className="w-5 h-5 text-gray-500" />
+            {/* Informações do imóvel */}
+            <div className="space-y-4 mb-6">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-gray-50 rounded-lg">
+                  {(review.apartments.property_type || 'apartment') === 'house' ? (
+                    <HomeIcon className="w-5 h-5 text-gray-700" />
+                  ) : (
+                    <BuildingOfficeIcon className="w-5 h-5 text-gray-700" />
+                  )}
+                </div>
+                <h3 className="text-lg font-bold text-gray-900">
+                  {review.apartments.building_name}
+                </h3>
+              </div>
+
+              {formatPeriod() && (
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <div className="p-1.5 bg-gray-50 rounded-lg">
+                    <CalendarIcon className="w-4 h-4" />
+                  </div>
+                  <span>{formatPeriod()}</span>
+                </div>
               )}
-              <h3 className="text-lg font-bold text-gray-900">
-                {review.apartments.building_name}
-              </h3>
             </div>
 
-            {formatPeriod() && (
-              <p className="text-sm text-gray-500 mb-3 flex items-center gap-1">
-                <CalendarIcon className="w-4 h-4" />
-                <span>{formatPeriod()}</span>
-              </p>
-            )}
-
-            <div className="mb-3 text-sm text-gray-600">
+            {/* Endereço e fonte do aluguel */}
+            <div className="space-y-3 mb-6">
               <a 
                 href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
                   `${review.apartments.address}, ${review.apartments.neighborhood}, ${review.apartments.city} - ${review.apartments.state}`
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-black transition-colors flex items-center gap-2 group"
+                className="flex items-center gap-3 group"
               >
-                <div className="bg-blue-600 p-1.5 rounded-lg group-hover:bg-blue-700 transition-colors">
-                  <svg 
-                    className="w-4 h-4 text-white" 
-                    fill="none" 
-                    stroke="currentColor" 
-                    viewBox="0 0 24 24"
-                  >
-                    <path 
-                      strokeLinecap="round" 
-                      strokeLinejoin="round" 
-                      strokeWidth={2} 
-                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                    />
-                    <path 
-                      strokeLinecap="round" 
-                      strokeLinejoin="round" 
-                      strokeWidth={2} 
-                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
+                <div className="p-2 bg-blue-600 group-hover:bg-blue-700 rounded-lg transition-colors">
+                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
                 </div>
-                <span className="line-clamp-1">{getReviewAddress(review)}</span>
+                <div className="space-y-1">
+                  <p className="text-sm text-gray-900 font-medium line-clamp-1">{getReviewAddress(review)}</p>
+                  <p className="text-sm text-gray-500">{getReviewLocation(review)}</p>
+                </div>
               </a>
-              <p className="text-gray-500">{getReviewLocation(review)}</p>
+
               {review.rental_source && (
-                <p className="text-gray-500 mt-1 flex items-center gap-1">
-                  <span className="text-gray-400">•</span>
-                  <span className="font-medium">Alugado via:</span> {review.rental_source}
-                </p>
+                <div className="flex items-center gap-2 text-sm text-gray-600 pl-2 border-l-2 border-gray-100">
+                  <span className="font-medium">Alugado via:</span>
+                  <span className="text-gray-500">{review.rental_source}</span>
+                </div>
               )}
             </div>
 
-            <p className="text-sm text-gray-600 line-clamp-2 mb-3">
-              {getReviewSummary(review)}
-            </p>
+            {/* Resumo da review */}
+            <div className="mb-6">
+              <p className={`
+                text-sm text-gray-600
+                ${layout === 'profile' ? 'line-clamp-4' : 'line-clamp-3'}
+              `}>
+                {getReviewSummary(review)}
+              </p>
+            </div>
 
+            {/* Amenidades */}
             {review.amenities && review.amenities.length > 0 && (
-              <div className="mb-3">
+              <div className={`
+                mb-6
+                ${layout === 'profile' ? 'flex-wrap' : ''}
+              `}>
                 <div className="flex flex-wrap gap-2">
                   {review.amenities.slice(0, 3).map((amenityId: string) => {
                     const amenity = AMENITIES.find(a => a.id === amenityId)
@@ -256,30 +274,36 @@ export default function ReviewCard({
                     return (
                       <span 
                         key={amenityId}
-                        className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700"
+                        className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-gray-50 text-gray-700 hover:bg-gray-100 transition-colors"
                       >
-                        <span className="mr-1">{amenity.icon}</span>
+                        <span className="mr-1.5">{amenity.icon}</span>
                         {amenity.label}
                       </span>
                     )
                   })}
                   {review.amenities.length > 3 && (
-                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
+                    <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-gray-50 text-gray-700 hover:bg-gray-100 transition-colors">
                       +{review.amenities.length - 3}
-                </span>
+                    </span>
                   )}
                 </div>
               </div>
             )}
 
+            {/* Botão Ver mais */}
             <div className="flex justify-end">
-              <Button variant="ghost" size="sm" onClick={handleCardClick}>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={handleCardClick}
+                className="hover:bg-gray-50"
+              >
                 Ver mais
               </Button>
             </div>
           </>
         ) : (
-        <ReviewModal
+          <ReviewModal
             review={{
               ...review,
               profiles: {
@@ -288,17 +312,13 @@ export default function ReviewCard({
               }
             }}
             username={username || review.profiles?.full_name || userMap[review.user_id] || 'Usuário'}
-          currentUserId={currentUserId}
-          userMap={userMap}
-        />
-      )}
-              </div>
+            currentUserId={currentUserId}
+            userMap={userMap}
+          />
+        )}
+      </div>
 
-      <AuthModal 
-        isOpen={showAuthModal} 
-        onClose={() => setShowAuthModal(false)} 
-      />
-
+      <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent className="sm:max-w-[425px]">
           <AlertDialogHeader>

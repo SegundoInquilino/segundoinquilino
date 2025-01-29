@@ -8,6 +8,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import type { Review } from '@/types/review'
 import { MapPinIcon } from '@heroicons/react/24/outline'
+import { createClient } from '@/utils/supabase-client-server'
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -22,15 +23,46 @@ const jsonLd = {
   }
 }
 
-export default function HomePage() {
-  const [reviews, setReviews] = useState<Review[]>([])
-  const router = useRouter()
-
-  const handleDeleteReview = (reviewId: string) => {
-    setReviews(prevReviews => prevReviews.filter(review => review.id !== reviewId))
-    router.refresh()
+async function getRegionStats() {
+  const supabase = createClient()
+  
+  type ReviewWithApartment = {
+    apartments: {
+      neighborhood: string
+    }
   }
 
+  const { data } = await supabase
+    .from('reviews')
+    .select(`
+      apartments!inner (
+        neighborhood
+      )
+    `)
+    .not('apartments.neighborhood', 'is', null)
+    .returns<ReviewWithApartment[]>()
+
+  if (!data) return []
+
+  // Agrupa e conta por bairro
+  const stats = data.reduce((acc, review) => {
+    const neighborhood = review.apartments.neighborhood
+    if (neighborhood) {
+      acc[neighborhood] = (acc[neighborhood] || 0) + 1
+    }
+    return acc
+  }, {} as Record<string, number>)
+
+  // Converte para array e ordena por contagem
+  return Object.entries(stats)
+    .map(([neighborhood, count]) => ({ neighborhood, count }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 5) // Pega os 5 principais bairros
+}
+
+export default async function HomePage() {
+  const regionStats = await getRegionStats()
+  
   return (
     <>
       <script
@@ -58,8 +90,7 @@ export default function HomePage() {
             
             <p className="mt-6 text-xl text-gray-600 max-w-2xl mx-auto">
             
-              <b>Está gostando do Imóvel que alugou?</b> Segundo Inquilino é a plataforma que conecta inquilinos e compartilha experiências reais sobre apartamentos.
-              Tome decisões mais seguras baseadas em avaliações autênticas.
+              <b>Sua experiência pode ajudar outros inquilinos!</b> Avalie seu imóvel e descubra o que outros moradores dizem. No Segundo Inquilino, você encontra <b>opiniões reais</b> para tomar decisões mais seguras.
             </p>
 
             <div className="mt-8 flex flex-col items-center space-y-4">
@@ -94,7 +125,7 @@ export default function HomePage() {
             <div className="mt-12 bg-purple-50 py-12 rounded-3xl">
               <div className="max-w-4xl mx-auto px-4">
                 <h2 className="text-2xl font-bold text-center text-gray-900 mb-8">
-                  O que você quer saber sobre o apartamento? 🤔
+                  O que você quer saber sobre o Edifico/Casa? 🤔
                 </h2>
 
               

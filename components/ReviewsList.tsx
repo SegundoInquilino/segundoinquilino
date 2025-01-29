@@ -8,7 +8,7 @@ interface ReviewsListProps {
   userMap: Record<string, string>
   currentUserId: string | null
   onReviewDeleted?: (reviewId: string) => void
-  layout?: 'square' | 'list'
+  layout?: 'square' | 'list' | 'profile'
 }
 
 export default function ReviewsList({ 
@@ -20,12 +20,17 @@ export default function ReviewsList({
 }: ReviewsListProps) {
   return (
     <div className={`grid gap-6 ${
-      layout === 'square' 
-        ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 w-full' 
-        : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+      layout === 'profile'
+        ? 'grid-cols-1 md:grid-cols-2'  // Grid de 2 colunas para perfil
+        : layout === 'square'
+          ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' 
+          : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
     }`}>
       {reviews?.map((review) => (
-        <div className="h-full" key={review.id}>
+        <div 
+          className={`${layout === 'profile' ? 'w-full' : 'h-full'}`} 
+          key={review.id}
+        >
           <ReviewCardWrapper
             review={review}
             username={userMap[review.user_id]}

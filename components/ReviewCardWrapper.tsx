@@ -18,7 +18,7 @@ interface ReviewCardWrapperProps {
   username: string
   currentUserId: string | null
   onReviewDeleted?: (reviewId: string) => void
-  layout?: 'square' | 'list'
+  layout?: 'square' | 'list' | 'profile'
   userMap: Record<string, string>
 }
 

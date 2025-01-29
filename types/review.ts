@@ -7,7 +7,7 @@ export interface Apartment {
   city: string
   state: string
   zip_code: string
-  property_type: 'house' | 'apartment'
+  property_type?: 'house' | 'apartment'
   latitude?: number
   longitude?: number
 }

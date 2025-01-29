@@ -401,7 +401,7 @@ export default function ProfilePage() {
                 onReviewDeleted={() => {
                   loadProfileData()
                 }}
-                layout="square"
+                layout="profile"
               />
             )}
           </div>

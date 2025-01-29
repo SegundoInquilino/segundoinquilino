@@ -6,13 +6,23 @@ import Link from 'next/link'
 import { Review } from '@/types/review'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
+import RegionCard from './RegionCard'
+import RegionCarousel from './RegionCarousel'
 
 interface HomeContentProps {
   initialReviews: Review[]
   topReviews: Review[]
   userMap: Record<string, string>
   currentUserId?: string
+  regionStats: RegionStats[]
   children?: ReactNode
+}
+
+interface RegionStats {
+  neighborhood: string
+  city: string
+  state: string
+  count: number
 }
 
 export default function HomeContent({ 
@@ -20,6 +30,7 @@ export default function HomeContent({
   topReviews, 
   userMap, 
   currentUserId,
+  regionStats = [],
   children 
 }: HomeContentProps) {
   const router = useRouter()
@@ -43,8 +54,6 @@ export default function HomeContent({
 
   return (
     <div className="min-h-screen bg-gray-100">
-      {children}
-
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <section className="mb-16">
           <div className="flex justify-between items-center mb-8">
@@ -76,6 +85,20 @@ export default function HomeContent({
             onReviewDeleted={handleReviewDeleted}
           />
         </section>
+
+        {regionStats.length > 0 && (
+          <section className="mb-16">
+            <h2 className="text-2xl font-bold text-gray-800 mb-8">
+              Explore por Região
+            </h2>
+            <RegionCarousel
+              regions={regionStats}
+              onRegionClick={(neighborhood) => 
+                router.push(`/reviews?neighborhood=${encodeURIComponent(neighborhood)}`)
+              }
+            />
+          </section>
+        )}
 
         <section className="bg-white rounded-2xl shadow-sm p-8">
           <h2 className="text-2xl font-bold text-gray-800 mb-8">Melhores Avaliações</h2>

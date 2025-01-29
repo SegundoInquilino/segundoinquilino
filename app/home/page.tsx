@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase-server'
 import HomeContent from '@/components/HomeContent'
 import Link from 'next/link'
+import { getRegionStats } from '@/utils/region-stats'
 
 // Adicionar interfaces
 interface Profile {
@@ -56,12 +57,15 @@ export default async function HomePage() {
     userMap[profile.id] = profile.username || 'Usuário'
   })
 
+  const regionStats = await getRegionStats()
+
   return (
     <HomeContent 
       initialReviews={recentReviews || []}
       topReviews={topReviews || []}
       userMap={userMap}
       currentUserId={currentUserId}
+      regionStats={regionStats}
     >
       <div className="relative pt-16 pb-24 sm:pt-20 sm:pb-32 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
