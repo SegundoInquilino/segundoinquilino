@@ -76,8 +76,8 @@ export default async function HomePage() {
               <Image
                 src="/images/Logo_SI_icon.png"
                 alt="Segundo Inquilino Logo"
-                width={150}
-                height={150}
+                width={130}
+                height={130}
                 className="h-auto w-auto"
                 priority
               />
