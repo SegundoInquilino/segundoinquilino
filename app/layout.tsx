@@ -110,7 +110,8 @@ export default async function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         
         <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="icon" href="/icon.png" type="image/png" />
+        <link rel="icon" href="/web-app-manifest-192x192.png" sizes="any" />
+        <link rel="icon" href="/web-app-manifest-192x192.png" type="image/png" />
         <link rel="apple-touch-icon" href="/web-app-manifest-192x192.png" />
         <link rel="icon" type="image/png" sizes="192x192" href="/web-app-manifest-192x192.png" />
         <link rel="icon" type="image/png" sizes="512x512" href="/web-app-manifest-512x512.png" />
