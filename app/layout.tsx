@@ -51,15 +51,15 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: '/images/Logo_SI_icon_160x160.png' },
-      { url: '/images/Logo_SI_icon_160x160.png', sizes: '16x16', type: 'image/png' },
-      { url: '/images/Logo_SI_icon_160x160.png', sizes: '32x32', type: 'image/png' },
+      { url: '/images/si_mobile.png' },
+      { url: '/images/si_mobile.png', sizes: '16x16', type: 'image/png' },
+      { url: '/images/si_mobile.png', sizes: '32x32', type: 'image/png' },
     ],
     apple: [
-      { url: '/images/Logo_SI_icon.png' },
+      { url: '/images/si_mobile.png' },
     ],
     shortcut: [
-      { url: '/images/Logo_SI_icon.png' }
+      { url: '/images/si_mobile.png' }
     ],
   },
   manifest: '/site.webmanifest',
