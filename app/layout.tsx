@@ -17,7 +17,7 @@ import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://segundoinquilino.com.br'),
+  metadataBase: new URL(siteMetadata.siteUrl),
   title: {
     default: siteMetadata.title,
     template: `%s | ${siteMetadata.title}`
@@ -110,11 +110,11 @@ export default async function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         
         <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="icon" href="/images/si_mobile.png" type="image/png" />
-        <link rel="icon" type="image/png" sizes="192x192" href="/images/si_mobile.png" />
-        <link rel="icon" type="image/png" sizes="512x512" href="/images/si_mobile.png" />
-        <link rel="apple-touch-icon" href="/images/si_mobile.png" />
-        <link rel="apple-touch-startup-image" href="/images/si_mobile.png" />
+        <link rel="icon" href="/web-app-manifest-192x192.png" type="image/png" />
+        <link rel="icon" type="image/png" sizes="192x192" href="/web-app-manifest-192x192.png" />
+        <link rel="icon" type="image/png" sizes="512x512" href="/web-app-manifest-512x512.png" />
+        <link rel="apple-touch-icon" href="/web-app-manifest-192x192.png" />
+        <link rel="apple-touch-startup-image" href="/web-app-manifest-192x192.png" />
       </head>
       <body className={inter.className}>
         <ServiceWorkerRegistration />
