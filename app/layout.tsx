@@ -100,7 +100,7 @@ export default async function RootLayout({
           src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
         />
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#7C3AED" />
+        <meta name="theme-color" content="#6B46C1" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="application-name" content="Segundo Inquilino" />
@@ -109,10 +109,11 @@ export default async function RootLayout({
         <meta name="msapplication-starturl" content="/" />
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         
-        <link rel="icon" type="image/png" sizes="192x192" href="/images/Logo_SI_icon_192x192.png" />
-        <link rel="apple-touch-icon" type="image/png" sizes="192x192" href="/images/Logo_SI_icon_192x192.png" />
-        <link rel="icon" type="image/png" sizes="512x512" href="/images/Logo_SI_icon_512x512.png" />
-        <link rel="apple-touch-icon" type="image/png" sizes="512x512" href="/images/Logo_SI_icon_512x512.png" />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="/icon.png" type="image/png" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+        <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
       </head>
       <body className={inter.className}>
         <ServiceWorkerRegistration />
