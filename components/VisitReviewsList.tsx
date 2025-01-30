@@ -92,9 +92,11 @@ export default function VisitReviewsList({ reviews }: VisitReviewsListProps) {
                     <div key={index} className="relative h-48">
                       <Image
                         src={photo}
-                        alt={`Foto ${index + 1}`}
+                        alt={`Foto ${index + 1} do imóvel`}
                         fill
                         className="object-cover"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        priority={index === 0}
                       />
                     </div>
                   ))}
@@ -103,14 +105,16 @@ export default function VisitReviewsList({ reviews }: VisitReviewsListProps) {
                 <div className="relative h-48">
                   <Image
                     src={review.photos[0]}
-                    alt="Imóvel"
+                    alt="Foto do imóvel"
                     fill
                     className="object-cover"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    priority
                   />
                 </div>
               )
             ) : (
-              <div className="w-full h-full flex items-center justify-center">
+              <div className="w-full h-full flex items-center justify-center bg-gray-50">
                 {review.property_type === 'apartment' ? (
                   <BuildingOfficeIcon className="h-20 w-20 text-gray-300" />
                 ) : (
