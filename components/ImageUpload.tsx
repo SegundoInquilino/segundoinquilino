@@ -1,8 +1,10 @@
 'use client'
 
-import { useState } from 'react'
-import { v4 as uuidv4 } from 'uuid'
+import { useCallback, useState } from 'react'
+import { useDropzone } from 'react-dropzone'
 import { createClient } from '@/utils/supabase-client'
+import Image from 'next/image'
+import { XMarkIcon } from '@heroicons/react/24/outline'
 
 interface ImageUploadProps {
   onImagesUploaded: (urls: string[]) => void
@@ -10,144 +12,135 @@ interface ImageUploadProps {
   existingImages?: string[]
 }
 
-export default function ImageUpload({ 
-  onImagesUploaded,
-  maxImages = 5,
-  existingImages = []
-}: ImageUploadProps) {
-  const [uploading, setUploading] = useState(false)
-  const [previewUrls, setPreviewUrls] = useState<string[]>([])
-  const [uploadedUrls, setUploadedUrls] = useState<string[]>(existingImages)
-  const [error, setError] = useState<string>('')
+export default function ImageUpload({ onImagesUploaded, maxImages = 5, existingImages = [] }: ImageUploadProps) {
+  const [isUploading, setIsUploading] = useState(false)
+  const [uploadedImages, setUploadedImages] = useState<string[]>(existingImages)
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files
-    if (!files) return
+  const onDrop = useCallback(async (acceptedFiles: File[]) => {
+    if (uploadedImages.length + acceptedFiles.length > maxImages) {
+      alert(`Você pode enviar no máximo ${maxImages} imagens`)
+      return
+    }
+
+    setIsUploading(true)
+    const supabase = createClient()
 
     try {
-      setError('')
-      setUploading(true)
+      const newImages = await Promise.all(
+        acceptedFiles.map(async (file) => {
+          const fileExt = file.name.split('.').pop()
+          const fileName = `${Math.random()}.${fileExt}`
+          const filePath = `${fileName}`
 
-      const supabase = createClient()
-      const tempUploadedUrls: string[] = []
-      const filesArray = Array.from(files)
+          const { error: uploadError, data } = await supabase.storage
+            .from('visit-reviews')
+            .upload(filePath, file)
 
-      for (const file of filesArray) {
-        // Validar tamanho (max 5MB)
-        if (file.size > 5 * 1024 * 1024) {
-          setError('Cada imagem deve ter no máximo 5MB')
-          return
-        }
+          if (uploadError) {
+            throw uploadError
+          }
 
-        // Validar tipo
-        if (!file.type.startsWith('image/')) {
-          setError('Apenas imagens são permitidas')
-          return
-        }
+          const { data: { publicUrl } } = supabase.storage
+            .from('visit-reviews')
+            .getPublicUrl(filePath)
 
-        const fileExt = file.name.split('.').pop()
-        const fileName = `${uuidv4()}.${fileExt}`
-        const filePath = `apartment-images/${fileName}`
+          return publicUrl
+        })
+      )
 
-        // Criar preview
-        const objectUrl = URL.createObjectURL(file)
-        setPreviewUrls(prev => [...prev, objectUrl])
-
-        // Upload para o Supabase Storage
-        const { error: uploadError, data } = await supabase.storage
-          .from('reviews')
-          .upload(filePath, file)
-
-        console.log('Upload response:', { error: uploadError, data })
-
-        if (uploadError) {
-          console.error('Erro no upload:', uploadError)
-          setError('Erro ao fazer upload da imagem')
-          continue
-        }
-
-        // Pegar URL pública
-        const { data: { publicUrl } } = supabase.storage
-          .from('reviews')
-          .getPublicUrl(filePath)
-
-        console.log('Public URL:', publicUrl)
-        tempUploadedUrls.push(publicUrl)
-      }
-
-      const newUploadedUrls = [...uploadedUrls, ...tempUploadedUrls]
-      setUploadedUrls(newUploadedUrls)
-      console.log('Todas URLs:', newUploadedUrls)
-      onImagesUploaded(newUploadedUrls)
+      const updatedImages = [...uploadedImages, ...newImages]
+      setUploadedImages(updatedImages)
+      onImagesUploaded(updatedImages)
     } catch (error) {
       console.error('Erro ao fazer upload:', error)
-      setError('Erro ao fazer upload da imagem')
+      alert('Erro ao fazer upload das imagens')
     } finally {
-      setUploading(false)
+      setIsUploading(false)
+    }
+  }, [maxImages, onImagesUploaded, uploadedImages])
+
+  const handleRemoveImage = async (imageUrl: string) => {
+    if (!confirm('Tem certeza que deseja remover esta imagem?')) return
+
+    try {
+      const supabase = createClient()
+      const fileName = imageUrl.split('/').pop()
+      
+      if (fileName) {
+        // Remove do storage apenas se a imagem estiver no storage (não for uma URL externa)
+        if (imageUrl.includes('visit-reviews')) {
+          const { error } = await supabase.storage
+            .from('visit-reviews')
+            .remove([fileName])
+
+          if (error) throw error
+        }
+      }
+
+      const updatedImages = uploadedImages.filter(url => url !== imageUrl)
+      setUploadedImages(updatedImages)
+      onImagesUploaded(updatedImages)
+    } catch (error) {
+      console.error('Erro ao remover imagem:', error)
+      alert('Erro ao remover imagem')
     }
   }
 
-  const removeImage = (index: number) => {
-    const newPreviewUrls = previewUrls.filter((_, i) => i !== index)
-    const newUploadedUrls = uploadedUrls.filter((_, i) => i !== index)
-    setPreviewUrls(newPreviewUrls)
-    setUploadedUrls(newUploadedUrls)
-    onImagesUploaded(newUploadedUrls)
-  }
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: {
+      'image/*': ['.jpeg', '.jpg', '.png', '.webp']
+    },
+    disabled: isUploading || uploadedImages.length >= maxImages
+  })
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-center w-full">
-        <label className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
-          <div className="flex flex-col items-center justify-center pt-5 pb-6">
-            <svg className="w-8 h-8 mb-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
-              <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
-            </svg>
-            <p className="mb-2 text-sm text-gray-500">
-              <span className="font-semibold">Clique para enviar</span> ou arraste as imagens
-            </p>
-            <p className="text-xs text-gray-500">PNG, JPG ou GIF (Max. {maxImages} imagens)</p>
-          </div>
-          <input
-            type="file"
-            className="hidden"
-            multiple
-            accept="image/*"
-            onChange={handleFileChange}
-            disabled={uploading}
-          />
-        </label>
-      </div>
-
-      {error && (
-        <p className="text-red-500 text-sm">{error}</p>
-      )}
-
-      {uploading && (
-        <div className="text-center">
-          <p className="text-gray-500">Enviando imagens...</p>
-        </div>
-      )}
-
-      {previewUrls.length > 0 && (
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          {previewUrls.map((url, index) => (
-            <div key={url} className="relative group">
-              <img
+      {/* Preview das imagens */}
+      {uploadedImages.length > 0 && (
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+          {uploadedImages.map((url, index) => (
+            <div key={url} className="relative aspect-video">
+              <Image
                 src={url}
-                alt={`Preview ${index + 1}`}
-                className="h-24 w-full object-cover rounded-lg"
+                alt={`Imagem ${index + 1}`}
+                fill
+                className="object-cover rounded-lg"
               />
               <button
-                onClick={() => removeImage(index)}
-                className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                onClick={() => handleRemoveImage(url)}
+                className="absolute top-2 right-2 p-1 bg-white/90 rounded-full text-gray-600 hover:text-red-500 transition-colors"
+                title="Remover imagem"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <XMarkIcon className="h-4 w-4" />
               </button>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Dropzone */}
+      {uploadedImages.length < maxImages && (
+        <div
+          {...getRootProps()}
+          className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors
+            ${isDragActive ? 'border-purple-500 bg-purple-50' : 'border-gray-300 hover:border-purple-500'}
+            ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}`}
+        >
+          <input {...getInputProps()} />
+          {isUploading ? (
+            <p className="text-sm text-gray-500">Enviando...</p>
+          ) : isDragActive ? (
+            <p className="text-sm text-gray-500">Solte as imagens aqui...</p>
+          ) : (
+            <p className="text-sm text-gray-500">
+              Arraste e solte imagens aqui, ou clique para selecionar
+              <br />
+              <span className="text-xs">
+                ({uploadedImages.length}/{maxImages} imagens)
+              </span>
+            </p>
+          )}
         </div>
       )}
     </div>

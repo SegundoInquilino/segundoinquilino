@@ -4,7 +4,7 @@ import { VisitReview } from '@/types/visit-review'
 import Image from 'next/image'
 import { formatDistanceToNow } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-import { HomeIcon, BuildingOfficeIcon, TrashIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
+import { HomeIcon, BuildingOfficeIcon, TrashIcon, ChevronLeftIcon, ChevronRightIcon, PencilIcon } from '@heroicons/react/24/outline'
 import { MapPinIcon, ShareIcon } from '@heroicons/react/24/solid'
 import { createClient } from '@/utils/supabase-client'
 import { useAuth } from '@/contexts/AuthContext'
@@ -17,6 +17,7 @@ import { useState } from 'react'
 import VisitReviewModal from './VisitReviewModal'
 import { Menu, Transition } from '@headlessui/react'
 import { LinkIcon } from '@heroicons/react/24/outline'
+import EditVisitReviewModal from './EditVisitReviewModal'
 
 interface VisitReviewsListProps {
   reviews: (VisitReview & {
@@ -59,6 +60,9 @@ export default function VisitReviewsList({ reviews }: VisitReviewsListProps) {
   const { currentUserId } = useAuth()
   const router = useRouter()
   const [selectedReview, setSelectedReview] = useState<(VisitReview & {
+    profiles: { username: string }
+  }) | null>(null)
+  const [selectedReviewForEdit, setSelectedReviewForEdit] = useState<(VisitReview & {
     profiles: { username: string }
   }) | null>(null)
 
@@ -198,16 +202,28 @@ export default function VisitReviewsList({ reviews }: VisitReviewsListProps) {
 
               {/* Botão de deletar */}
               {currentUserId === review.user_id && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    handleDelete(review.id)
-                  }}
-                  className="absolute top-4 right-4 z-10 p-2 bg-white/90 rounded-full text-gray-600 hover:text-red-500 transition-colors"
-                  title="Deletar review"
-                >
-                  <TrashIcon className="h-5 w-5" />
-                </button>
+                <div className="absolute top-4 right-4 z-10 flex space-x-2">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setSelectedReviewForEdit(review)
+                    }}
+                    className="p-2 bg-white/90 rounded-full text-gray-600 hover:text-purple-500 transition-colors"
+                    title="Editar review"
+                  >
+                    <PencilIcon className="h-5 w-5" />
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleDelete(review.id)
+                    }}
+                    className="p-2 bg-white/90 rounded-full text-gray-600 hover:text-red-500 transition-colors"
+                    title="Deletar review"
+                  >
+                    <TrashIcon className="h-5 w-5" />
+                  </button>
+                </div>
               )}
             </div>
 
@@ -356,11 +372,11 @@ export default function VisitReviewsList({ reviews }: VisitReviewsListProps) {
                     <h4 className="text-sm font-semibold text-gray-800 mb-1.5">
                       Pontos Positivos
                     </h4>
-                    <ul className="text-xs text-gray-600 list-disc list-inside">
+                    <div className="text-xs text-gray-600 space-y-1">
                       {review.positive_points.slice(0, 2).map((point, index) => (
-                        <li key={index} className="line-clamp-1">{point}</li>
+                        <p key={index} className="line-clamp-1">{point}</p>
                       ))}
-                    </ul>
+                    </div>
                   </div>
                 )}
                 {review.negative_points && review.negative_points.length > 0 && (
@@ -368,11 +384,11 @@ export default function VisitReviewsList({ reviews }: VisitReviewsListProps) {
                     <h4 className="text-sm font-semibold text-gray-800 mb-1.5">
                       Pontos Negativos
                     </h4>
-                    <ul className="text-xs text-gray-600 list-disc list-inside">
+                    <div className="text-xs text-gray-600 space-y-1">
                       {review.negative_points.slice(0, 2).map((point, index) => (
-                        <li key={index} className="line-clamp-1">{point}</li>
+                        <p key={index} className="line-clamp-1">{point}</p>
                       ))}
-                    </ul>
+                    </div>
                   </div>
                 )}
               </div>
@@ -404,6 +420,18 @@ export default function VisitReviewsList({ reviews }: VisitReviewsListProps) {
           review={selectedReview}
           isOpen={!!selectedReview}
           onClose={() => setSelectedReview(null)}
+        />
+      )}
+
+      {selectedReviewForEdit && (
+        <EditVisitReviewModal
+          review={selectedReviewForEdit}
+          isOpen={!!selectedReviewForEdit}
+          onClose={() => setSelectedReviewForEdit(null)}
+          onUpdate={() => {
+            router.refresh()
+            setSelectedReviewForEdit(null)
+          }}
         />
       )}
     </>

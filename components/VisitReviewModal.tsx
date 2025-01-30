@@ -176,11 +176,11 @@ export default function VisitReviewModal({ review, isOpen, onClose }: VisitRevie
                         <h4 className="text-sm font-semibold text-gray-800 mb-2">
                           Pontos Positivos
                         </h4>
-                        <ul className="list-disc list-inside text-gray-600 space-y-1">
+                        <div className="text-gray-600 space-y-2">
                           {review.positive_points.map((point, index) => (
-                            <li key={index}>{point}</li>
+                            <p key={index}>{point}</p>
                           ))}
-                        </ul>
+                        </div>
                       </div>
                     )}
 
@@ -189,11 +189,11 @@ export default function VisitReviewModal({ review, isOpen, onClose }: VisitRevie
                         <h4 className="text-sm font-semibold text-gray-800 mb-2">
                           Pontos Negativos
                         </h4>
-                        <ul className="list-disc list-inside text-gray-600 space-y-1">
+                        <div className="text-gray-600 space-y-2">
                           {review.negative_points.map((point, index) => (
-                            <li key={index}>{point}</li>
+                            <p key={index}>{point}</p>
                           ))}
-                        </ul>
+                        </div>
                       </div>
                     )}
                   </div>
