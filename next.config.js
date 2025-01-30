@@ -27,7 +27,8 @@ const nextConfig = {
       'ejoivntarqlinulkiure.supabase.co', // Domínio do Supabase Storage
       'lh3.googleusercontent.com', // Para avatares do Google
       'avatars.githubusercontent.com' // Para avatares do GitHub
-    ]
+    ],
+    unoptimized: true
   },
   async redirects() {
     return []
