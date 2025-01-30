@@ -7,7 +7,8 @@ const nextConfig = {
     '@radix-ui/react-dialog',
     '@radix-ui/react-primitive',
     '@heroicons/react',
-    '@sendgrid/mail'
+    '@sendgrid/mail',
+    'react-slick'
   ],
   env: {
     SENDGRID_API_KEY: process.env.SENDGRID_API_KEY,
@@ -37,6 +38,13 @@ const nextConfig = {
       //   permanent: true,
       // },
     ]
+  },
+  webpack: (config) => {
+    config.module.rules.push({
+      test: /\.css$/,
+      use: ['style-loader', 'css-loader'],
+    })
+    return config
   },
 }
 

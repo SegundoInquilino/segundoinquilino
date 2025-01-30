@@ -9,6 +9,8 @@
   SKIP_TYPE_CHECK = "true"
   NEXT_PUBLIC_GA_ID = "AW-11553438817"
   SECRETS_SCAN_OMIT_PATHS = ".next/**/*,.netlify/**/*"
+  NEXT_USE_NETLIFY_EDGE = "true"
+  NODE_VERSION = "18"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
@@ -17,4 +19,9 @@
   directory = "netlify/functions"
   # Roda toda segunda-feira às 10h
   [functions.weekly-digest]
-    schedule = "0 10 * * 1" 
+    schedule = "0 10 * * 1"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200 
