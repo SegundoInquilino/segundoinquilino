@@ -1,10 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import VisitReviewsList from '@/components/VisitReviewsList'
 import Link from 'next/link'
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline'
 import { VisitReview } from '@/types/visit-review'
+import VisitReviewModal from '@/components/VisitReviewModal'
 
 interface VisitReviewsClientProps {
   initialReviews: (VisitReview & {
@@ -16,7 +18,19 @@ interface VisitReviewsClientProps {
 
 export default function VisitReviewsClient({ initialReviews }: VisitReviewsClientProps) {
   const [searchTerm, setSearchTerm] = useState('')
+  const [selectedReview, setSelectedReview] = useState<VisitReview | null>(null)
+  const searchParams = useSearchParams()
   
+  useEffect(() => {
+    const reviewId = searchParams.get('review')
+    if (reviewId) {
+      const review = initialReviews.find(r => r.id === reviewId)
+      if (review) {
+        setSelectedReview(review)
+      }
+    }
+  }, [searchParams, initialReviews])
+
   // Atualizar a lógica de filtragem para incluir a origem
   const filteredReviews = initialReviews.filter(review => {
     const searchLower = searchTerm.toLowerCase()
@@ -81,6 +95,18 @@ export default function VisitReviewsClient({ initialReviews }: VisitReviewsClien
           <VisitReviewsList reviews={filteredReviews} />
         )}
       </div>
+
+      {selectedReview && (
+        <VisitReviewModal
+          review={selectedReview}
+          isOpen={!!selectedReview}
+          onClose={() => {
+            setSelectedReview(null)
+            // Remove o parâmetro da URL ao fechar o modal
+            window.history.replaceState({}, '', '/visit-reviews')
+          }}
+        />
+      )}
     </div>
   )
 } 
