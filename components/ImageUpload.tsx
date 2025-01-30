@@ -4,15 +4,20 @@ import { useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import { createClient } from '@/utils/supabase-client'
 
-type ImageUploadProps = {
-  onUploadComplete: (urls: string[]) => void
+interface ImageUploadProps {
+  onImagesUploaded: (urls: string[]) => void
   maxImages?: number
+  existingImages?: string[]
 }
 
-export default function ImageUpload({ onUploadComplete, maxImages = 5 }: ImageUploadProps) {
+export default function ImageUpload({ 
+  onImagesUploaded,
+  maxImages = 5,
+  existingImages = []
+}: ImageUploadProps) {
   const [uploading, setUploading] = useState(false)
   const [previewUrls, setPreviewUrls] = useState<string[]>([])
-  const [uploadedUrls, setUploadedUrls] = useState<string[]>([])
+  const [uploadedUrls, setUploadedUrls] = useState<string[]>(existingImages)
   const [error, setError] = useState<string>('')
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -24,7 +29,7 @@ export default function ImageUpload({ onUploadComplete, maxImages = 5 }: ImageUp
       setUploading(true)
 
       const supabase = createClient()
-      const newUploadedUrls: string[] = [...uploadedUrls]
+      const tempUploadedUrls: string[] = []
       const filesArray = Array.from(files)
 
       for (const file of filesArray) {
@@ -67,12 +72,13 @@ export default function ImageUpload({ onUploadComplete, maxImages = 5 }: ImageUp
           .getPublicUrl(filePath)
 
         console.log('Public URL:', publicUrl)
-        newUploadedUrls.push(publicUrl)
+        tempUploadedUrls.push(publicUrl)
       }
 
+      const newUploadedUrls = [...uploadedUrls, ...tempUploadedUrls]
       setUploadedUrls(newUploadedUrls)
       console.log('Todas URLs:', newUploadedUrls)
-      onUploadComplete(newUploadedUrls)
+      onImagesUploaded(newUploadedUrls)
     } catch (error) {
       console.error('Erro ao fazer upload:', error)
       setError('Erro ao fazer upload da imagem')
@@ -86,7 +92,7 @@ export default function ImageUpload({ onUploadComplete, maxImages = 5 }: ImageUp
     const newUploadedUrls = uploadedUrls.filter((_, i) => i !== index)
     setPreviewUrls(newPreviewUrls)
     setUploadedUrls(newUploadedUrls)
-    onUploadComplete(newUploadedUrls)
+    onImagesUploaded(newUploadedUrls)
   }
 
   return (

@@ -95,6 +95,12 @@ export default function Sidebar({ isOpen, onClose, currentUserId }: SidebarProps
       requiresAuth: true
     },
     {
+      name: 'Reviews de Visitas',
+      href: '/visit-reviews',
+      icon: HomeIcon,
+      requiresAuth: true
+    },
+    {
       name: 'Perfil',
       href: '/profile',
       icon: UserCircleIcon,
@@ -111,7 +117,7 @@ export default function Sidebar({ isOpen, onClose, currentUserId }: SidebarProps
       href: '/forum',
       icon: ChatBubbleLeftRightIcon,
       requiresAuth: false
-    }
+    },
   ]
 
   return (
