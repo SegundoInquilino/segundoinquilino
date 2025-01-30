@@ -6,7 +6,7 @@ import { VisitReview } from '@/types/visit-review'
 import Image from 'next/image'
 import { formatDistanceToNow } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-import { MapPinIcon } from '@heroicons/react/24/solid'
+import { MapPinIcon, LinkIcon } from '@heroicons/react/24/solid'
 import Slider from 'react-slick'
 import { useState } from 'react'
 import ImageViewerModal from './ImageViewerModal'
@@ -127,14 +127,38 @@ export default function VisitReviewModal({ review, isOpen, onClose }: VisitRevie
                   </div>
 
                   {/* Origem da visita */}
-                  <div>
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
-                      {review.source === 'quintoandar' && 'Quinto Andar'}
-                      {review.source === 'imovelweb' && 'ImovelWeb'}
-                      {review.source === 'vivareal' && 'Viva Real'}
-                      {review.source === 'zap' && 'Zap Imóveis'}
-                      {review.source === 'other' && 'Outro'}
-                    </span>
+                  <div className="mb-6">
+                    {review.listing_url ? (
+                      <a
+                        href={review.listing_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800 hover:bg-purple-200 transition-colors group"
+                      >
+                        <span>
+                          {review.source === 'quintoandar' && 'Quinto Andar'}
+                          {review.source === 'imovelweb' && 'ImovelWeb'}
+                          {review.source === 'vivareal' && 'Viva Real'}
+                          {review.source === 'zap' && 'Zap Imóveis'}
+                          {review.source === 'other' && 'Outro'}
+                          {review.source !== 'quintoandar' && 
+                           review.source !== 'imovelweb' && 
+                           review.source !== 'vivareal' && 
+                           review.source !== 'zap' && 
+                           review.source !== 'other' && review.source}
+                        </span>
+                        <LinkIcon className="h-4 w-4 ml-2 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </a>
+                    ) : (
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
+                        {review.source === 'quintoandar' && 'Quinto Andar'}
+                        {review.source === 'imovelweb' && 'ImovelWeb'}
+                        {review.source === 'vivareal' && 'Viva Real'}
+                        {review.source === 'zap' && 'Zap Imóveis'}
+                        {review.source === 'other' && 'Outro'}
+                      </span>
+                    )}
                   </div>
 
                   {/* Comentário */}

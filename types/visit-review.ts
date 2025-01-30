@@ -10,6 +10,10 @@ export type VisitReview = {
   positive_points?: string[]
   negative_points?: string[]
   source: string
+  listing_url?: string
   photos?: string[]
   status: 'published' | 'draft' | 'deleted'
+  profiles: {
+    username: string
+  }
 } 

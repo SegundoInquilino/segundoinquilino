@@ -15,6 +15,7 @@ export default function VisitReviewForm() {
   const [propertyType, setPropertyType] = useState<'apartment' | 'house'>('apartment')
   const [source, setSource] = useState<string>('quintoandar')
   const [otherSource, setOtherSource] = useState<string>('')
+  const [listingUrl, setListingUrl] = useState<string>('')
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -43,7 +44,8 @@ export default function VisitReviewForm() {
         negative_points: formData.get('negative_points')?.toString().split('\n').filter(Boolean),
         source: finalSource,
         photos,
-        status: 'published'
+        status: 'published',
+        listing_url: listingUrl
       }
 
       console.log('Dados a serem enviados:', visitReview)
@@ -74,6 +76,10 @@ export default function VisitReviewForm() {
     } finally {
       setIsSubmitting(false)
     }
+  }
+
+  const handleSourceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSource(e.target.value)
   }
 
   return (
@@ -160,10 +166,13 @@ export default function VisitReviewForm() {
           Origem da Visita
         </label>
         <select
+          id="source"
+          name="source"
           value={source}
-          onChange={(e) => setSource(e.target.value)}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+          onChange={handleSourceChange}
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
         >
+          <option value="">Selecione a origem</option>
           <option value="quintoandar">Quinto Andar</option>
           <option value="imovelweb">ImovelWeb</option>
           <option value="vivareal">Viva Real</option>
@@ -186,6 +195,26 @@ export default function VisitReviewForm() {
             />
           </div>
         )}
+      </div>
+
+      <div>
+        <label htmlFor="listing_url" className="block text-sm font-medium text-gray-700">
+          Link do anúncio (opcional)
+        </label>
+        <div className="mt-1">
+          <input
+            type="url"
+            name="listing_url"
+            id="listing_url"
+            value={listingUrl}
+            onChange={(e) => setListingUrl(e.target.value)}
+            placeholder="https://www.quintoandar.com.br/imovel/..."
+            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
+          />
+        </div>
+        <p className="mt-1 text-sm text-gray-500">
+          Adicione o link do anúncio original para referência futura
+        </p>
       </div>
 
       <div>
