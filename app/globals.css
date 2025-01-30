@@ -1,3 +1,18 @@
 @tailwind base;
 @tailwind components;
-@tailwind utilities; 
+@tailwind utilities;
+
+/* Estilos personalizados para o carrossel */
+.slick-dots {
+  bottom: 10px !important;
+}
+
+.slick-dots li button:before {
+  color: white !important;
+  opacity: 0.8 !important;
+}
+
+.slick-dots li.slick-active button:before {
+  color: white !important;
+  opacity: 1 !important;
+} 

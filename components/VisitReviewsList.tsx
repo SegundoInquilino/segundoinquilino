@@ -1,0 +1,220 @@
+'use client'
+
+import { VisitReview } from '@/types/visit-review'
+import Image from 'next/image'
+import { formatDistanceToNow } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
+import { HomeIcon, BuildingOfficeIcon, TrashIcon, MapPinIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
+import { createClient } from '@/utils/supabase-client'
+import { useAuth } from '@/contexts/AuthContext'
+import toast from 'react-hot-toast'
+import { useRouter } from 'next/navigation'
+import Slider from 'react-slick'
+import "slick-carousel/slick/slick.css"
+import "slick-carousel/slick/slick-theme.css"
+
+interface VisitReviewsListProps {
+  reviews: (VisitReview & {
+    profiles: {
+      username: string
+    }
+  })[]
+}
+
+function NextArrow(props: any) {
+  const { onClick } = props
+  return (
+    <button
+      onClick={onClick}
+      className="absolute right-2 top-1/2 -translate-y-1/2 z-10 p-1 rounded-full bg-white/80 hover:bg-white shadow-md"
+    >
+      <ChevronRightIcon className="h-5 w-5 text-gray-600" />
+    </button>
+  )
+}
+
+function PrevArrow(props: any) {
+  const { onClick } = props
+  return (
+    <button
+      onClick={onClick}
+      className="absolute left-2 top-1/2 -translate-y-1/2 z-10 p-1 rounded-full bg-white/80 hover:bg-white shadow-md"
+    >
+      <ChevronLeftIcon className="h-5 w-5 text-gray-600" />
+    </button>
+  )
+}
+
+export default function VisitReviewsList({ reviews }: VisitReviewsListProps) {
+  const { currentUserId } = useAuth()
+  const router = useRouter()
+
+  const handleDelete = async (reviewId: string) => {
+    if (!confirm('Tem certeza que deseja deletar esta review?')) return
+
+    try {
+      const supabase = createClient()
+      const { error } = await supabase
+        .from('visit_reviews')
+        .delete()
+        .eq('id', reviewId)
+        .eq('user_id', currentUserId)
+
+      if (error) throw error
+
+      toast.success('Review deletada com sucesso!')
+      router.refresh()
+    } catch (error) {
+      console.error('Erro ao deletar review:', error)
+      toast.error('Erro ao deletar review')
+    }
+  }
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {reviews.map((review) => (
+        <div key={review.id} className="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
+          {/* Cabeçalho com Foto */}
+          <div className="relative h-48 bg-gray-100">
+            {review.photos && review.photos.length > 0 ? (
+              review.photos.length > 1 ? (
+                <Slider
+                  dots={true}
+                  infinite={true}
+                  speed={500}
+                  slidesToShow={1}
+                  slidesToScroll={1}
+                  nextArrow={<NextArrow />}
+                  prevArrow={<PrevArrow />}
+                  className="h-full"
+                >
+                  {review.photos.map((photo, index) => (
+                    <div key={index} className="relative h-48">
+                      <Image
+                        src={photo}
+                        alt={`Foto ${index + 1}`}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  ))}
+                </Slider>
+              ) : (
+                <div className="relative h-48">
+                  <Image
+                    src={review.photos[0]}
+                    alt="Imóvel"
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              )
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                {review.property_type === 'apartment' ? (
+                  <BuildingOfficeIcon className="h-20 w-20 text-gray-300" />
+                ) : (
+                  <HomeIcon className="h-20 w-20 text-gray-300" />
+                )}
+              </div>
+            )}
+
+            {/* Badge do tipo de imóvel */}
+            <div className="absolute top-4 left-4 z-10">
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white/90 text-gray-800">
+                {review.property_type === 'apartment' ? 'Apartamento' : 'Casa'}
+              </span>
+            </div>
+
+            {/* Botão de deletar */}
+            {currentUserId === review.user_id && (
+              <button
+                onClick={() => handleDelete(review.id)}
+                className="absolute top-4 right-4 z-10 p-2 bg-white/90 rounded-full text-gray-600 hover:text-red-500 transition-colors"
+                title="Deletar review"
+              >
+                <TrashIcon className="h-5 w-5" />
+              </button>
+            )}
+          </div>
+
+          {/* Conteúdo */}
+          <div className="p-4">
+            {/* Nome do prédio/Endereço */}
+            <div className="mb-3">
+              {review.building_name && (
+                <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                  {review.building_name}
+                </h3>
+              )}
+              <div className="flex items-start space-y-1 text-gray-500 text-sm">
+                <MapPinIcon className="h-4 w-4 mt-0.5 mr-1 flex-shrink-0" />
+                <div className="flex flex-col">
+                  <span className="font-medium">Endereço:</span>
+                  <span className="text-gray-600">{review.address}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Origem da visita */}
+            <div className="mb-3">
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                {review.source === 'quintoandar' && 'Quinto Andar'}
+                {review.source === 'imovelweb' && 'ImovelWeb'}
+                {review.source === 'vivareal' && 'Viva Real'}
+                {review.source === 'zap' && 'Zap Imóveis'}
+                {review.source === 'other' && 'Outro'}
+              </span>
+            </div>
+
+            {/* Comentário */}
+            {review.comment && (
+              <p className="text-gray-600 text-sm mb-4 line-clamp-3">
+                {review.comment}
+              </p>
+            )}
+
+            {/* Pontos positivos e negativos */}
+            <div className="space-y-2 mb-4">
+              {review.positive_points && review.positive_points.length > 0 && (
+                <div>
+                  <h4 className="text-sm font-semibold text-gray-800 mb-1.5">
+                    Pontos Positivos
+                  </h4>
+                  <ul className="text-xs text-gray-600 list-disc list-inside">
+                    {review.positive_points.slice(0, 2).map((point, index) => (
+                      <li key={index} className="line-clamp-1">{point}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {review.negative_points && review.negative_points.length > 0 && (
+                <div>
+                  <h4 className="text-sm font-semibold text-gray-800 mb-1.5">
+                    Pontos Negativos
+                  </h4>
+                  <ul className="text-xs text-gray-600 list-disc list-inside">
+                    {review.negative_points.slice(0, 2).map((point, index) => (
+                      <li key={index} className="line-clamp-1">{point}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="flex items-center justify-between text-xs text-gray-500 pt-3 border-t">
+              <span>{review.profiles.username}</span>
+              <span>
+                {formatDistanceToNow(new Date(review.created_at), {
+                  addSuffix: true,
+                  locale: ptBR
+                })}
+              </span>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+} 
