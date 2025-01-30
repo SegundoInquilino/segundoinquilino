@@ -78,15 +78,15 @@ export default function Sidebar({ isOpen, onClose, currentUserId }: SidebarProps
 
   const menuItems = [
     {
+      name: 'Home',
+      href: '/home',
+      icon: HomeIcon
+    },
+    {
       name: 'Dashboard',
       href: '/dashboard',
       icon: Squares2X2Icon,
       requiresAuth: true
-    },
-    {
-      name: 'Home',
-      href: '/home',
-      icon: HomeIcon
     },
     {
       name: 'Nova Review',

@@ -4,7 +4,8 @@ import { VisitReview } from '@/types/visit-review'
 import Image from 'next/image'
 import { formatDistanceToNow } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-import { HomeIcon, BuildingOfficeIcon, TrashIcon, MapPinIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
+import { HomeIcon, BuildingOfficeIcon, TrashIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
+import { MapPinIcon } from '@heroicons/react/24/solid'
 import { createClient } from '@/utils/supabase-client'
 import { useAuth } from '@/contexts/AuthContext'
 import toast from 'react-hot-toast'
@@ -189,7 +190,7 @@ export default function VisitReviewsList({ reviews }: VisitReviewsListProps) {
                     onClick={(e) => e.stopPropagation()}
                     className="flex items-start hover:text-purple-600 transition-colors"
                   >
-                    <MapPinIcon className="h-4 w-4 mt-0.5 mr-1 flex-shrink-0" />
+                    <MapPinIcon className="h-4 w-4 mt-0.5 mr-1 flex-shrink-0 text-purple-600" />
                     <div className="flex flex-col">
                       <span className="font-medium">Endereço:</span>
                       <span className="text-gray-600 hover:text-purple-600">{review.address}</span>
@@ -251,7 +252,14 @@ export default function VisitReviewsList({ reviews }: VisitReviewsListProps) {
 
               {/* Footer */}
               <div className="flex items-center justify-between text-xs text-gray-500 pt-3 border-t">
-                <span>{review.profiles.username}</span>
+                <div className="flex items-center space-x-2">
+                  <div className="w-6 h-6 rounded-full bg-gray-900 flex items-center justify-center flex-shrink-0">
+                    <span className="text-xs font-medium text-white">
+                      {review.profiles.username.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                  <span>{review.profiles.username}</span>
+                </div>
                 <span>
                   {formatDistanceToNow(new Date(review.created_at), {
                     addSuffix: true,

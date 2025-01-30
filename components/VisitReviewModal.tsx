@@ -118,7 +118,7 @@ export default function VisitReviewModal({ review, isOpen, onClose }: VisitRevie
                       rel="noopener noreferrer"
                       className="flex items-start text-gray-500 hover:text-purple-600 transition-colors"
                     >
-                      <MapPinIcon className="h-5 w-5 mt-0.5 mr-2 flex-shrink-0" />
+                      <MapPinIcon className="h-5 w-5 mt-0.5 mr-2 flex-shrink-0 text-purple-600" />
                       <div className="flex flex-col">
                         <span className="font-medium">Endereço:</span>
                         <span className="text-gray-600 hover:text-purple-600">{review.address}</span>
@@ -176,7 +176,14 @@ export default function VisitReviewModal({ review, isOpen, onClose }: VisitRevie
 
                   {/* Footer com informações do autor */}
                   <div className="flex items-center justify-between text-sm text-gray-500 pt-4 border-t">
-                    <span>{review.profiles.username}</span>
+                    <div className="flex items-center space-x-2">
+                      <div className="w-7 h-7 rounded-full bg-gray-900 flex items-center justify-center flex-shrink-0">
+                        <span className="text-sm font-medium text-white">
+                          {review.profiles.username.charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                      <span>{review.profiles.username}</span>
+                    </div>
                     <span>
                       {formatDistanceToNow(new Date(review.created_at), {
                         addSuffix: true,
