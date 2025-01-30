@@ -228,30 +228,17 @@ export default function ReviewsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50 py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Reviews</h1>
-          {currentUserId && (
-            <Link
-              href="/new-review"
-              className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
-            >
-              <svg
-                className="w-5 h-5 mr-2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
-              Nova Review
-            </Link>
-          )}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold text-gray-900">
+            Reviews de Imóveis
+          </h1>
+          <Link
+            href="/new-review"
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-purple-600 hover:bg-purple-700"
+          >
+            Nova Review
+          </Link>
         </div>
 
         <ReviewFilters onFilterChange={handleFilterChange} />
