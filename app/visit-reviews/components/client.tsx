@@ -17,11 +17,25 @@ interface VisitReviewsClientProps {
 export default function VisitReviewsClient({ initialReviews }: VisitReviewsClientProps) {
   const [searchTerm, setSearchTerm] = useState('')
   
-  // Filtrar reviews baseado na busca
-  const filteredReviews = initialReviews.filter(review => 
-    review.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (review.building_name && review.building_name.toLowerCase().includes(searchTerm.toLowerCase()))
-  )
+  // Atualizar a lógica de filtragem para incluir a origem
+  const filteredReviews = initialReviews.filter(review => {
+    const searchLower = searchTerm.toLowerCase()
+    
+    // Normalizar o texto da origem para exibição
+    const sourceDisplay = 
+      review.source === 'quintoandar' ? 'Quinto Andar' :
+      review.source === 'imovelweb' ? 'ImovelWeb' :
+      review.source === 'vivareal' ? 'Viva Real' :
+      review.source === 'zap' ? 'Zap Imóveis' :
+      review.source === 'other' ? 'Outro' :
+      review.source
+
+    return (
+      review.address.toLowerCase().includes(searchLower) ||
+      (review.building_name && review.building_name.toLowerCase().includes(searchLower)) ||
+      sourceDisplay.toLowerCase().includes(searchLower)
+    )
+  })
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -38,14 +52,14 @@ export default function VisitReviewsClient({ initialReviews }: VisitReviewsClien
       </div>
 
       {/* Campo de busca */}
-      <div className="mb-12">
+      <div className="mb-6">
         <div className="relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
           </div>
           <input
             type="text"
-            placeholder="Buscar por endereço ou nome do prédio..."
+            placeholder="Buscar por endereço, nome do prédio ou origem da visita..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-purple-500 focus:border-purple-500 sm:text-sm"

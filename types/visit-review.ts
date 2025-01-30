@@ -9,7 +9,7 @@ export type VisitReview = {
   comment?: string
   positive_points?: string[]
   negative_points?: string[]
-  source: 'quintoandar' | 'imovelweb' | 'vivareal' | 'zap' | 'other'
+  source: string
   photos?: string[]
   status: 'published' | 'draft' | 'deleted'
 } 

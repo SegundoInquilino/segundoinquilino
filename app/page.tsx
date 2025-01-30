@@ -74,10 +74,10 @@ export default async function HomePage() {
           <div className="text-center">
             <div className="flex justify-center mb-12">
               <Image
-                src="/images/Logo_SI_icon.png"
+                src="/images/favicon-96x96.png"
                 alt="Segundo Inquilino Logo"
-                width={130}
-                height={130}
+                width={150}
+                height={150}
                 className="h-auto w-auto"
                 priority
               />

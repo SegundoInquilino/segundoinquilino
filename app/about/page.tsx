@@ -9,7 +9,7 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <Image
-              src="/images/Logo_SI.png"
+              src="/images/si_mobile.png"
               alt="Segundo Inquilino Logo"
               width={300}
               height={300}

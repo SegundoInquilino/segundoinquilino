@@ -13,6 +13,8 @@ export default function VisitReviewForm() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [photos, setPhotos] = useState<string[]>([])
   const [propertyType, setPropertyType] = useState<'apartment' | 'house'>('apartment')
+  const [source, setSource] = useState<string>('quintoandar')
+  const [otherSource, setOtherSource] = useState<string>('')
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -24,20 +26,28 @@ export default function VisitReviewForm() {
     setIsSubmitting(true)
     const formData = new FormData(e.currentTarget)
     
-    const visitReview = {
-      user_id: currentUserId,
-      property_type: formData.get('property_type'),
-      building_name: propertyType === 'apartment' ? formData.get('building_name') : null,
-      address: formData.get('address'),
-      comment: formData.get('comment'),
-      positive_points: formData.get('positive_points')?.toString().split('\n').filter(Boolean),
-      negative_points: formData.get('negative_points')?.toString().split('\n').filter(Boolean),
-      source: formData.get('source'),
-      photos,
-      status: 'published'
-    }
-
     try {
+      if (source === 'other' && !otherSource.trim()) {
+        throw new Error('Por favor, especifique a origem da visita')
+      }
+
+      const finalSource = source === 'other' ? otherSource.trim() : source
+
+      const visitReview = {
+        user_id: currentUserId,
+        property_type: formData.get('property_type'),
+        building_name: propertyType === 'apartment' ? formData.get('building_name') : null,
+        address: formData.get('address'),
+        comment: formData.get('comment'),
+        positive_points: formData.get('positive_points')?.toString().split('\n').filter(Boolean),
+        negative_points: formData.get('negative_points')?.toString().split('\n').filter(Boolean),
+        source: finalSource,
+        photos,
+        status: 'published'
+      }
+
+      console.log('Dados a serem enviados:', visitReview)
+
       const supabase = createClient()
       const { error, data } = await supabase
         .from('visit_reviews')
@@ -45,15 +55,22 @@ export default function VisitReviewForm() {
         .select()
         .single()
 
-      if (error) throw error
+      if (error) {
+        console.error('Erro do Supabase:', error)
+        throw new Error(error.message)
+      }
 
-      console.log('Review criada:', data)
+      console.log('Review criada com sucesso:', data)
       toast.success('Review de visita criada com sucesso!')
       router.push('/visit-reviews')
       router.refresh()
     } catch (error) {
-      console.error('Erro ao criar review:', error)
-      toast.error('Erro ao criar review. Tente novamente.')
+      console.error('Erro detalhado:', error)
+      if (error instanceof Error) {
+        toast.error(error.message)
+      } else {
+        toast.error('Erro ao criar review. Tente novamente.')
+      }
     } finally {
       setIsSubmitting(false)
     }
@@ -138,13 +155,13 @@ export default function VisitReviewForm() {
         />
       </div>
 
-      <div>
+      <div className="space-y-4">
         <label className="block text-sm font-medium text-gray-700">
           Origem da Visita
         </label>
         <select
-          name="source"
-          required
+          value={source}
+          onChange={(e) => setSource(e.target.value)}
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
         >
           <option value="quintoandar">Quinto Andar</option>
@@ -153,6 +170,22 @@ export default function VisitReviewForm() {
           <option value="zap">Zap Imóveis</option>
           <option value="other">Outro</option>
         </select>
+
+        {source === 'other' && (
+          <div className="mt-2">
+            <label className="block text-sm font-medium text-gray-700">
+              Especifique a origem
+            </label>
+            <input
+              type="text"
+              value={otherSource}
+              onChange={(e) => setOtherSource(e.target.value)}
+              required
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+              placeholder="Ex: Imobiliária Local, Indicação, etc."
+            />
+          </div>
+        )}
       </div>
 
       <div>
