@@ -61,48 +61,48 @@ export default async function HomePage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Nova seção de CTA */}
-      <div className="mb-12 grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+      {/* Nova seção de CTA - Ajustada para mobile */}
+      <div className="mb-8 sm:mb-12 grid grid-cols-1 gap-4 sm:gap-6">
+        <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4 sm:p-6 shadow-sm hover:shadow-md transition-shadow">
           <h3 className="text-lg font-semibold text-purple-900 mb-2">
             Visitou um imóvel recentemente?
           </h3>
           <p className="text-purple-700 mb-4">
             Compartilhe sua experiência e ajude outros inquilinos a encontrarem o lugar ideal.
           </p>
-          <div className="space-x-4">
+          <div className="flex flex-col sm:flex-row gap-3 sm:space-x-4">
             <Link
               href="/visit-reviews"
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+              className="w-full sm:w-auto text-center inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
             >
               Ver Reviews de Visitas
             </Link>
             <Link
               href="/visit-reviews/new"
-              className="inline-flex items-center px-4 py-2 border border-purple-200 text-sm font-medium rounded-md shadow-sm text-purple-700 bg-white hover:bg-purple-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+              className="w-full sm:w-auto text-center inline-flex items-center justify-center px-4 py-2 border border-purple-200 text-sm font-medium rounded-md shadow-sm text-purple-700 bg-white hover:bg-purple-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
             >
               Criar Review
             </Link>
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+        <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 sm:p-6 shadow-sm hover:shadow-md transition-shadow">
           <h3 className="text-lg font-semibold text-blue-900 mb-2">
             Já está morando de aluguel?
           </h3>
           <p className="text-blue-700 mb-4">
             Conte sua experiência com o imóvel e ajude futuros inquilinos a tomarem a melhor decisão.
           </p>
-          <div className="space-x-4">
+          <div className="flex flex-col sm:flex-row gap-3 sm:space-x-4">
             <Link
               href="/reviews"
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="w-full sm:w-auto text-center inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
               Ver Reviews de Imóveis
             </Link>
             <Link
               href="/new-review"
-              className="inline-flex items-center px-4 py-2 border border-blue-200 text-sm font-medium rounded-md shadow-sm text-blue-700 bg-white hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="w-full sm:w-auto text-center inline-flex items-center justify-center px-4 py-2 border border-blue-200 text-sm font-medium rounded-md shadow-sm text-blue-700 bg-white hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
               Criar Review
             </Link>
@@ -110,8 +110,8 @@ export default async function HomePage() {
         </div>
       </div>
 
-      {/* Título existente */}
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">
+      {/* Título ajustado para mobile */}
+      <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6 px-1">
         Reviews Recentes
       </h2>
 
