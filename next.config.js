@@ -30,21 +30,7 @@ const nextConfig = {
     ]
   },
   async redirects() {
-    return [
-      // Remova ou comente o redirecionamento do blog
-      // {
-      //   source: '/blog',
-      //   destination: '/blog',
-      //   permanent: true,
-      // },
-    ]
-  },
-  webpack: (config) => {
-    config.module.rules.push({
-      test: /\.css$/,
-      use: ['style-loader', 'css-loader'],
-    })
-    return config
+    return []
   },
 }
 

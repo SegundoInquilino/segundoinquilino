@@ -13,6 +13,9 @@ import { Toaster } from 'react-hot-toast'
 import Script from 'next/script'
 import CookieConsent from '@/components/CookieConsent'
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration'
+import { NextRequest, NextResponse } from 'next/server'
+import 'slick-carousel/slick/slick.css'
+import 'slick-carousel/slick/slick-theme.css'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -63,6 +66,16 @@ export const metadata: Metadata = {
     ],
   },
   manifest: '/site.webmanifest',
+}
+
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+// Adicionar middleware para cookies
+export const middleware = async (request: NextRequest) => {
+  const response = NextResponse.next()
+  await Promise.resolve() // Garante que os cookies sejam processados
+  return response
 }
 
 export default async function RootLayout({
