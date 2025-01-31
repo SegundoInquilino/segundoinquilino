@@ -7,7 +7,7 @@ export default function ReviewGuidelines() {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
-    <div className="bg-purple-50 rounded-lg p-4">
+    <div className="bg-purple-50 rounded-xl p-4 mb-8">
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="w-full flex items-center justify-between text-left"

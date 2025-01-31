@@ -2,7 +2,7 @@
 
 import { VisitReview } from '@/types/review'
 import { useState } from 'react'
-import { StarIcon } from '@heroicons/react/24/solid'
+import { StarIcon, ArrowRightIcon } from '@heroicons/react/24/solid'
 import { MapPinIcon, ShareIcon, TrashIcon, LinkIcon } from '@heroicons/react/24/outline'
 import VisitReviewModal from './VisitReviewModal'
 import { useAuth } from '@/contexts/AuthContext'
@@ -10,6 +10,38 @@ import { createClient } from '@/utils/supabase-client'
 import toast from 'react-hot-toast'
 import { formatDistanceToNow } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+
+// Categorias de avaliação com labels
+const RATING_CATEGORIES = [
+  {
+    id: 'location',
+    label: 'Localização'
+  },
+  {
+    id: 'condition',
+    label: 'Estado do Imóvel'
+  },
+  {
+    id: 'rooms',
+    label: 'Quartos'
+  },
+  {
+    id: 'neighborhood',
+    label: 'Vizinhança'
+  },
+  {
+    id: 'amenities',
+    label: 'Comodidades'
+  },
+  {
+    id: 'renovation',
+    label: 'Necessidade de Reformas'
+  },
+  {
+    id: 'cost_benefit',
+    label: 'Custo-Benefício'
+  }
+] as const
 
 interface VisitReviewCardProps {
   review: VisitReview & {
@@ -105,108 +137,79 @@ export default function VisitReviewCard({ review }: VisitReviewCardProps) {
 
   return (
     <>
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-all duration-200">
-        {/* Header com usuário e nota média */}
-        <div className="flex justify-between items-start mb-5">
-          <div className="flex items-center">
-            {/* Avatar */}
-            <div className="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center text-white font-medium text-lg">
-              {review.profile?.username?.charAt(0).toUpperCase() || 'A'}
+      <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-4 sm:p-6 space-y-4">
+        {/* Header do card */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center flex-shrink-0">
+              <span className="text-white font-medium text-lg">
+                {review.profile?.username?.charAt(0).toUpperCase() || 'A'}
+              </span>
             </div>
-            
-            <div className="ml-3">
-              <h3 className="text-lg font-semibold text-gray-900">
+            <div>
+              <span className="font-medium text-gray-900">
                 {review.profile?.username || 'Usuário anônimo'}
-              </h3>
-              <p className="text-sm text-gray-500">
-                {formatDistanceToNow(new Date(review.created_at), { 
+              </span>
+              <span className="block text-sm text-gray-500">
+                {formatDistanceToNow(new Date(review.created_at), {
                   addSuffix: true,
-                  locale: ptBR 
+                  locale: ptBR
                 })}
-              </p>
+              </span>
             </div>
           </div>
-
-          <div className="flex items-center px-3 py-1 bg-yellow-50 rounded-lg">
-            <StarIcon className="h-5 w-5 text-yellow-400" />
-            <span className="ml-1 font-semibold text-gray-700">
-              {averageRating.toFixed(1)}
-            </span>
-          </div>
-        </div>
-
-        {/* Endereço clicável */}
-        <div className="space-y-3 mb-4">
-          <button
-            onClick={handleAddressClick}
-            className="w-full flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors mb-4 group"
-          >
-            <MapPinIcon className="h-5 w-5 text-gray-400 group-hover:text-purple-500 flex-shrink-0" />
-            <span className="ml-2 text-sm text-gray-600 group-hover:text-gray-900 line-clamp-1 text-left">
-              {review.full_address}
-            </span>
-          </button>
-
-          {/* Fonte da visita e tipo do imóvel */}
-          <div className="flex items-center space-x-2 px-1 flex-wrap gap-y-2">
-            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-              {getVisitSourceLabel(review.visit_source)}
-            </span>
-            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-              {getPropertyTypeLabel(review.property_type)}
-            </span>
-            {review.listing_url && (
-              <a
-                href={review.listing_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-purple-600 hover:text-purple-700 flex items-center text-sm"
+          <div className="flex items-center gap-2">
+            <div className="flex items-center px-3 py-1 bg-yellow-50 rounded-lg">
+              <StarIcon className="h-5 w-5 text-yellow-400" />
+              <span className="ml-1.5 font-semibold text-gray-700">
+                {averageRating.toFixed(1)}
+              </span>
+            </div>
+            {currentUserId === review.user_id && (
+              <button
+                onClick={handleDelete}
+                disabled={isDeleting}
+                className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
               >
-                <LinkIcon className="h-4 w-4 mr-1" />
-                <span>Ver anúncio</span>
-              </a>
+                <TrashIcon className="h-5 w-5" />
+              </button>
             )}
           </div>
         </div>
 
-        {/* Preview do comentário */}
-        <div className="mb-6">
-          <p className="text-gray-600 line-clamp-3 leading-relaxed">
-            {review.comments}
-          </p>
+        {/* Conteúdo do card */}
+        <div className="space-y-4">
+          {/* Endereço */}
+          <div className="flex items-start gap-3">
+            <MapPinIcon className="h-5 w-5 text-purple-600 flex-shrink-0 mt-0.5" />
+            <span className="text-gray-600 text-sm sm:text-base">
+              {review.full_address}
+            </span>
+          </div>
+
+          {/* Preview das avaliações */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-sm">
+            {Object.entries(review.ratings).slice(0, 3).map(([key, value]) => (
+              <div key={key} className="bg-gray-50 p-2 rounded-lg">
+                <div className="font-medium text-gray-700">
+                  {RATING_CATEGORIES.find(cat => cat.id === key)?.label}
+                </div>
+                <div className="flex items-center mt-1">
+                  <StarIcon className="h-4 w-4 text-yellow-400" />
+                  <span className="ml-1 text-gray-600">{value}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Botão de ver mais */}
           <button
             onClick={() => setIsModalOpen(true)}
-            className="mt-3 text-sm font-medium text-purple-600 hover:text-purple-700 transition-colors flex items-center"
+            className="w-full mt-4 bg-purple-50 hover:bg-purple-100 text-purple-700 font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
           >
             Ver avaliação completa
-            <svg className="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
+            <ArrowRightIcon className="h-4 w-4" />
           </button>
-        </div>
-
-        {/* Linha divisória */}
-        <div className="border-t border-gray-100 -mx-6 mb-4" />
-
-        {/* Ações */}
-        <div className="flex justify-end space-x-2 px-2">
-          <button
-            onClick={handleShare}
-            className="p-2 text-gray-400 hover:text-purple-600 rounded-full hover:bg-purple-50 transition-all"
-            title="Compartilhar"
-          >
-            <ShareIcon className="h-5 w-5" />
-          </button>
-          {currentUserId === review.user_id && (
-            <button
-              onClick={handleDelete}
-              disabled={isDeleting}
-              className="p-2 text-gray-400 hover:text-red-600 rounded-full hover:bg-red-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              title="Excluir"
-            >
-              <TrashIcon className="h-5 w-5" />
-            </button>
-          )}
         </div>
       </div>
 
@@ -214,6 +217,8 @@ export default function VisitReviewCard({ review }: VisitReviewCardProps) {
         review={review}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        isOwner={currentUserId === review.user_id}
+        onDelete={handleDelete}
       />
     </>
   )

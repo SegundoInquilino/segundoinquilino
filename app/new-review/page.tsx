@@ -151,10 +151,12 @@ export default function NewReview() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-6">Nova Review</h1>
+    <div className="max-w-3xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+      <h1 className="text-2xl font-bold text-gray-900 mb-8">Nova Review</h1>
 
-      <ReviewGuidelines />
+      <div className="mb-10">
+        <ReviewGuidelines />
+      </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-4">
