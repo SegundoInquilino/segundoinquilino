@@ -39,4 +39,25 @@ export interface Review {
   lived_from: string | null
   lived_until: string | null
   currently_living: boolean
+}
+
+export interface VisitReviewRatings {
+  location: number
+  condition: number
+  rooms: number
+  neighborhood: number
+  amenities: number
+  renovation: number
+  cost_benefit: number
+}
+
+export type VisitSource = 'imobiliaria' | 'corretor' | 'proprietario' | 'site' | 'outro'
+
+export interface VisitReview extends Review {
+  ratings: VisitReviewRatings
+  visit_source: VisitSource
+  listing_url?: string
+  comments?: string
+  images?: string[]
+  full_address?: string
 } 

@@ -6,234 +6,510 @@ import { createClient } from '@/utils/supabase-client'
 import { useAuth } from '@/contexts/AuthContext'
 import toast from 'react-hot-toast'
 import ImageUpload from './ImageUpload'
+import RatingInput from './RatingInput'
+import { StarIcon } from '@heroicons/react/24/solid'
+import VisitReviewGuidelines from './VisitReviewGuidelines'
 
-export default function VisitReviewForm() {
+// Definir as categorias de avaliação
+const RATING_CATEGORIES = [
+  {
+    id: 'location',
+    label: 'Localização',
+    description: 'Avalie a facilidade de acesso, proximidade de transporte público, segurança da região'
+  },
+  {
+    id: 'condition',
+    label: 'Estado do Imóvel',
+    description: 'Condições gerais de conservação, pintura, instalações elétricas e hidráulicas'
+  },
+  {
+    id: 'rooms',
+    label: 'Quartos',
+    description: 'Tamanho dos quartos, iluminação natural, ventilação, armários embutidos'
+  },
+  {
+    id: 'neighborhood',
+    label: 'Vizinhança',
+    description: 'Perfil dos vizinhos, barulho, convivência no prédio/região'
+  },
+  {
+    id: 'amenities',
+    label: 'Comodidades',
+    description: 'Proximidade de mercados, farmácias, restaurantes, lazer'
+  },
+  {
+    id: 'renovation',
+    label: 'Necessidade de Reformas',
+    description: 'Avalie se o imóvel precisa de reformas (1 = precisa muito, 5 = não precisa)'
+  },
+  {
+    id: 'cost_benefit',
+    label: 'Custo-Benefício',
+    description: 'Relação entre o valor pedido e o que o imóvel oferece'
+  }
+]
+
+const ESTADOS_BRASILEIROS = [
+  { value: 'AC', label: 'Acre' },
+  { value: 'AL', label: 'Alagoas' },
+  { value: 'AP', label: 'Amapá' },
+  { value: 'AM', label: 'Amazonas' },
+  { value: 'BA', label: 'Bahia' },
+  { value: 'CE', label: 'Ceará' },
+  { value: 'DF', label: 'Distrito Federal' },
+  { value: 'ES', label: 'Espírito Santo' },
+  { value: 'GO', label: 'Goiás' },
+  { value: 'MA', label: 'Maranhão' },
+  { value: 'MT', label: 'Mato Grosso' },
+  { value: 'MS', label: 'Mato Grosso do Sul' },
+  { value: 'MG', label: 'Minas Gerais' },
+  { value: 'PA', label: 'Pará' },
+  { value: 'PB', label: 'Paraíba' },
+  { value: 'PR', label: 'Paraná' },
+  { value: 'PE', label: 'Pernambuco' },
+  { value: 'PI', label: 'Piauí' },
+  { value: 'RJ', label: 'Rio de Janeiro' },
+  { value: 'RN', label: 'Rio Grande do Norte' },
+  { value: 'RS', label: 'Rio Grande do Sul' },
+  { value: 'RO', label: 'Rondônia' },
+  { value: 'RR', label: 'Roraima' },
+  { value: 'SC', label: 'Santa Catarina' },
+  { value: 'SP', label: 'São Paulo' },
+  { value: 'SE', label: 'Sergipe' },
+  { value: 'TO', label: 'Tocantins' }
+]
+
+// Definir o tipo para visit_source
+type VisitSource = 'imobiliaria' | 'corretor' | 'proprietario' | 'site' | 'outro'
+
+// Adicionar tipo para property_type
+type PropertyType = 'house' | 'apartment'
+
+interface VisitReviewFormProps {
+  userId: string
+}
+
+export default function VisitReviewForm({ userId }: VisitReviewFormProps) {
   const router = useRouter()
-  const { currentUserId } = useAuth()
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [photos, setPhotos] = useState<string[]>([])
-  const [propertyType, setPropertyType] = useState<'apartment' | 'house'>('apartment')
-  const [source, setSource] = useState<string>('quintoandar')
-  const [otherSource, setOtherSource] = useState<string>('')
-  const [listingUrl, setListingUrl] = useState<string>('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [ratings, setRatings] = useState<Record<string, number>>({})
+  const [images, setImages] = useState<File[]>([])
+  const [address, setAddress] = useState({
+    street: '',
+    number: '',
+    complement: '',
+    neighborhood: '',
+    city: '',
+    state: '',
+    postal_code: ''
+  })
+  const [propertyType, setPropertyType] = useState<PropertyType>('apartment')
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    if (!currentUserId) {
-      toast.error('Você precisa estar logado para criar uma review')
-      return
-    }
+    setLoading(true)
+    setError(null)
 
-    setIsSubmitting(true)
-    const formData = new FormData(e.currentTarget)
-    
     try {
-      if (source === 'other' && !otherSource.trim()) {
-        throw new Error('Por favor, especifique a origem da visita')
+      // Validações iniciais
+      const hasAllRatings = RATING_CATEGORIES.every(category => 
+        ratings[category.id] && ratings[category.id] > 0
+      )
+
+      if (!hasAllRatings) {
+        setError('Por favor, preencha todas as avaliações')
+        return
       }
 
-      const finalSource = source === 'other' ? otherSource.trim() : source
+      const form = e.currentTarget
+      const formData = new FormData(form)
+      const visitSource = formData.get('visit_source') as VisitSource
 
-      const visitReview = {
-        user_id: currentUserId,
-        property_type: formData.get('property_type'),
-        building_name: propertyType === 'apartment' ? formData.get('building_name') : null,
-        address: formData.get('address'),
-        comment: formData.get('comment'),
-        positive_points: formData.get('positive_points')?.toString().split('\n').filter(Boolean),
-        negative_points: formData.get('negative_points')?.toString().split('\n').filter(Boolean),
-        source: finalSource,
-        photos,
-        status: 'published',
-        listing_url: listingUrl
+      if (!visitSource) {
+        setError('Por favor, selecione como você visitou o imóvel')
+        return
       }
-
-      console.log('Dados a serem enviados:', visitReview)
 
       const supabase = createClient()
-      const { error, data } = await supabase
+
+      // Primeiro criar a review sem as imagens
+      const reviewData = {
+        user_id: userId,
+        visit_source: visitSource,
+        listing_url: formData.get('listing_url') || null,
+        ratings,
+        comments: formData.get('comments') || null,
+        images: [],
+        street: address.street,
+        number: address.number,
+        complement: address.complement || null,
+        neighborhood: address.neighborhood,
+        city: address.city,
+        state: address.state,
+        postal_code: address.postal_code,
+        property_type: propertyType,
+        address: `${address.street}, ${address.number}${
+          address.complement ? ` ${address.complement}` : ''
+        } - ${address.neighborhood}, ${address.city} - ${address.state}, ${address.postal_code}`,
+        full_address: `${address.street}, ${address.number}${
+          address.complement ? ` ${address.complement}` : ''
+        } - ${address.neighborhood}, ${address.city} - ${address.state}, ${address.postal_code}`
+      }
+
+      // Inserir a review primeiro
+      const { data: review, error: insertError } = await supabase
         .from('visit_reviews')
-        .insert(visitReview)
+        .insert(reviewData)
         .select()
         .single()
 
-      if (error) {
-        console.error('Erro do Supabase:', error)
-        throw new Error(error.message)
+      if (insertError) {
+        throw new Error(insertError.message || 'Erro ao salvar a avaliação')
       }
 
-      console.log('Review criada com sucesso:', data)
-      toast.success('Review de visita criada com sucesso!')
+      // Se houver imagens, fazer o upload em segundo plano
+      if (images.length > 0) {
+        toast.loading('Fazendo upload das imagens...', { duration: 3000 })
+        
+        // Upload das imagens em paralelo
+        const uploadPromises = images.map(async (image, index) => {
+          try {
+            const fileExt = image.name.split('.').pop()
+            const fileName = `${Math.random()}.${fileExt}`
+            const filePath = `${userId}/${fileName}`
+
+            console.log(`[Upload ${index + 1}/${images.length}] Iniciando:`, {
+              fileName,
+              filePath,
+              fileType: image.type,
+              userId
+            })
+
+            // Verificar se o usuário está autenticado
+            const { data: { session } } = await supabase.auth.getSession()
+            if (!session) {
+              throw new Error('Usuário não está autenticado')
+            }
+
+            // Primeiro fazer o upload
+            const { error: uploadError, data: uploadData } = await supabase.storage
+              .from('reviews_images')
+              .upload(filePath, image, {
+                cacheControl: '3600',
+                upsert: false,
+                contentType: image.type
+              })
+
+            if (uploadError) {
+              console.error('Upload error:', uploadError.message)
+              throw new Error(uploadError.message)
+            }
+
+            console.log(`[Upload ${index + 1}/${images.length}] Upload concluído:`, uploadData)
+
+            // Depois pegar a URL pública
+            const { data: urlData } = supabase.storage
+              .from('reviews_images')
+              .getPublicUrl(filePath)
+
+            if (!urlData) {
+              console.error(`[Upload ${index + 1}/${images.length}] Erro ao gerar URL`)
+              return null
+            }
+
+            console.log(`[Upload ${index + 1}/${images.length}] URL gerada:`, urlData)
+            return urlData.publicUrl
+
+          } catch (error) {
+            console.error(`[Upload ${index + 1}/${images.length}] Erro inesperado:`, {
+              error,
+              message: error instanceof Error ? error.message : 'Erro desconhecido',
+              stack: error instanceof Error ? error.stack : undefined
+            })
+            return null
+          }
+        })
+
+        // Aguardar todos os uploads
+        const imageUrls = (await Promise.all(uploadPromises)).filter(Boolean)
+        console.log('URLs finais:', imageUrls)
+
+        if (imageUrls.length > 0) {
+          // Atualizar a review com as URLs
+          const { error: updateError } = await supabase
+            .from('visit_reviews')
+            .update({ images: imageUrls })
+            .eq('id', review.id)
+
+          if (updateError) {
+            console.error('Erro ao atualizar imagens:', {
+              error: updateError,
+              code: updateError.code,
+              message: updateError.message,
+              details: updateError.details
+            })
+            toast.error('Algumas imagens não puderam ser salvas')
+          } else {
+            console.log('Review atualizada com sucesso com as imagens:', imageUrls)
+          }
+        } else {
+          console.warn('Nenhuma imagem foi carregada com sucesso')
+          toast.error('Não foi possível fazer o upload das imagens')
+        }
+      }
+
+      toast.success('Avaliação enviada com sucesso!')
       router.push('/visit-reviews')
-      router.refresh()
-    } catch (error) {
-      console.error('Erro detalhado:', error)
-      if (error instanceof Error) {
-        toast.error(error.message)
-      } else {
-        toast.error('Erro ao criar review. Tente novamente.')
-      }
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
 
-  const handleSourceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSource(e.target.value)
+    } catch (error) {
+      console.error('Erro ao enviar review:', error)
+      setError(error instanceof Error ? error.message : 'Erro ao enviar avaliação. Por favor, tente novamente.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      <VisitReviewGuidelines />
+      
+      {error && (
+        <div className="p-3 text-sm text-red-700 bg-red-100 rounded-lg">
+          {error}
+        </div>
+      )}
+
+      {/* Origem da visita e link do anúncio */}
+      <div className="space-y-6">
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Como você visitou o imóvel?
+          </label>
+          <select
+            name="visit_source"
+            required
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+          >
+            <option value="">Selecione...</option>
+            <option value="imobiliaria">Imobiliária</option>
+            <option value="corretor">Corretor</option>
+            <option value="proprietario">Proprietário</option>
+            <option value="site">Site (QuintoAndar, ImovelWeb, EmCasa, etc)</option>
+            <option value="outro">Outro</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Link do anúncio (opcional)
+          </label>
+          <input
+            type="url"
+            name="listing_url"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+            placeholder="https://..."
+          />
+        </div>
+      </div>
+
+      {/* Avaliações por categoria */}
+      <div className="space-y-6">
+        <h3 className="text-lg font-medium text-gray-900">Avaliações</h3>
+        
+        <div className="grid gap-6 md:grid-cols-2">
+          {RATING_CATEGORIES.map(category => (
+            <div key={category.id} className="border rounded-lg p-4 bg-white shadow-sm">
+              <label className="block text-sm font-medium text-gray-700">
+                {category.label}
+              </label>
+              <p className="mt-1 text-sm text-gray-500">
+                {category.description}
+              </p>
+              <div className="mt-3">
+                <RatingInput
+                  value={ratings[category.id] || 0}
+                  onChange={(value) => setRatings(prev => ({
+                    ...prev,
+                    [category.id]: value
+                  }))}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Comentários adicionais */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700">
+          Outros comentários
+        </label>
+        <p className="mt-1 text-sm text-gray-500">
+          Compartilhe outras observações relevantes sobre sua visita ao imóvel
+        </p>
+        <textarea
+          name="comments"
+          rows={4}
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+        />
+      </div>
+
+      {/* Upload de fotos */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700">
+          Fotos do imóvel (opcional)
+        </label>
+        <p className="mt-1 text-sm text-gray-500">
+          Adicione fotos que você tirou durante a visita
+        </p>
+        <ImageUpload
+          images={images}
+          onChange={setImages}
+          maxFiles={5}
+        />
+      </div>
+
+      {/* Campos de endereço */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Rua
+          </label>
+          <input
+            type="text"
+            required
+            value={address.street}
+            onChange={(e) => setAddress(prev => ({ ...prev, street: e.target.value }))}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Número
+            </label>
+            <input
+              type="text"
+              required
+              value={address.number}
+              onChange={(e) => setAddress(prev => ({ ...prev, number: e.target.value }))}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Complemento
+            </label>
+            <input
+              type="text"
+              value={address.complement}
+              onChange={(e) => setAddress(prev => ({ ...prev, complement: e.target.value }))}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Bairro
+          </label>
+          <input
+            type="text"
+            required
+            value={address.neighborhood}
+            onChange={(e) => setAddress(prev => ({ ...prev, neighborhood: e.target.value }))}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Cidade
+          </label>
+          <input
+            type="text"
+            required
+            value={address.city}
+            onChange={(e) => setAddress(prev => ({ ...prev, city: e.target.value }))}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Estado
+          </label>
+          <select
+            required
+            value={address.state}
+            onChange={(e) => setAddress(prev => ({ ...prev, state: e.target.value }))}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+          >
+            <option value="">Selecione...</option>
+            {ESTADOS_BRASILEIROS.map(estado => (
+              <option key={estado.value} value={estado.value}>
+                {estado.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            CEP
+          </label>
+          <input
+            type="text"
+            required
+            value={address.postal_code}
+            onChange={(e) => setAddress(prev => ({ ...prev, postal_code: e.target.value }))}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+          />
+        </div>
+      </div>
+
+      {/* Adicionar seleção de tipo de imóvel */}
       <div>
         <label className="block text-sm font-medium text-gray-700">
           Tipo de Imóvel
         </label>
-        <select
-          name="property_type"
-          required
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
-          onChange={(e) => setPropertyType(e.target.value as 'apartment' | 'house')}
-          value={propertyType}
-        >
-          <option value="apartment">Apartamento</option>
-          <option value="house">Casa</option>
-        </select>
-      </div>
-
-      {propertyType === 'apartment' && (
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Nome do Prédio
-          </label>
-          <input
-            type="text"
-            name="building_name"
-            required
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
-            placeholder="Ex: Edifício Solar das Flores"
-          />
-        </div>
-      )}
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700">
-          Endereço Completo
-        </label>
-        <input
-          type="text"
-          name="address"
-          required
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
-          placeholder="Ex: Rua das Flores, 123 - Bairro - Cidade/UF"
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700">
-          Comentário
-        </label>
-        <textarea
-          name="comment"
-          rows={4}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700">
-          Pontos Positivos (um por linha)
-        </label>
-        <textarea
-          name="positive_points"
-          rows={4}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700">
-          Pontos Negativos (um por linha)
-        </label>
-        <textarea
-          name="negative_points"
-          rows={4}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
-        />
-      </div>
-
-      <div className="space-y-4">
-        <label className="block text-sm font-medium text-gray-700">
-          Origem da Visita
-        </label>
-        <select
-          id="source"
-          name="source"
-          value={source}
-          onChange={handleSourceChange}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
-        >
-          <option value="">Selecione a origem</option>
-          <option value="quintoandar">Quinto Andar</option>
-          <option value="imovelweb">ImovelWeb</option>
-          <option value="vivareal">Viva Real</option>
-          <option value="zap">Zap Imóveis</option>
-          <option value="other">Outro</option>
-        </select>
-
-        {source === 'other' && (
-          <div className="mt-2">
-            <label className="block text-sm font-medium text-gray-700">
-              Especifique a origem
+        <div className="mt-2">
+          <div className="flex space-x-4">
+            <label className="inline-flex items-center">
+              <input
+                type="radio"
+                name="property_type"
+                value="apartment"
+                checked={propertyType === 'apartment'}
+                onChange={(e) => setPropertyType(e.target.value as PropertyType)}
+                className="form-radio h-4 w-4 text-purple-600"
+              />
+              <span className="ml-2">Apartamento</span>
             </label>
-            <input
-              type="text"
-              value={otherSource}
-              onChange={(e) => setOtherSource(e.target.value)}
-              required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
-              placeholder="Ex: Imobiliária Local, Indicação, etc."
-            />
+            <label className="inline-flex items-center">
+              <input
+                type="radio"
+                name="property_type"
+                value="house"
+                checked={propertyType === 'house'}
+                onChange={(e) => setPropertyType(e.target.value as PropertyType)}
+                className="form-radio h-4 w-4 text-purple-600"
+              />
+              <span className="ml-2">Casa</span>
+            </label>
           </div>
-        )}
-      </div>
-
-      <div>
-        <label htmlFor="listing_url" className="block text-sm font-medium text-gray-700">
-          Link do anúncio (opcional)
-        </label>
-        <div className="mt-1">
-          <input
-            type="url"
-            name="listing_url"
-            id="listing_url"
-            value={listingUrl}
-            onChange={(e) => setListingUrl(e.target.value)}
-            placeholder="https://www.quintoandar.com.br/imovel/..."
-            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
-          />
         </div>
-        <p className="mt-1 text-sm text-gray-500">
-          Adicione o link do anúncio original para referência futura
-        </p>
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700">
-          Fotos
-        </label>
-        <ImageUpload
-          onImagesUploaded={setPhotos}
-          maxImages={5}
-          existingImages={photos}
-        />
       </div>
 
       <button
         type="submit"
-        disabled={isSubmitting}
+        disabled={loading}
         className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50"
       >
-        {isSubmitting ? 'Enviando...' : 'Criar Review de Visita'}
+        {loading ? 'Enviando...' : 'Enviar avaliação'}
       </button>
     </form>
   )

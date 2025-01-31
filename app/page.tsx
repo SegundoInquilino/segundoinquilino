@@ -125,7 +125,7 @@ export default async function HomePage() {
             <div className="mt-12 bg-purple-50 py-12 rounded-3xl">
               <div className="max-w-4xl mx-auto px-4">
                 <h2 className="text-2xl font-bold text-center text-gray-900 mb-8">
-                  O que você quer saber sobre o Edifico/Casa? 🤔
+                  O que você quer saber sobre o Edifício/Casa? 🤔
                 </h2>
 
               

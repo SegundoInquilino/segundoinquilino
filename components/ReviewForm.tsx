@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { createClient } from '@/utils/supabase-client'
 import { useAuth } from '@/contexts/AuthContext'
 import { StarRating } from '@/components/ui/star-rating'
+import ReviewGuidelines from './ReviewGuidelines'
 
 interface ReviewFormProps {
   initialData?: {
@@ -90,6 +91,8 @@ const ReviewForm = ({ initialData, onSubmit }: ReviewFormProps) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl mx-auto p-6">
+      <ReviewGuidelines />
+
       <h2 className="text-2xl font-bold">Nova Review</h2>
 
       <div className="space-y-4">

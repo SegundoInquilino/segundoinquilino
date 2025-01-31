@@ -112,6 +112,10 @@ export default async function RootLayout({
           strategy="afterInteractive"
           src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
         />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#6B46C1" />
         <meta name="mobile-web-app-capable" content="yes" />
@@ -128,6 +132,11 @@ export default async function RootLayout({
         <link rel="icon" type="image/png" sizes="512x512" href="/web-app-manifest-512x512.png" />
         <link rel="apple-touch-icon" href="/web-app-manifest-192x192.png" />
         <link rel="apple-touch-startup-image" href="/web-app-manifest-192x192.png" />
+        <script 
+          src="https://www.google.com/recaptcha/enterprise.js" 
+          async 
+          defer
+        ></script>
       </head>
       <body className={inter.className}>
         <ServiceWorkerRegistration />

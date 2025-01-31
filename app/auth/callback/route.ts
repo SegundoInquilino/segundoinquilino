@@ -5,20 +5,45 @@ import { NextResponse } from 'next/server'
 export const dynamic = 'force-dynamic'
 
 export async function GET(request: Request) {
-  try {
-    const requestUrl = new URL(request.url)
-    const code = requestUrl.searchParams.get('code')
+  const requestUrl = new URL(request.url)
+  const code = requestUrl.searchParams.get('code')
+  const error = requestUrl.searchParams.get('error')
+  const error_description = requestUrl.searchParams.get('error_description')
 
-    if (code) {
-      const cookieStore = cookies()
-      const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
-      await supabase.auth.exchangeCodeForSession(code)
-    }
-
-    // Redirecionando para a página de reviews após o login
-    return NextResponse.redirect(new URL('/reviews', requestUrl.origin))
-  } catch (error) {
-    console.error('Erro no callback de autenticação:', error)
-    return NextResponse.redirect(new URL('/auth/error', request.url))
+  // Se houver erro de link expirado
+  if (error === 'access_denied' && error_description?.includes('expired')) {
+    // Redirecionar para página de reenvio de confirmação
+    return NextResponse.redirect(`${requestUrl.origin}/auth/resend-confirmation`)
   }
+
+  if (code) {
+    const cookieStore = cookies()
+    const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
+    
+    try {
+      // Verificar se o email foi confirmado
+      const { error } = await supabase.auth.exchangeCodeForSession(code)
+      
+      if (error) {
+        console.error('Erro na confirmação:', error)
+        return NextResponse.redirect(`${requestUrl.origin}/auth/error`)
+      }
+
+      // Atualizar o status de verificação
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        await supabase.from('profiles')
+          .update({ email_confirmed_at: new Date().toISOString() })
+          .eq('id', user.id)
+      }
+
+      return NextResponse.redirect(`${requestUrl.origin}/auth/success`)
+    } catch (error) {
+      console.error('Erro no callback:', error)
+      return NextResponse.redirect(`${requestUrl.origin}/auth/error`)
+    }
+  }
+
+  // Se não houver código, redirecionar para página de erro
+  return NextResponse.redirect(`${requestUrl.origin}/auth/error`)
 } 

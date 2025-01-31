@@ -6,6 +6,7 @@ import ImageUpload from '@/components/ImageUpload'
 import { useRouter } from 'next/navigation'
 import AmenitiesSelector from '@/components/AmenitiesSelector'
 import { DatePicker } from '@/components/ui/date-picker'
+import ReviewGuidelines from '@/components/ReviewGuidelines'
 
 // Lista completa de estados brasileiros
 const ESTADOS_BRASILEIROS = [
@@ -153,37 +154,7 @@ export default function NewReview() {
     <div className="max-w-2xl mx-auto p-4">
       <h1 className="text-2xl font-bold mb-6">Nova Review</h1>
 
-      <div className="bg-gradient-to-r from-primary-50 to-secondary-50 rounded-lg p-6 mb-8">
-        <h2 className="text-lg font-semibold text-gray-800 mb-4">
-          📝 Boas Práticas para sua Review
-        </h2>
-        <div className="space-y-3 text-gray-600">
-          <p className="font-medium text-primary-600 mb-2">
-            Compartilhe informações relevantes que ajudarão outros inquilinos a tomar uma decisão informada:
-          </p>
-          <ul className="list-disc list-inside space-y-2 ml-2">
-            <li>Como foi/é sua experiência morando no apartamento?</li>
-            <li>O prédio possui acessibilidade? (elevadores, rampas, etc)</li>
-            <li>Como é a segurança do local e da região?</li>
-            <li>Existem estabelecimentos próximos? (mercados, farmácias, etc)</li>
-            <li>Como é o transporte público da região? (metrô, ônibus, etc)</li>
-            <li>Como é a qualidade da infraestrutura? (água, luz, internet)</li>
-            <li>Existe barulho excessivo? (vizinhos, rua, obras)</li>
-            <li>Como é a administração do condomínio?</li>
-            <li>Há áreas de lazer? Como é a manutenção?</li>
-          </ul>
-          <div className="mt-4 text-sm bg-white p-4 rounded-lg border border-primary-100">
-            <p className="font-medium text-primary-600">💡 Dicas importantes:</p>
-            <ul className="list-disc list-inside space-y-1 mt-2 text-gray-600">
-              <li>Seja honesto e imparcial em sua avaliação</li>
-              <li>Inclua tanto pontos positivos quanto negativos</li>
-              <li>Adicione fotos para ilustrar melhor sua experiência</li>
-              <li>Evite informações pessoais ou que identifiquem outras pessoas</li>
-              <li>Mantenha um tom construtivo e respeitoso</li>
-            </ul>
-          </div>
-        </div>
-      </div>
+      <ReviewGuidelines />
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-4">
@@ -348,8 +319,17 @@ export default function NewReview() {
             Fotos do Apartamento
           </label>
           <ImageUpload
-            onUploadComplete={(urls) => setImageUrls(urls)}
-            maxImages={5}
+            images={[]}
+            onChange={(files) => {
+              // Para preview local
+              const urls = files.map(file => URL.createObjectURL(file))
+              setImageUrls(urls)
+            }}
+            onUploadComplete={(urls) => {
+              // URLs finais do Supabase
+              setImageUrls(urls)
+            }}
+            maxFiles={5}
           />
         </div>
 
