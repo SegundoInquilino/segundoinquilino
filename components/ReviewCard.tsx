@@ -157,9 +157,10 @@ export default function ReviewCard({
             )}
 
             {/* Cabeçalho com informações do autor */}
-            <div className="flex justify-between items-start mb-5">
+            <div className="flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between mb-5">
+              {/* Informações do autor */}
               <div className="flex items-center gap-3">
-                <Avatar className="w-10 h-10">
+                <Avatar className="w-10 h-10 flex-shrink-0">
                   <AvatarImage src={review.profiles?.avatar_url || ''} />
                   <AvatarFallback className="bg-black text-white font-bold">
                     {getInitials(getReviewAuthor(review, userMap))}
@@ -175,7 +176,8 @@ export default function ReviewCard({
                 </div>
               </div>
 
-              <div className="flex items-center gap-3">
+              {/* Rating e botão deletar */}
+              <div className="flex items-center gap-2 self-end sm:self-auto">
                 <div className="bg-gray-50 px-3 py-1 rounded-full">
                   <StarRating rating={review.rating} size="sm" />
                 </div>
@@ -186,7 +188,7 @@ export default function ReviewCard({
                       setShowDeleteDialog(true)
                     }}
                     disabled={isDeleting}
-                    className="text-gray-400 hover:text-red-500 transition-colors p-2 rounded-full hover:bg-red-50"
+                    className="p-2 text-gray-400 hover:text-red-500 transition-colors rounded-full hover:bg-red-50 flex-shrink-0"
                     title="Deletar review"
                   >
                     <TrashIcon className="w-5 h-5" />
