@@ -89,13 +89,13 @@ export default function Sidebar({ isOpen, onClose, currentUserId }: SidebarProps
       requiresAuth: true
     },
     {
-      name: 'Nova Review',
+      name: 'Review de Imóveis',
       href: '/new-review',
-      icon: PlusCircleIcon,
+      icon: HomeIcon,
       requiresAuth: true
     },
     {
-      name: 'Reviews de Visitas',
+      name: 'Review de Visitas',
       href: '/visit-reviews',
       icon: HomeIcon,
       requiresAuth: true
