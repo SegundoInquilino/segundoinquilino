@@ -138,15 +138,40 @@ export default function ReviewCard({
     <>
       <div className={`
         w-full bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200
-        ${isModal ? 'p-6' : 'p-5'}
+        ${isModal ? 'p-6' : 'p-4 sm:p-5'}
         ${layout === 'profile' ? 'max-w-2xl mx-auto' : ''}
       `}>
         {!isModal ? (
           <>
+            {/* Rating no topo */}
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <div className="bg-yellow-50 px-3 py-1.5 rounded-lg">
+                  <StarRating rating={review.rating} size="sm" />
+                </div>
+                <span className="text-sm font-medium text-gray-500">
+                  {review.rating.toFixed(1)}
+                </span>
+              </div>
+              {currentUserId === review.user_id && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setShowDeleteDialog(true)
+                  }}
+                  disabled={isDeleting}
+                  className="p-1.5 text-gray-400 hover:text-red-500 transition-colors rounded-full hover:bg-red-50 flex-shrink-0"
+                  title="Deletar review"
+                >
+                  <TrashIcon className="w-5 h-5" />
+                </button>
+              )}
+            </div>
+
             {/* Carrossel de imagens */}
             {review.images && review.images.length > 0 && (
               <div className={`
-                -mx-5 -mt-5 mb-6
+                -mx-4 sm:-mx-5 -mt-0 mb-6
                 ${layout === 'profile' ? 'aspect-video' : ''}
               `}>
                 <ImageCarousel 
@@ -156,67 +181,42 @@ export default function ReviewCard({
               </div>
             )}
 
-            {/* Cabeçalho com informações do autor */}
-            <div className="flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between mb-5">
-              {/* Informações do autor */}
-              <div className="flex items-center gap-3">
-                <Avatar className="w-10 h-10 flex-shrink-0">
-                  <AvatarImage src={review.profiles?.avatar_url || ''} />
-                  <AvatarFallback className="bg-black text-white font-bold">
-                    {getInitials(getReviewAuthor(review, userMap))}
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <h3 className="font-semibold text-gray-900">
-                    {getReviewAuthor(review, userMap)}
-                  </h3>
-                  <p className="text-sm text-gray-500">
-                    {formatDate(review.created_at)}
-                  </p>
-                </div>
-              </div>
-
-              {/* Rating e botão deletar */}
-              <div className="flex items-center gap-2 self-end sm:self-auto">
-                <div className="bg-gray-50 px-3 py-1 rounded-full">
-                  <StarRating rating={review.rating} size="sm" />
-                </div>
-                {currentUserId === review.user_id && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      setShowDeleteDialog(true)
-                    }}
-                    disabled={isDeleting}
-                    className="p-2 text-gray-400 hover:text-red-500 transition-colors rounded-full hover:bg-red-50 flex-shrink-0"
-                    title="Deletar review"
-                  >
-                    <TrashIcon className="w-5 h-5" />
-                  </button>
-                )}
+            {/* Header do card com autor e data */}
+            <div className="flex items-center gap-3 mb-6">
+              <Avatar className="w-10 h-10 flex-shrink-0">
+                <AvatarImage src={review.profiles?.avatar_url || ''} />
+                <AvatarFallback className="bg-black text-white font-bold">
+                  {getInitials(getReviewAuthor(review, userMap))}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <h3 className="font-semibold text-gray-900">
+                  {getReviewAuthor(review, userMap)}
+                </h3>
+                <p className="text-sm text-gray-500">
+                  {formatDate(review.created_at)}
+                </p>
               </div>
             </div>
 
             {/* Informações do imóvel */}
             <div className="space-y-4 mb-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-gray-50 rounded-lg">
+                <div className="p-2 bg-gray-50 rounded-lg flex-shrink-0">
                   {(review.apartments.property_type || 'apartment') === 'house' ? (
                     <HomeIcon className="w-5 h-5 text-gray-700" />
                   ) : (
                     <BuildingOfficeIcon className="w-5 h-5 text-gray-700" />
                   )}
                 </div>
-                <h3 className="text-lg font-bold text-gray-900">
+                <h3 className="text-lg font-bold text-gray-900 line-clamp-1">
                   {review.apartments.building_name}
                 </h3>
               </div>
 
               {formatPeriod() && (
                 <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <div className="p-1.5 bg-gray-50 rounded-lg">
-                    <CalendarIcon className="w-4 h-4" />
-                  </div>
+                  <CalendarIcon className="w-4 h-4 flex-shrink-0" />
                   <span>{formatPeriod()}</span>
                 </div>
               )}
@@ -226,26 +226,31 @@ export default function ReviewCard({
             <div className="space-y-3 mb-6">
               <a 
                 href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                  `${review.apartments.address}, ${review.apartments.neighborhood}, ${review.apartments.city} - ${review.apartments.state}`
+                  getReviewAddress(review)
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-3 group"
+                className="flex items-start gap-3 group"
+                onClick={(e) => e.stopPropagation()}
               >
-                <div className="p-2 bg-blue-600 group-hover:bg-blue-700 rounded-lg transition-colors">
+                <div className="p-2 bg-blue-600 group-hover:bg-blue-700 rounded-lg flex-shrink-0">
                   <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
                 </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-gray-900 font-medium line-clamp-1">{getReviewAddress(review)}</p>
-                  <p className="text-sm text-gray-500">{getReviewLocation(review)}</p>
+                <div className="space-y-1 flex-1">
+                  <p className="text-sm text-gray-900 font-medium line-clamp-1">
+                    {getReviewAddress(review)}
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    {getReviewLocation(review)}
+                  </p>
                 </div>
               </a>
 
               {review.rental_source && (
-                <div className="flex items-center gap-2 text-sm text-gray-600 pl-2 border-l-2 border-gray-100">
+                <div className="flex items-center gap-2 text-sm text-gray-600 pl-3 border-l-2 border-gray-100">
                   <span className="font-medium">Alugado via:</span>
                   <span className="text-gray-500">{review.rental_source}</span>
                 </div>
