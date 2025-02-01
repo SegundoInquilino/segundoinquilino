@@ -370,104 +370,65 @@ export default function VisitReviewForm({ userId }: VisitReviewFormProps) {
         />
       </div>
 
-      {/* Campos de endereço */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* Endereço */}
+      <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Rua
+          <label htmlFor="address" className="block text-sm font-medium text-gray-700">
+            Nome da Rua *
           </label>
           <input
             type="text"
-            required
+            id="address"
+            name="address"
             value={address.street}
-            onChange={(e) => setAddress(prev => ({ ...prev, street: e.target.value }))}
+            onChange={(e) => {
+              // Remove números e caracteres especiais, mantém apenas letras, espaços e pontuação básica
+              const value = e.target.value.replace(/[0-9]/g, '')
+              setAddress(prev => ({ ...prev, street: value }))
+            }}
+            required
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+            placeholder="Ex: Rua das Flores"
+            pattern="^[A-Za-zÀ-ÖØ-öø-ÿ\s\.,'-]+$"
+            title="Digite apenas o nome da rua, sem números"
           />
+          <p className="mt-1 text-sm text-gray-500">
+            Digite apenas o nome da rua, sem o número
+          </p>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Número
+            <label htmlFor="neighborhood" className="block text-sm font-medium text-gray-700">
+              Bairro *
             </label>
             <input
               type="text"
+              id="neighborhood"
+              name="neighborhood"
+              value={address.neighborhood}
+              onChange={(e) => setAddress(prev => ({ ...prev, neighborhood: e.target.value }))}
               required
-              value={address.number}
-              onChange={(e) => setAddress(prev => ({ ...prev, number: e.target.value }))}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+              placeholder="Ex: Centro"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Complemento
+            <label htmlFor="city" className="block text-sm font-medium text-gray-700">
+              Cidade *
             </label>
             <input
               type="text"
-              value={address.complement}
-              onChange={(e) => setAddress(prev => ({ ...prev, complement: e.target.value }))}
+              id="city"
+              name="city"
+              value={address.city}
+              onChange={(e) => setAddress(prev => ({ ...prev, city: e.target.value }))}
+              required
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+              placeholder="Ex: São Paulo"
             />
           </div>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Bairro
-          </label>
-          <input
-            type="text"
-            required
-            value={address.neighborhood}
-            onChange={(e) => setAddress(prev => ({ ...prev, neighborhood: e.target.value }))}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Cidade
-          </label>
-          <input
-            type="text"
-            required
-            value={address.city}
-            onChange={(e) => setAddress(prev => ({ ...prev, city: e.target.value }))}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Estado
-          </label>
-          <select
-            required
-            value={address.state}
-            onChange={(e) => setAddress(prev => ({ ...prev, state: e.target.value }))}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
-          >
-            <option value="">Selecione...</option>
-            {ESTADOS_BRASILEIROS.map(estado => (
-              <option key={estado.value} value={estado.value}>
-                {estado.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            CEP
-          </label>
-          <input
-            type="text"
-            required
-            value={address.postal_code}
-            onChange={(e) => setAddress(prev => ({ ...prev, postal_code: e.target.value }))}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
-          />
         </div>
       </div>
 

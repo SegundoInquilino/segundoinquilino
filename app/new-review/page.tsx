@@ -45,7 +45,6 @@ interface FormData {
   neighborhood: string
   city: string
   state: string
-  zipCode: string
   rating: number
   comment: string
   propertyType: string
@@ -60,7 +59,6 @@ export default function NewReview() {
     neighborhood: '',
     city: '',
     state: '',
-    zipCode: '',
     rating: 5,
     comment: '',
     propertyType: 'apartment',
@@ -96,8 +94,8 @@ export default function NewReview() {
           neighborhood: formData.neighborhood,
           city: formData.city,
           state: formData.state,
-          zip_code: formData.zipCode,
-          property_type: formData.propertyType
+          property_type: formData.propertyType,
+          zip_code: null  // ou usar um valor padrão como '00000-000'
         })
         .select()
         .single()
@@ -196,18 +194,27 @@ export default function NewReview() {
 
           <div>
             <label htmlFor="address" className="block text-sm font-medium text-black">
-              Endereço *
+              Nome da Rua *
             </label>
             <input
               type="text"
               id="address"
               name="address"
               value={formData.address}
-              onChange={handleChange}
+              onChange={(e) => {
+                // Remove números e caracteres especiais, mantém apenas letras, espaços e pontuação básica
+                const value = e.target.value.replace(/[0-9]/g, '')
+                setFormData(prev => ({ ...prev, address: value }))
+              }}
               required
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              placeholder="Ex: Rua das Flores, 123"
+              placeholder="Ex: Rua das Flores"
+              pattern="^[A-Za-zÀ-ÖØ-öø-ÿ\s\.,'-]+$"
+              title="Digite apenas o nome da rua, sem números"
             />
+            <p className="mt-1 text-sm text-gray-500">
+              Digite apenas o nome da rua, sem o número
+            </p>
           </div>
 
           <div>
@@ -254,18 +261,6 @@ export default function NewReview() {
                 </option>
               ))}
             </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-black">CEP</label>
-            <input
-              type="text"
-              name="zipCode"
-              value={formData.zipCode}
-              onChange={handleChange}
-              required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            />
           </div>
         </div>
 
